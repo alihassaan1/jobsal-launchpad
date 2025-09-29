@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -69,6 +72,11 @@ export default {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
+        'albanian-red': {
+          DEFAULT: 'hsl(var(--albanian-red))',
+          dark: 'hsl(var(--albanian-red-dark))',
+          light: 'hsl(var(--albanian-red-light))',
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -78,6 +86,7 @@ export default {
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-hero': 'var(--gradient-hero)',
+        'gradient-accent': 'var(--gradient-accent)',
       },
       keyframes: {
         "accordion-down": {

@@ -9,44 +9,48 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 15%;
 
-    --primary: 217 91% 60%;
+    --primary: 0 85% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 0 0% 97%;
+    --secondary-foreground: 0 0% 15%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 217 91% 60%;
+    --accent: 0 85% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 217 91% 60%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+    --ring: 0 85% 60%;
 
     --radius: 0.5rem;
 
-    /* Job Portal Specific Colors */
-    --primary-glow: 217 91% 70%;
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%), hsl(142 76% 36%));
-    --success: 142 76% 36%;
+    /* Albanian Red & White Theme */
+    --albanian-red: 0 85% 60%;
+    --albanian-red-dark: 0 85% 50%;
+    --albanian-red-light: 0 85% 70%;
+    --primary-glow: 0 85% 70%;
+    --gradient-primary: linear-gradient(135deg, hsl(var(--albanian-red)), hsl(var(--primary-glow)));
+    --gradient-hero: linear-gradient(135deg, hsl(0 85% 60%), hsl(0 85% 70%));
+    --gradient-accent: linear-gradient(45deg, hsl(0 85% 60%), hsl(0 0% 100%));
+    --success: 120 60% 50%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 45 100% 51%;
     --warning-foreground: 0 0% 100%;
-    --info: 199 89% 48%;
+    --info: 200 100% 50%;
     --info-foreground: 0 0% 100%;
 
     --sidebar-background: 0 0% 98%;
@@ -67,43 +71,47 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 5%;
+    --foreground: 0 0% 98%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 217 91% 60%;
+    --primary: 0 85% 65%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 217 91% 60%;
+    --accent: 0 85% 65%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 217 91% 60%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 0 85% 65%;
 
-    /* Job Portal Specific Colors - Dark Mode */
-    --primary-glow: 217 91% 70%;
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 55%), hsl(142 70% 30%));
-    --success: 142 70% 30%;
+    /* Albanian Red & White Theme - Dark Mode */
+    --albanian-red: 0 85% 65%;
+    --albanian-red-dark: 0 85% 55%;
+    --albanian-red-light: 0 85% 75%;
+    --primary-glow: 0 85% 75%;
+    --gradient-primary: linear-gradient(135deg, hsl(var(--albanian-red)), hsl(var(--primary-glow)));
+    --gradient-hero: linear-gradient(135deg, hsl(0 85% 65%), hsl(0 85% 75%));
+    --gradient-accent: linear-gradient(45deg, hsl(0 85% 65%), hsl(0 0% 15%));
+    --success: 120 60% 45%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 85% 45%;
+    --warning: 45 95% 48%;
     --warning-foreground: 0 0% 100%;
-    --info: 199 80% 43%;
+    --info: 200 95% 48%;
     --info-foreground: 0 0% 100%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
