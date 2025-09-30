@@ -176,11 +176,10 @@ const Index = () => {
       </section>
 
       {/* Featured Jobs */}
-      <section className="py-16 relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-background to-muted/20"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-12 animate-fade-up">
-            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+      <section className="py-16 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4 text-foreground">
               Featured Jobs
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
@@ -189,22 +188,27 @@ const Index = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredJobs.map((job, index) => (
-              <Card key={job.id} className="hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group border-0 shadow-lg bg-card/95 backdrop-blur animate-fade-up" style={{animationDelay: `${index * 0.2}s`}}>
-                <CardHeader className="relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="flex items-start justify-between relative z-10">
+            {featuredJobs.map((job) => (
+              <Card key={job.id} className="hover:shadow-xl transition-all duration-300 border border-border/50 bg-card">
+                <CardHeader className="space-y-4">
+                  <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-3">
-                      <Avatar className="ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
-                        <AvatarFallback className="bg-gradient-to-br from-primary to-primary-foreground text-white font-semibold">{job.logo}</AvatarFallback>
+                      <Avatar className="h-12 w-12 border-2 border-primary/20">
+                        <AvatarFallback className="bg-primary text-white font-semibold text-sm">
+                          {job.logo}
+                        </AvatarFallback>
                       </Avatar>
                       <div>
-                        <CardTitle className="text-lg group-hover:text-primary transition-colors duration-300">{job.title}</CardTitle>
-                        <CardDescription className="group-hover:text-foreground/80 transition-colors duration-300">{job.company}</CardDescription>
+                        <CardTitle className="text-lg font-semibold text-foreground">
+                          {job.title}
+                        </CardTitle>
+                        <CardDescription className="text-sm">
+                          {job.company}
+                        </CardDescription>
                       </div>
                     </div>
                     {job.featured && (
-                      <Badge variant="default" className="bg-gradient-to-r from-primary to-primary-foreground shadow-lg animate-pulse">
+                      <Badge variant="default" className="bg-primary text-white border-0 shadow-sm">
                         <Star className="w-3 h-3 mr-1 fill-current" />
                         Featured
                       </Badge>
@@ -212,7 +216,7 @@ const Index = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
+                  <div className="flex items-center text-sm text-muted-foreground">
                     <MapPin className="h-4 w-4 mr-2 text-primary" />
                     {job.location}
                   </div>
@@ -228,25 +232,25 @@ const Index = () => {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {job.skills.map((skill) => (
-                      <Badge key={skill} variant="secondary" className="text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-300 cursor-default">
+                      <Badge key={skill} variant="secondary" className="text-xs font-normal">
                         {skill}
                       </Badge>
                     ))}
                   </div>
-                  <Button className="w-full group/btn shadow-lg hover:shadow-xl transition-all duration-300">
-                    <Briefcase className="mr-2 h-4 w-4 group-hover/btn:rotate-12 transition-transform" />
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-white shadow-sm">
+                    <Briefcase className="mr-2 h-4 w-4" />
                     Apply Now
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          <div className="text-center mt-12 animate-fade-up" style={{animationDelay: '1s'}}>
-            <Button variant="outline" size="lg" className="shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 group">
+          <div className="text-center mt-12">
+            <Button variant="outline" size="lg" className="shadow-sm hover:bg-accent">
               View All Jobs
-              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
