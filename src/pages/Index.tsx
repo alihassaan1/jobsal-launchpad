@@ -113,18 +113,12 @@ const Index = () => {
       {/* Hero Section */}
       <section 
         className="relative py-20 bg-gradient-hero overflow-hidden"
-        style={{
-          backgroundImage: `linear-gradient(135deg, rgba(220, 38, 127, 0.9), rgba(220, 38, 127, 0.8)), url(${heroBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
-        }}
       >
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full animate-float"></div>
-          <div className="absolute top-32 right-20 w-24 h-24 bg-white/5 rounded-full animate-float" style={{animationDelay: '1s'}}></div>
-          <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-white/5 rounded-full animate-float" style={{animationDelay: '2s'}}></div>
+        {/* Subtle geometric pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 70px)`
+          }}></div>
         </div>
         
         <div className="container mx-auto px-4 text-center relative z-10">
@@ -283,7 +277,7 @@ const Index = () => {
               <Card key={category.name} className="text-center hover:shadow-2xl transition-all duration-500 cursor-pointer group border-0 shadow-lg bg-card/95 backdrop-blur hover:-translate-y-2 animate-fade-up" style={{animationDelay: `${index * 0.1}s`}}>
                 <CardContent className="p-6 relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="text-5xl mb-4 animate-float group-hover:scale-110 transition-transform duration-500" style={{animationDelay: `${index * 0.5}s`}}>
+                  <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-500">
                     {category.icon}
                   </div>
                   <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors duration-300 text-lg">
