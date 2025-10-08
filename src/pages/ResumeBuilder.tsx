@@ -145,6 +145,33 @@ export default function ResumeBuilder() {
         if (error) throw error;
         return data;
       } else {
+        // Check if a resume with same title already exists in last 5 minutes (likely duplicate click)
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const { data: existingResumes } = await supabase
+          .from("resumes")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("title", `${resumeData.personal_info.full_name || "My"} Resume`)
+          .gte("created_at", fiveMinutesAgo)
+          .eq("is_active", true)
+          .limit(1);
+
+        if (existingResumes && existingResumes.length > 0) {
+          // Update the existing one instead of creating duplicate
+          const { data, error } = await supabase
+            .from("resumes")
+            .update({
+              data: resumeData as any,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", existingResumes[0].id)
+            .select()
+            .single();
+
+          if (error) throw error;
+          return data;
+        }
+
         // Insert new resume
         const { data, error } = await supabase
           .from("resumes")
