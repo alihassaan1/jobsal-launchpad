@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_settings: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_encrypted: boolean | null
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_encrypted?: boolean | null
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_encrypted?: boolean | null
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: string | null
+        }
+        Relationships: []
+      }
       analytics: {
         Row: {
           company_id: string | null
@@ -413,6 +446,60 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          ats_access: boolean | null
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          featured_jobs_limit: number
+          id: string
+          is_active: boolean | null
+          job_posts_limit: number
+          name: string
+          price_monthly: number
+          price_yearly: number
+          priority_support: boolean | null
+          resume_views_limit: number
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          ats_access?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          featured_jobs_limit?: number
+          id?: string
+          is_active?: boolean | null
+          job_posts_limit?: number
+          name: string
+          price_monthly?: number
+          price_yearly?: number
+          priority_support?: boolean | null
+          resume_views_limit?: number
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          ats_access?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          featured_jobs_limit?: number
+          id?: string
+          is_active?: boolean | null
+          job_posts_limit?: number
+          name?: string
+          price_monthly?: number
+          price_yearly?: number
+          priority_support?: boolean | null
+          resume_views_limit?: number
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           ats_access: boolean | null
@@ -422,6 +509,7 @@ export type Database = {
           featured_jobs_limit: number | null
           id: string
           job_posts_limit: number | null
+          plan_id: string | null
           priority_support: boolean | null
           resume_views_limit: number | null
           status: Database["public"]["Enums"]["subscription_status"]
@@ -439,6 +527,7 @@ export type Database = {
           featured_jobs_limit?: number | null
           id?: string
           job_posts_limit?: number | null
+          plan_id?: string | null
           priority_support?: boolean | null
           resume_views_limit?: number | null
           status?: Database["public"]["Enums"]["subscription_status"]
@@ -456,6 +545,7 @@ export type Database = {
           featured_jobs_limit?: number | null
           id?: string
           job_posts_limit?: number | null
+          plan_id?: string | null
           priority_support?: boolean | null
           resume_views_limit?: number | null
           status?: Database["public"]["Enums"]["subscription_status"]
@@ -465,7 +555,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -493,6 +591,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_post_job: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

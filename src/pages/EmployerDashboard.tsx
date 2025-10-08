@@ -135,6 +135,12 @@ const EmployerDashboard = () => {
             <span className="text-xl font-bold">Jobs.al</span>
           </Link>
           <div className="flex gap-2">
+            <Link to="/employer/analytics">
+              <Button variant="ghost">Analytics</Button>
+            </Link>
+            <Link to="/employer/subscription">
+              <Button variant="ghost">Subscription</Button>
+            </Link>
             <Link to="/jobs">
               <Button variant="ghost">Browse Jobs</Button>
             </Link>
@@ -343,6 +349,19 @@ const JobForm = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  // Check subscription limits
+  const { data: canPost } = useQuery({
+    queryKey: ["can-post-job", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("can_post_job", {
+        user_id: user!.id,
+      });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id && !job?.id, // Only check when creating new job
+  });
   const [formData, setFormData] = useState({
     title: job?.title || "",
     description: job?.description || "",
@@ -362,6 +381,11 @@ const JobForm = ({
 
   const createJobMutation = useMutation({
     mutationFn: async (data: any) => {
+      // Check limit before creating new job
+      if (!job?.id && canPost === false) {
+        throw new Error("You've reached your job posting limit. Please upgrade your subscription.");
+      }
+      
       const slug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       const jobData = {
         ...data,

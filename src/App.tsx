@@ -13,6 +13,10 @@ import CandidateDashboard from "./pages/CandidateDashboard";
 import ATSJobApplications from "./pages/ATSJobApplications";
 import ResumeTemplates from "./pages/ResumeTemplates";
 import ResumeBuilder from "./pages/ResumeBuilder";
+import AdminSubscriptions from "./pages/AdminSubscriptions";
+import AdminAnalytics from "./pages/AdminAnalytics";
+import EmployerAnalytics from "./pages/EmployerAnalytics";
+import EmployerSubscription from "./pages/EmployerSubscription";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +38,10 @@ const App = () => (
             <Route path="/ats/jobs/:jobId" element={<ATSJobApplications />} />
             <Route path="/resume-templates" element={<ResumeTemplates />} />
             <Route path="/resume-builder" element={<ResumeBuilder />} />
+            <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
+            <Route path="/admin/analytics" element={<AdminAnalytics />} />
+            <Route path="/employer/analytics" element={<EmployerAnalytics />} />
+            <Route path="/employer/subscription" element={<EmployerSubscription />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
