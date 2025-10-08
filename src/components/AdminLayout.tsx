@@ -25,6 +25,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
+  SidebarInset,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -77,7 +78,6 @@ function AdminSidebar() {
     navigate('/');
   };
 
-  const isCollapsed = state === 'collapsed';
 
   return (
     <Sidebar collapsible="icon">
@@ -142,20 +142,18 @@ export default function AdminLayout() {
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full bg-background">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="h-14 border-b flex items-center px-4 bg-card gap-4">
-            <SidebarTrigger />
-            <div className="flex-1">
-              <h1 className="text-lg font-semibold">Jobs.al Admin</h1>
-            </div>
-          </header>
-          <main className="flex-1 overflow-auto">
-            <Outlet />
-          </main>
-        </div>
-      </div>
+      <AdminSidebar />
+      <SidebarInset>
+        <header className="h-14 border-b flex items-center px-4 bg-card gap-4">
+          <SidebarTrigger />
+          <div className="flex-1">
+            <h1 className="text-lg font-semibold">Jobs.al Admin</h1>
+          </div>
+        </header>
+        <main className="flex-1 overflow-auto">
+          <Outlet />
+        </main>
+      </SidebarInset>
     </SidebarProvider>
   );
 }
