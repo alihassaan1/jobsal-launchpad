@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, MapPin, Building2, Users, TrendingUp, Star, ArrowRight, Briefcase, Clock, DollarSign, Sparkles, LogOut, User } from "lucide-react";
+import { Search, MapPin, Building2, Users, TrendingUp, Star, ArrowRight, Briefcase, Clock, DollarSign, Sparkles, LogOut, User, Calendar } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,8 +14,85 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import heroBg from "@/assets/hero-bg.jpg";
 import patternBg from "@/assets/pattern-bg.jpg";
+
+// Blog section component
+const BlogSection = () => {
+  const navigate = useNavigate();
+  const [latestPosts, setLatestPosts] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchLatestPosts();
+  }, []);
+
+  const fetchLatestPosts = async () => {
+    const { data } = await supabase
+      .from('posts')
+      .select('id, title, slug, excerpt, featured_image, category, published_at')
+      .eq('is_published', true)
+      .order('published_at', { ascending: false })
+      .limit(3);
+
+    if (data) setLatestPosts(data);
+  };
+
+  if (latestPosts.length === 0) return null;
+
+  return (
+    <section className="py-16 bg-muted/30">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Latest from our blog</h2>
+          <p className="text-muted-foreground">Expert career advice and job market insights</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {latestPosts.map(post => (
+            <Card 
+              key={post.id}
+              className="cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate(`/blog/${post.slug}`)}
+            >
+              {post.featured_image && (
+                <div className="h-40 overflow-hidden">
+                  <img 
+                    src={post.featured_image} 
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              <CardHeader>
+                <Badge variant="secondary" className="w-fit mb-2">{post.category}</Badge>
+                <CardTitle className="text-lg line-clamp-2">{post.title}</CardTitle>
+                <CardDescription className="line-clamp-2">{post.excerpt}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4 mr-1" />
+                  {new Date(post.published_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="text-center mt-8">
+          <Button variant="outline" onClick={() => navigate('/blog')}>
+            View All Articles
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 
 const Index = () => {
   const { user, signOut, userRole } = useAuth();
@@ -106,6 +183,10 @@ const Index = () => {
                 </a>
                 <a href="/ai-resume-builder" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
                   Resume Builder
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="/blog" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
+                  Blog
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                 </a>
                 <a href="/resume-builder-al" className="text-foreground hover:text-primary transition-colors duration-300 relative group flex items-center gap-1">
@@ -459,6 +540,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Latest Blog Posts */}
+      <BlogSection />
+
       {/* Footer */}
       <footer className="bg-secondary py-12">
         <div className="container mx-auto px-4">
@@ -496,6 +580,7 @@ const Index = () => {
               <h3 className="font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="#" className="hover:text-primary">About Us</a></li>
+                <li><a href="/blog" className="hover:text-primary">Blog</a></li>
                 <li><a href="#" className="hover:text-primary">Contact</a></li>
                 <li><a href="#" className="hover:text-primary">Privacy Policy</a></li>
                 <li><a href="#" className="hover:text-primary">Terms of Service</a></li>

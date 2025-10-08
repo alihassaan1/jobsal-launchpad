@@ -496,6 +496,20 @@ const ResumeBuilderLanding = () => {
           </div>
         </div>
       </section>
+
+      {/* Related Blog Articles - SEO linking */}
+      <section className="py-12 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl font-bold mb-4">Learn More About Resume Writing</h2>
+            <p className="text-muted-foreground mb-8">Check out our expert guides on the Jobs.al blog</p>
+            <Button variant="outline" onClick={() => navigate('/blog?category=Resume Tips')}>
+              View Resume Tips & Guides
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
     </div>
     </>
   );
