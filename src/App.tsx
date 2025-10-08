@@ -11,6 +11,8 @@ import JobDetail from "./pages/JobDetail";
 import EmployerDashboard from "./pages/EmployerDashboard";
 import CandidateDashboard from "./pages/CandidateDashboard";
 import ATSJobApplications from "./pages/ATSJobApplications";
+import ResumeTemplates from "./pages/ResumeTemplates";
+import ResumeBuilder from "./pages/ResumeBuilder";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +32,8 @@ const App = () => (
             <Route path="/dashboard" element={<EmployerDashboard />} />
             <Route path="/my-applications" element={<CandidateDashboard />} />
             <Route path="/ats/jobs/:jobId" element={<ATSJobApplications />} />
+            <Route path="/resume-templates" element={<ResumeTemplates />} />
+            <Route path="/resume-builder" element={<ResumeBuilder />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

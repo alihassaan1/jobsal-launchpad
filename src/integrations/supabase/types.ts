@@ -334,6 +334,7 @@ export type Database = {
           is_premium: boolean | null
           name: string
           preview_url: string | null
+          slug: string | null
           template_data: Json
           updated_at: string
         }
@@ -346,6 +347,7 @@ export type Database = {
           is_premium?: boolean | null
           name: string
           preview_url?: string | null
+          slug?: string | null
           template_data: Json
           updated_at?: string
         }
@@ -358,10 +360,58 @@ export type Database = {
           is_premium?: boolean | null
           name?: string
           preview_url?: string | null
+          slug?: string | null
           template_data?: Json
           updated_at?: string
         }
         Relationships: []
+      }
+      resumes: {
+        Row: {
+          ai_match_score: number | null
+          created_at: string
+          data: Json
+          extracted_data: Json | null
+          id: string
+          is_active: boolean | null
+          template_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_match_score?: number | null
+          created_at?: string
+          data?: Json
+          extracted_data?: Json | null
+          id?: string
+          is_active?: boolean | null
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_match_score?: number | null
+          created_at?: string
+          data?: Json
+          extracted_data?: Json | null
+          id?: string
+          is_active?: boolean | null
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resumes_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "resume_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {

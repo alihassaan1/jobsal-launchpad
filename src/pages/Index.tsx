@@ -392,14 +392,42 @@ const Index = () => {
             Join thousands of job seekers and employers who trust jobs.al for their career needs
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary">
-              <Users className="mr-2 h-4 w-4" />
-              Find Jobs
-            </Button>
-            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary">
-              <Building2 className="mr-2 h-4 w-4" />
-              Post a Job
-            </Button>
+            {user ? (
+              userRole === "employer" ? (
+                <>
+                  <Button size="lg" variant="secondary" onClick={() => navigate('/dashboard')}>
+                    <Building2 className="mr-2 h-4 w-4" />
+                    Post a Job
+                  </Button>
+                  <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary" onClick={() => navigate('/jobs')}>
+                    <Users className="mr-2 h-4 w-4" />
+                    Browse Jobs
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button size="lg" variant="secondary" onClick={() => navigate('/jobs')}>
+                    <Users className="mr-2 h-4 w-4" />
+                    Find Jobs
+                  </Button>
+                  <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary" onClick={() => navigate('/resume-builder')}>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Build Resume
+                  </Button>
+                </>
+              )
+            ) : (
+              <>
+                <Button size="lg" variant="secondary" onClick={() => navigate('/jobs')}>
+                  <Users className="mr-2 h-4 w-4" />
+                  Find Jobs
+                </Button>
+                <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary" onClick={() => navigate('/auth')}>
+                  <Building2 className="mr-2 h-4 w-4" />
+                  Post a Job
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -422,10 +450,10 @@ const Index = () => {
             <div>
               <h3 className="font-semibold mb-4">For Job Seekers</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary">Browse Jobs</a></li>
+                <li><a href="/jobs" className="hover:text-primary">Browse Jobs</a></li>
                 <li><a href="#" className="hover:text-primary">Career Advice</a></li>
-                <li><a href="#" className="hover:text-primary">Resume Builder</a></li>
-                <li><a href="#" className="hover:text-primary">Salary Guide</a></li>
+                <li><a href="/resume-templates" className="hover:text-primary">Resume Templates</a></li>
+                <li><a href="/resume-builder" className="hover:text-primary">Resume Builder</a></li>
               </ul>
             </div>
             <div>
