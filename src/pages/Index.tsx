@@ -130,8 +130,14 @@ const Index = () => {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                      {userRole === 'employer' || userRole === 'admin' ? 'Dashboard' : 'Profile'}
+                    </DropdownMenuItem>
+                    {userRole === 'job_seeker' && (
+                      <DropdownMenuItem onClick={() => navigate('/my-applications')}>
+                        My Applications
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => signOut()}>
                       <LogOut className="mr-2 h-4 w-4" />

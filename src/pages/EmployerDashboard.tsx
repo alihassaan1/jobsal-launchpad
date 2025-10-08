@@ -273,6 +273,14 @@ const EmployerDashboard = () => {
                           <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => navigate(`/ats/jobs/${job.id}`)}
+                          >
+                            <Users className="h-4 w-4 mr-1" />
+                            {job.applications_count}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => navigate(`/jobs/${job.slug}`)}
                           >
                             <Eye className="h-4 w-4" />

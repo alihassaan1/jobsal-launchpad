@@ -1,0 +1,416 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Briefcase, ArrowLeft, FileText, Mail, Phone, MapPin, Calendar, Download } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const ATSJobApplications = () => {
+  const { jobId } = useParams();
+  const { user, userRole } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedApplication, setSelectedApplication] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  if (userRole !== "employer" && userRole !== "admin") {
+    navigate("/");
+    return null;
+  }
+
+  // Fetch job details
+  const { data: job } = useQuery({
+    queryKey: ["job", jobId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select(`
+          *,
+          companies (name)
+        `)
+        .eq("id", jobId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch applications for this job
+  const { data: applications, isLoading } = useQuery({
+    queryKey: ["jobApplications", jobId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("applications")
+        .select(`
+          *,
+          profiles (
+            full_name,
+            email,
+            phone,
+            location
+          )
+        `)
+        .eq("job_id", jobId)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Update application status
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ applicationId, status, notes }: { applicationId: string; status: string; notes?: string }) => {
+      const updateData: any = { status };
+      if (notes !== undefined) updateData.notes = notes;
+
+      const { error } = await supabase
+        .from("applications")
+        .update(updateData)
+        .eq("id", applicationId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jobApplications"] });
+      toast({ title: "Application updated successfully" });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error updating application",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      applied: "bg-blue-100 text-blue-800",
+      viewed: "bg-purple-100 text-purple-800",
+      shortlisted: "bg-yellow-100 text-yellow-800",
+      interview: "bg-orange-100 text-orange-800",
+      hired: "bg-green-100 text-green-800",
+      rejected: "bg-red-100 text-red-800",
+    };
+    return colors[status] || "bg-gray-100 text-gray-800";
+  };
+
+  const filterByStatus = (status?: string) => {
+    if (!applications) return [];
+    let filtered = applications;
+
+    if (status && status !== "all") {
+      filtered = filtered.filter((app: any) => app.status === status);
+    }
+
+    if (searchTerm) {
+      filtered = filtered.filter((app: any) =>
+        app.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        app.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    return filtered;
+  };
+
+  const downloadResume = async (resumeUrl: string) => {
+    const { data, error } = await supabase.storage.from("resumes").download(resumeUrl);
+    if (error) {
+      toast({ title: "Error downloading resume", description: error.message, variant: "destructive" });
+      return;
+    }
+
+    const url = URL.createObjectURL(data);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = resumeUrl.split("/").pop() || "resume.pdf";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <Briefcase className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold">Jobs.al</span>
+          </Link>
+          <div className="flex gap-2">
+            <Link to="/dashboard">
+              <Button variant="ghost">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Job Header */}
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-3xl mb-2">{job?.title}</CardTitle>
+                <CardDescription className="text-base">{job?.companies?.name}</CardDescription>
+              </div>
+              <Link to={`/jobs/${job?.slug}`}>
+                <Button variant="outline">View Job Posting</Button>
+              </Link>
+            </div>
+          </CardHeader>
+        </Card>
+
+        {/* Stats */}
+        <div className="grid md:grid-cols-6 gap-4 mb-8">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{applications?.length || 0}</div>
+            </CardContent>
+          </Card>
+          {["applied", "viewed", "shortlisted", "interview", "hired"].map((status) => (
+            <Card key={status}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground capitalize">
+                  {status}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {applications?.filter((a: any) => a.status === status).length || 0}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Search and Filters */}
+        <div className="mb-6">
+          <Input
+            placeholder="Search by name or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-md"
+          />
+        </div>
+
+        {/* Applications List */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* List View */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Applications</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="all">
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="all">All</TabsTrigger>
+                    <TabsTrigger value="applied">Applied</TabsTrigger>
+                    <TabsTrigger value="shortlisted">Shortlisted</TabsTrigger>
+                    <TabsTrigger value="interview">Interview</TabsTrigger>
+                    <TabsTrigger value="hired">Hired</TabsTrigger>
+                  </TabsList>
+
+                  {["all", "applied", "shortlisted", "interview", "hired"].map((status) => (
+                    <TabsContent key={status} value={status} className="space-y-4">
+                      {isLoading ? (
+                        <div className="space-y-3">
+                          {[1, 2, 3].map((i) => (
+                            <div key={i} className="h-24 bg-muted animate-pulse rounded-lg" />
+                          ))}
+                        </div>
+                      ) : filterByStatus(status === "all" ? undefined : status).length > 0 ? (
+                        filterByStatus(status === "all" ? undefined : status).map((application: any) => (
+                          <Card
+                            key={application.id}
+                            className={`cursor-pointer transition-all ${
+                              selectedApplication?.id === application.id ? "ring-2 ring-primary" : "hover:shadow-md"
+                            }`}
+                            onClick={() => setSelectedApplication(application)}
+                          >
+                            <CardHeader className="pb-3">
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <CardTitle className="text-lg">
+                                    {application.profiles?.full_name || "Unknown Applicant"}
+                                  </CardTitle>
+                                  <CardDescription className="flex items-center gap-1 mt-1">
+                                    <Mail className="h-3 w-3" />
+                                    {application.profiles?.email}
+                                  </CardDescription>
+                                </div>
+                                <Badge className={getStatusColor(application.status)}>
+                                  {application.status}
+                                </Badge>
+                              </div>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  {new Date(application.created_at).toLocaleDateString()}
+                                </span>
+                                {application.ai_match_score && (
+                                  <span className="font-medium text-primary">
+                                    Match: {application.ai_match_score}%
+                                  </span>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))
+                      ) : (
+                        <div className="text-center py-12 text-muted-foreground">
+                          No applications in this category
+                        </div>
+                      )}
+                    </TabsContent>
+                  ))}
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Detail View */}
+          <div className="lg:col-span-1">
+            {selectedApplication ? (
+              <Card className="sticky top-20">
+                <CardHeader>
+                  <CardTitle>{selectedApplication.profiles?.full_name}</CardTitle>
+                  <CardDescription>{selectedApplication.profiles?.email}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Contact Info */}
+                  <div className="space-y-2">
+                    {selectedApplication.profiles?.phone && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        {selectedApplication.profiles.phone}
+                      </div>
+                    )}
+                    {selectedApplication.profiles?.location && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        {selectedApplication.profiles.location}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Status Update */}
+                  <div>
+                    <Label>Application Status</Label>
+                    <Select
+                      value={selectedApplication.status}
+                      onValueChange={(value) =>
+                        updateStatusMutation.mutate({
+                          applicationId: selectedApplication.id,
+                          status: value,
+                        })
+                      }
+                    >
+                      <SelectTrigger className="mt-2">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="applied">Applied</SelectItem>
+                        <SelectItem value="viewed">Viewed</SelectItem>
+                        <SelectItem value="shortlisted">Shortlisted</SelectItem>
+                        <SelectItem value="interview">Interview</SelectItem>
+                        <SelectItem value="hired">Hired</SelectItem>
+                        <SelectItem value="rejected">Rejected</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Resume */}
+                  {selectedApplication.resume_url && (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => downloadResume(selectedApplication.resume_url)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download Resume
+                    </Button>
+                  )}
+
+                  {/* Cover Letter */}
+                  {selectedApplication.cover_letter && (
+                    <div>
+                      <Label>Cover Letter</Label>
+                      <div className="mt-2 p-3 bg-muted rounded-lg text-sm max-h-48 overflow-y-auto">
+                        {selectedApplication.cover_letter}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Notes */}
+                  <div>
+                    <Label htmlFor="notes">Internal Notes</Label>
+                    <Textarea
+                      id="notes"
+                      placeholder="Add notes about this candidate..."
+                      value={selectedApplication.notes || ""}
+                      onChange={(e) => {
+                        setSelectedApplication({ ...selectedApplication, notes: e.target.value });
+                      }}
+                      onBlur={(e) => {
+                        updateStatusMutation.mutate({
+                          applicationId: selectedApplication.id,
+                          status: selectedApplication.status,
+                          notes: e.target.value,
+                        });
+                      }}
+                      rows={4}
+                      className="mt-2"
+                    />
+                  </div>
+
+                  {/* Application Date */}
+                  <div className="text-sm text-muted-foreground">
+                    Applied on {new Date(selectedApplication.created_at).toLocaleDateString()}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="sticky top-20">
+                <CardContent className="p-12 text-center text-muted-foreground">
+                  Select an application to view details
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ATSJobApplications;

@@ -7,12 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Briefcase, MapPin, DollarSign, Building2, Calendar, Users, Share2, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import ApplyToJobDialog from "@/components/ApplyToJobDialog";
 
 const JobDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user, userRole } = useAuth();
+  const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
 
   const { data: job, isLoading } = useQuery({
     queryKey: ["job", slug],
@@ -71,13 +73,31 @@ const JobDetail = () => {
     return `Up to ${currency}${max?.toLocaleString()}`;
   };
 
+  // Check if user has already applied
+  const { data: hasApplied } = useQuery({
+    queryKey: ["hasApplied", job?.id, user?.id],
+    enabled: !!job?.id && !!user?.id && userRole === "job_seeker",
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("applications")
+        .select("id")
+        .eq("job_id", job!.id)
+        .eq("applicant_id", user!.id)
+        .single();
+      return !!data;
+    },
+  });
+
   const handleApply = () => {
     if (!user) {
       navigate("/auth");
       return;
     }
-    // Will integrate with applications later
-    alert("Application feature coming soon!");
+    if (userRole !== "job_seeker") {
+      alert("Only job seekers can apply to jobs");
+      return;
+    }
+    setIsApplyDialogOpen(true);
   };
 
   const handleShare = () => {
@@ -195,8 +215,13 @@ const JobDetail = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex gap-4 mb-6">
-                  <Button onClick={handleApply} size="lg" className="flex-1">
-                    Apply Now
+                  <Button
+                    onClick={handleApply}
+                    size="lg"
+                    className="flex-1"
+                    disabled={hasApplied || !job.is_active}
+                  >
+                    {hasApplied ? "Already Applied" : job.is_active ? "Apply Now" : "Position Closed"}
                   </Button>
                   <Button variant="outline" size="lg">
                     Save Job
@@ -378,6 +403,15 @@ const JobDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Apply Dialog */}
+      {job && (
+        <ApplyToJobDialog
+          job={job}
+          isOpen={isApplyDialogOpen}
+          onClose={() => setIsApplyDialogOpen(false)}
+        />
+      )}
     </div>
   );
 };
