@@ -142,8 +142,8 @@ const Index = () => {
                         <DropdownMenuItem onClick={() => navigate('/my-applications')}>
                           My Applications
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/resume-builder')}>
-                          Resume Builder
+                        <DropdownMenuItem onClick={() => navigate('/my-resumes')}>
+                          My Resumes
                         </DropdownMenuItem>
                       </>
                     )}

@@ -61,6 +61,7 @@ export default function ResumeBuilder() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const templateId = searchParams.get("template");
+  const resumeId = searchParams.get("id");
   const queryClient = useQueryClient();
 
   const [resumeData, setResumeData] = useState<ResumeData>({
@@ -98,30 +99,80 @@ export default function ResumeBuilder() {
     enabled: !!templateId,
   });
 
+  // Load existing resume if editing
+  const { data: existingResume, isLoading: resumeLoading } = useQuery({
+    queryKey: ["resume", resumeId],
+    queryFn: async () => {
+      if (!resumeId || !user) return null;
+      const { data, error } = await supabase
+        .from("resumes")
+        .select("*")
+        .eq("id", resumeId)
+        .eq("user_id", user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!resumeId && !!user,
+  });
+
+  // Load resume data when existingResume is fetched
+  useEffect(() => {
+    if (existingResume?.data) {
+      setResumeData(existingResume.data as unknown as ResumeData);
+    }
+  }, [existingResume]);
+
   const saveResumeMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("User not authenticated");
 
-      const { data, error } = await supabase
-        .from("resumes")
-        .insert([{
-          user_id: user.id,
-          template_id: templateId || null,
-          title: `${resumeData.personal_info.full_name || "My"} Resume`,
-          data: resumeData as any,
-        }])
-        .select()
-        .single();
+      if (resumeId) {
+        // Update existing resume
+        const { data, error } = await supabase
+          .from("resumes")
+          .update({
+            title: `${resumeData.personal_info.full_name || "My"} Resume`,
+            data: resumeData as any,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", resumeId)
+          .eq("user_id", user.id)
+          .select()
+          .single();
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        return data;
+      } else {
+        // Insert new resume
+        const { data, error } = await supabase
+          .from("resumes")
+          .insert([{
+            user_id: user.id,
+            template_id: templateId || null,
+            title: `${resumeData.personal_info.full_name || "My"} Resume`,
+            data: resumeData as any,
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
-        title: "Resume saved",
-        description: "Your resume has been saved successfully",
+        title: resumeId ? "Resume updated" : "Resume saved",
+        description: resumeId ? "Your resume has been updated successfully" : "Your resume has been saved successfully",
       });
       queryClient.invalidateQueries({ queryKey: ["user-resumes"] });
+      queryClient.invalidateQueries({ queryKey: ["resume", resumeId] });
+      
+      // If creating new resume, redirect to edit mode
+      if (!resumeId && data) {
+        navigate(`/resume-builder?id=${data.id}`, { replace: true });
+      }
     },
     onError: (error) => {
       toast({
@@ -299,23 +350,31 @@ export default function ResumeBuilder() {
         <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">AI Resume Builder</h1>
+            <h1 className="text-3xl font-bold">
+              {resumeId ? "Edit Resume" : "AI Resume Builder"}
+            </h1>
             <p className="text-muted-foreground">
-              {template ? `Using ${template.name} template` : "Build your professional resume"}
+              {resumeLoading ? "Loading..." : template ? `Using ${template.name} template` : resumeId ? "Update your professional resume" : "Build your professional resume"}
             </p>
           </div>
           <div className="flex gap-2">
             <Button
+              variant="outline"
+              onClick={() => navigate('/my-resumes')}
+            >
+              View All Resumes
+            </Button>
+            <Button
               onClick={() => saveResumeMutation.mutate()}
-              disabled={saveResumeMutation.isPending}
+              disabled={saveResumeMutation.isPending || resumeLoading}
             >
               {saveResumeMutation.isPending ? (
                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>
               ) : (
-                <><Save className="mr-2 h-4 w-4" /> Save Resume</>
+                <><Save className="mr-2 h-4 w-4" /> {resumeId ? "Update Resume" : "Save Resume"}</>
               )}
             </Button>
-            <Button variant="outline" onClick={exportToPDF}>
+            <Button variant="outline" onClick={exportToPDF} disabled={resumeLoading}>
               <Download className="mr-2 h-4 w-4" /> Export PDF
             </Button>
           </div>
