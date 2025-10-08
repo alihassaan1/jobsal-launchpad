@@ -486,13 +486,18 @@ export type Database = {
       }
       subscription_plans: {
         Row: {
+          ai_access: boolean | null
+          analytics_enabled: boolean | null
           ats_access: boolean | null
+          company_page: boolean | null
           created_at: string | null
+          currency: string | null
           description: string | null
           display_order: number | null
           featured_jobs_limit: number
           id: string
           is_active: boolean | null
+          is_popular: boolean | null
           job_posts_limit: number
           name: string
           price_monthly: number
@@ -500,16 +505,22 @@ export type Database = {
           priority_support: boolean | null
           resume_views_limit: number
           slug: string
+          support_level: string | null
           updated_at: string | null
         }
         Insert: {
+          ai_access?: boolean | null
+          analytics_enabled?: boolean | null
           ats_access?: boolean | null
+          company_page?: boolean | null
           created_at?: string | null
+          currency?: string | null
           description?: string | null
           display_order?: number | null
           featured_jobs_limit?: number
           id?: string
           is_active?: boolean | null
+          is_popular?: boolean | null
           job_posts_limit?: number
           name: string
           price_monthly?: number
@@ -517,16 +528,22 @@ export type Database = {
           priority_support?: boolean | null
           resume_views_limit?: number
           slug: string
+          support_level?: string | null
           updated_at?: string | null
         }
         Update: {
+          ai_access?: boolean | null
+          analytics_enabled?: boolean | null
           ats_access?: boolean | null
+          company_page?: boolean | null
           created_at?: string | null
+          currency?: string | null
           description?: string | null
           display_order?: number | null
           featured_jobs_limit?: number
           id?: string
           is_active?: boolean | null
+          is_popular?: boolean | null
           job_posts_limit?: number
           name?: string
           price_monthly?: number
@@ -534,6 +551,7 @@ export type Database = {
           priority_support?: boolean | null
           resume_views_limit?: number
           slug?: string
+          support_level?: string | null
           updated_at?: string | null
         }
         Relationships: []

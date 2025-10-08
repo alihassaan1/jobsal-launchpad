@@ -18,6 +18,7 @@ import AdminAnalytics from "./pages/AdminAnalytics";
 import EmployerAnalytics from "./pages/EmployerAnalytics";
 import EmployerSubscription from "./pages/EmployerSubscription";
 import RecommendedJobs from "./pages/RecommendedJobs";
+import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/employer/analytics" element={<EmployerAnalytics />} />
             <Route path="/employer/subscription" element={<EmployerSubscription />} />
             <Route path="/recommended-jobs" element={<RecommendedJobs />} />
+            <Route path="/pricing" element={<Pricing />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

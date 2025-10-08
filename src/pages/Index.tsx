@@ -96,7 +96,7 @@ const Index = () => {
                 <div className="absolute inset-0 bg-gradient-hero bg-clip-text text-transparent opacity-50 animate-shine"></div>
               </div>
               <nav className="hidden md:flex space-x-6">
-                <a href="#" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
+                <a href="/jobs" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
                   Find Jobs
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                 </a>
@@ -104,8 +104,8 @@ const Index = () => {
                   Companies
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                 </a>
-                <a href="#" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
-                  Post Job
+                <a href="/pricing" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
+                  Pricing
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                 </a>
                 <a href="#" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
@@ -470,7 +470,7 @@ const Index = () => {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="#" className="hover:text-primary">Post a Job</a></li>
                 <li><a href="#" className="hover:text-primary">Browse Resumes</a></li>
-                <li><a href="#" className="hover:text-primary">Pricing Plans</a></li>
+                <li><a href="/pricing" className="hover:text-primary">Pricing Plans</a></li>
                 <li><a href="#" className="hover:text-primary">ATS Integration</a></li>
               </ul>
             </div>
