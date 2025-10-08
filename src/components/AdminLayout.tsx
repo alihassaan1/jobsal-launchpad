@@ -96,16 +96,17 @@ function AdminSidebar() {
 }
 
 export default function AdminLayout() {
-  const { userRole } = useAuth();
+  const { userRole, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (userRole !== 'admin') {
+    if (!loading && userRole !== 'admin') {
       navigate('/');
       toast.error("Access denied");
     }
-  }, [userRole, navigate]);
+  }, [loading, userRole, navigate]);
 
+  if (loading) return null;
   if (userRole !== 'admin') {
     return null;
   }

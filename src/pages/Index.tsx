@@ -227,8 +227,13 @@ const Index = () => {
                         navigate('/my-applications');
                       }
                     }}>
-                      {userRole === 'employer' || userRole === 'admin' ? 'Dashboard' : 'My Applications'}
+                      {userRole === 'employer' || userRole === 'admin' ? 'Employer Dashboard' : 'My Applications'}
                     </DropdownMenuItem>
+                    {userRole === 'admin' && (
+                      <DropdownMenuItem onClick={() => navigate('/admin/dashboard')}>
+                        Admin Panel
+                      </DropdownMenuItem>
+                    )}
                     {userRole === 'job_seeker' && (
                       <>
                         <DropdownMenuItem onClick={() => navigate('/recommended-jobs')}>
