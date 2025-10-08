@@ -158,9 +158,11 @@ export type Database = {
           created_at: string
           description: string | null
           email: string | null
+          followers_count: number | null
           founded_year: number | null
           id: string
           industry: string | null
+          is_sponsored: boolean | null
           is_verified: boolean | null
           location: string | null
           logo_url: string | null
@@ -169,7 +171,9 @@ export type Database = {
           phone: string | null
           slug: string
           social_links: Json | null
+          sponsorship_plan: string | null
           updated_at: string
+          views_count: number | null
           website: string | null
         }
         Insert: {
@@ -178,9 +182,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           email?: string | null
+          followers_count?: number | null
           founded_year?: number | null
           id?: string
           industry?: string | null
+          is_sponsored?: boolean | null
           is_verified?: boolean | null
           location?: string | null
           logo_url?: string | null
@@ -189,7 +195,9 @@ export type Database = {
           phone?: string | null
           slug: string
           social_links?: Json | null
+          sponsorship_plan?: string | null
           updated_at?: string
+          views_count?: number | null
           website?: string | null
         }
         Update: {
@@ -198,9 +206,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           email?: string | null
+          followers_count?: number | null
           founded_year?: number | null
           id?: string
           industry?: string | null
+          is_sponsored?: boolean | null
           is_verified?: boolean | null
           location?: string | null
           logo_url?: string | null
@@ -209,10 +219,41 @@ export type Database = {
           phone?: string | null
           slug?: string
           social_links?: Json | null
+          sponsorship_plan?: string | null
           updated_at?: string
+          views_count?: number | null
           website?: string | null
         }
         Relationships: []
+      }
+      company_followers: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_followers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       job_recommendations: {
         Row: {
@@ -357,12 +398,14 @@ export type Database = {
         Row: {
           author_id: string
           category: string
+          company_id: string | null
           content: string
           created_at: string
           excerpt: string | null
           featured_image: string | null
           id: string
           is_published: boolean
+          is_sponsored: boolean | null
           language: string
           meta_description: string | null
           meta_title: string | null
@@ -376,12 +419,14 @@ export type Database = {
         Insert: {
           author_id: string
           category: string
+          company_id?: string | null
           content: string
           created_at?: string
           excerpt?: string | null
           featured_image?: string | null
           id?: string
           is_published?: boolean
+          is_sponsored?: boolean | null
           language?: string
           meta_description?: string | null
           meta_title?: string | null
@@ -395,12 +440,14 @@ export type Database = {
         Update: {
           author_id?: string
           category?: string
+          company_id?: string | null
           content?: string
           created_at?: string
           excerpt?: string | null
           featured_image?: string | null
           id?: string
           is_published?: boolean
+          is_sponsored?: boolean | null
           language?: string
           meta_description?: string | null
           meta_title?: string | null
@@ -411,7 +458,15 @@ export type Database = {
           updated_at?: string
           views_count?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -540,6 +595,54 @@ export type Database = {
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "resume_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sponsored_content: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          end_date: string
+          id: string
+          is_active: boolean | null
+          post_id: string
+          start_date: string
+          updated_at: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          end_date: string
+          id?: string
+          is_active?: boolean | null
+          post_id: string
+          start_date: string
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          end_date?: string
+          id?: string
+          is_active?: boolean | null
+          post_id?: string
+          start_date?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsored_content_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsored_content_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
             referencedColumns: ["id"]
           },
         ]
@@ -721,6 +824,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_company_views: {
+        Args: { company_slug: string }
+        Returns: undefined
       }
       increment_job_views: {
         Args: { job_id: string }

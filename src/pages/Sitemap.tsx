@@ -17,10 +17,16 @@ const Sitemap = () => {
       .select('slug, updated_at')
       .eq('is_published', true);
 
+    // Fetch all companies
+    const { data: companies } = await supabase
+      .from('companies')
+      .select('slug, updated_at');
+
     // Static routes
     const staticRoutes = [
       { loc: '/', priority: '1.0', changefreq: 'daily' },
       { loc: '/jobs', priority: '0.9', changefreq: 'daily' },
+      { loc: '/companies', priority: '0.9', changefreq: 'daily' },
       { loc: '/blog', priority: '0.9', changefreq: 'daily' },
       { loc: '/ai-resume-builder', priority: '0.8', changefreq: 'weekly' },
       { loc: '/resume-builder-al', priority: '0.8', changefreq: 'weekly' },
@@ -47,6 +53,16 @@ const Sitemap = () => {
       xmlContent += `    <lastmod>${new Date(post.updated_at).toISOString()}</lastmod>\n`;
       xmlContent += `    <changefreq>monthly</changefreq>\n`;
       xmlContent += `    <priority>0.6</priority>\n`;
+      xmlContent += '  </url>\n';
+    });
+
+    // Add company profiles
+    companies?.forEach(company => {
+      xmlContent += '  <url>\n';
+      xmlContent += `    <loc>${baseUrl}/companies/${company.slug}</loc>\n`;
+      xmlContent += `    <lastmod>${new Date(company.updated_at).toISOString()}</lastmod>\n`;
+      xmlContent += `    <changefreq>weekly</changefreq>\n`;
+      xmlContent += `    <priority>0.7</priority>\n`;
       xmlContent += '  </url>\n';
     });
 

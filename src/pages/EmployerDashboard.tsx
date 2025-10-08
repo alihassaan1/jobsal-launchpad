@@ -135,6 +135,9 @@ const EmployerDashboard = () => {
             <span className="text-xl font-bold">Jobs.al</span>
           </Link>
           <div className="flex gap-2">
+            <Link to="/dashboard/company">
+              <Button variant="ghost">Company Profile</Button>
+            </Link>
             <Link to="/employer/analytics">
               <Button variant="ghost">Analytics</Button>
             </Link>

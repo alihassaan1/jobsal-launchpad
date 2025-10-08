@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import heroBg from "@/assets/hero-bg.jpg";
 import patternBg from "@/assets/pattern-bg.jpg";
+import FeaturedCompanies from "./FeaturedCompanies";
 
 // Blog section component
 const BlogSection = () => {
@@ -177,7 +178,7 @@ const Index = () => {
                   Find Jobs
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                 </a>
-                <a href="#" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
+                <a href="/companies" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
                   Companies
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
                 </a>
@@ -490,6 +491,23 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Featured Companies */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Featured Companies</h2>
+            <p className="text-muted-foreground">Discover top employers hiring in Albania</p>
+          </div>
+          <FeaturedCompanies />
+          <div className="text-center mt-8">
+            <Button variant="outline" onClick={() => navigate('/companies')}>
+              Browse All Companies
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-16 bg-gradient-primary">
         <div className="container mx-auto px-4 text-center">
@@ -580,6 +598,7 @@ const Index = () => {
               <h3 className="font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="#" className="hover:text-primary">About Us</a></li>
+                <li><a href="/companies" className="hover:text-primary">Companies</a></li>
                 <li><a href="/blog" className="hover:text-primary">Blog</a></li>
                 <li><a href="#" className="hover:text-primary">Contact</a></li>
                 <li><a href="#" className="hover:text-primary">Privacy Policy</a></li>
