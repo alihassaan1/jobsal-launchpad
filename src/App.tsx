@@ -49,7 +49,7 @@ const App = () => (
             <Route path="/employer/subscription" element={<EmployerSubscription />} />
             <Route path="/recommended-jobs" element={<RecommendedJobs />} />
             <Route path="/pricing" element={<Pricing />} />
-            <Route path="/resume-builder-landing" element={<ResumeBuilderLanding />} />
+            <Route path="/ai-resume-builder" element={<ResumeBuilderLanding />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
