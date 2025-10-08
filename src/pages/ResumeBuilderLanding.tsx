@@ -15,15 +15,29 @@ import {
   MessageSquare
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Helmet } from "react-helmet";
 
 const ResumeBuilderLanding = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Track page view
+    const trackPageView = async () => {
+      await supabase.from('analytics').insert({
+        event_type: 'resume_builder_en_page_view',
+        event_data: { page: '/ai-resume-builder', language: 'en' }
+      });
+    };
+    trackPageView();
+  }, []);
 
   const features = [
     {
@@ -92,10 +106,75 @@ const ResumeBuilderLanding = () => {
     }
   ];
 
+  const handleCTAClick = (destination: string) => {
+    // Track conversion
+    supabase.from('analytics').insert({
+      event_type: 'resume_builder_en_cta_click',
+      event_data: { 
+        destination,
+        utm_source: 'resume_builder_en',
+        language: 'en'
+      }
+    });
+    navigate(destination);
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-28 bg-gradient-hero overflow-hidden">
+    <>
+      <Helmet>
+        <html lang="en" />
+        <title>Free Online Resume Builder – Create a Professional CV with AI | Jobs.al</title>
+        <meta name="description" content="Build your perfect resume online using Jobs.al's free AI-powered resume builder. Choose professional templates, optimize for ATS, and connect directly with employers in Albania." />
+        <meta name="keywords" content="online resume builder, AI CV maker, professional resume templates, build resume Albania, job seeker tools, free CV builder" />
+        <meta property="og:title" content="Free Online Resume Builder – Create a Professional CV with AI | Jobs.al" />
+        <meta property="og:description" content="Build your perfect resume online using Jobs.al's free AI-powered resume builder. Choose professional templates, optimize for ATS, and connect directly with employers in Albania." />
+        <meta property="og:type" content="website" />
+        <link rel="alternate" hrefLang="en" href="/ai-resume-builder" />
+        <link rel="alternate" hrefLang="sq" href="/resume-builder-al" />
+        
+        {/* Schema.org Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Jobs.al Resume Builder",
+            "applicationCategory": "BusinessApplication",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "EUR"
+            },
+            "operatingSystem": "Web",
+            "description": "Free online AI-powered resume builder for creating professional resumes",
+            "inLanguage": "en",
+            "featureList": "AI-powered suggestions, ATS-friendly templates, PDF export, Employer visibility"
+          })}
+        </script>
+      </Helmet>
+
+      <div className="min-h-screen bg-background">
+        {/* Language Toggle Bar */}
+        <div className="bg-muted/50 border-b">
+          <div className="container mx-auto px-4 py-2">
+            <div className="flex items-center justify-end gap-4 text-sm">
+              <span className="text-muted-foreground">Language:</span>
+              <div className="flex items-center gap-2 text-foreground font-semibold">
+                <span className="text-lg">🇬🇧</span>
+                <span>English</span>
+              </div>
+              <a 
+                href="/resume-builder-al" 
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <span className="text-lg">🇦🇱</span>
+                <span>Shqip</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Hero Section */}
+        <section className="relative py-20 md:py-28 bg-gradient-hero overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
             backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 70px)`
@@ -120,7 +199,7 @@ const ResumeBuilderLanding = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button 
                 size="lg" 
-                onClick={() => navigate('/resume-builder')}
+                onClick={() => handleCTAClick('/resume-builder')}
                 className="bg-white text-primary hover:bg-white/90 shadow-2xl hover:shadow-xl transition-all duration-300 text-lg px-8 py-6 group"
               >
                 <FileText className="mr-2 h-5 w-5" />
@@ -131,7 +210,7 @@ const ResumeBuilderLanding = () => {
               <Button 
                 size="lg" 
                 variant="outline"
-                onClick={() => navigate('/resume-templates')}
+                onClick={() => handleCTAClick('/resume-templates')}
                 className="border-2 border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur text-lg px-8 py-6"
               >
                 <Star className="mr-2 h-5 w-5" />
@@ -362,7 +441,7 @@ const ResumeBuilderLanding = () => {
             </p>
             <Button 
               size="lg"
-              onClick={() => navigate('/resume-builder')}
+              onClick={() => handleCTAClick('/resume-builder')}
               className="bg-white text-primary hover:bg-white/90 shadow-2xl text-lg px-10 py-6 group"
             >
               <FileText className="mr-2 h-5 w-5" />
@@ -418,6 +497,7 @@ const ResumeBuilderLanding = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

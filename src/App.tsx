@@ -21,6 +21,7 @@ import EmployerSubscription from "./pages/EmployerSubscription";
 import RecommendedJobs from "./pages/RecommendedJobs";
 import Pricing from "./pages/Pricing";
 import ResumeBuilderLanding from "./pages/ResumeBuilderLanding";
+import ResumeBuilderLandingAL from "./pages/ResumeBuilderLandingAL";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/recommended-jobs" element={<RecommendedJobs />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/ai-resume-builder" element={<ResumeBuilderLanding />} />
+            <Route path="/resume-builder-al" element={<ResumeBuilderLandingAL />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
