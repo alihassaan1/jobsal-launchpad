@@ -17,7 +17,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Briefcase, ArrowLeft, FileText, Mail, Phone, MapPin, Calendar, Download } from "lucide-react";
+import { Briefcase, ArrowLeft, FileText, Mail, Phone, MapPin, Calendar, Download, Sparkles, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ATSJobApplications = () => {
@@ -28,6 +28,7 @@ const ATSJobApplications = () => {
   const queryClient = useQueryClient();
   const [selectedApplication, setSelectedApplication] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [rankedCandidates, setRankedCandidates] = useState<any[]>([]);
 
   if (userRole !== "employer" && userRole !== "admin") {
     navigate("/");
@@ -72,6 +73,30 @@ const ATSJobApplications = () => {
 
       if (error) throw error;
       return data;
+    },
+  });
+
+  // Generate AI candidate ranking
+  const rankCandidatesMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("match-candidates", {
+        body: { job_id: jobId },
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      setRankedCandidates(data.ranked_candidates || []);
+      toast({
+        title: "AI Ranking Complete",
+        description: `Found ${data.excellent_fits} excellent fits and ${data.good_fits} good fits`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to rank candidates",
+        variant: "destructive",
+      });
     },
   });
 
@@ -220,9 +245,31 @@ const ATSJobApplications = () => {
           />
         </div>
 
-        {/* Applications List */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* List View */}
+        {/* Applications List with Tabs */}
+        <Tabs defaultValue="all" className="w-full">
+          <div className="flex justify-between items-center mb-4">
+            <TabsList>
+              <TabsTrigger value="all">All Applications</TabsTrigger>
+              <TabsTrigger value="best-fit" className="flex items-center gap-1">
+                <Sparkles className="h-3 w-3" />
+                Best Fit (AI)
+              </TabsTrigger>
+            </TabsList>
+            {rankedCandidates.length === 0 && (
+              <Button
+                onClick={() => rankCandidatesMutation.mutate()}
+                disabled={rankCandidatesMutation.isPending || !applications || applications.length === 0}
+                variant="outline"
+              >
+                <TrendingUp className={`h-4 w-4 mr-2 ${rankCandidatesMutation.isPending ? "animate-pulse" : ""}`} />
+                {rankCandidatesMutation.isPending ? "Analyzing..." : "Generate AI Ranking"}
+              </Button>
+            )}
+          </div>
+
+          <TabsContent value="all" className="mt-0">
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* List View */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
@@ -408,6 +455,101 @@ const ATSJobApplications = () => {
             )}
           </div>
         </div>
+        </TabsContent>
+
+        <TabsContent value="best-fit" className="mt-0">
+          {rankedCandidates.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Sparkles className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No AI Ranking Yet</h3>
+                <p className="text-muted-foreground mb-6">
+                  Click "Generate AI Ranking" to analyze and rank candidates based on their fit
+                </p>
+                <Button
+                  onClick={() => rankCandidatesMutation.mutate()}
+                  disabled={rankCandidatesMutation.isPending || !applications || applications.length === 0}
+                >
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  Generate AI Ranking
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {rankedCandidates.map((candidate) => {
+                const getBadgeColor = (fitLevel: string) => {
+                  switch (fitLevel) {
+                    case "excellent":
+                      return "bg-green-500";
+                    case "good":
+                      return "bg-blue-500";
+                    case "potential":
+                      return "bg-yellow-500";
+                    default:
+                      return "bg-gray-500";
+                  }
+                };
+
+                const matchPercentage = Math.round(candidate.match_score * 100);
+
+                return (
+                  <Card key={candidate.application_id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-semibold">{candidate.applicant_name}</h3>
+                            <Badge variant="outline" className="capitalize">
+                              {candidate.status}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-3">{candidate.applicant_email}</p>
+
+                          {candidate.match_reasoning?.strengths && (
+                            <div className="mb-3">
+                              <p className="text-sm font-semibold mb-1">Key Strengths:</p>
+                              <ul className="text-sm text-muted-foreground space-y-1">
+                                {candidate.match_reasoning.strengths.slice(0, 3).map((strength: string, i: number) => (
+                                  <li key={i}>• {strength}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {candidate.match_reasoning?.matching_skills && (
+                            <div>
+                              <p className="text-sm text-muted-foreground">
+                                Matching Skills: {candidate.match_reasoning.skill_match_percentage}%
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex flex-col items-end gap-2">
+                          <div className={`w-20 h-20 rounded-full ${getBadgeColor(candidate.fit_level)} flex flex-col items-center justify-center text-white`}>
+                            <div className="text-2xl font-bold">{matchPercentage}%</div>
+                            <div className="text-[10px] uppercase">{candidate.fit_level}</div>
+                          </div>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              const app = applications?.find(a => a.id === candidate.application_id);
+                              if (app) setSelectedApplication(app);
+                            }}
+                          >
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
       </div>
     </div>
   );

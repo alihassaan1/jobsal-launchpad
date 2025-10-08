@@ -214,6 +214,44 @@ export type Database = {
         }
         Relationships: []
       }
+      job_recommendations: {
+        Row: {
+          ai_match_score: number | null
+          created_at: string | null
+          id: string
+          job_id: string
+          matched_on: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_match_score?: number | null
+          created_at?: string | null
+          id?: string
+          job_id: string
+          matched_on?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_match_score?: number | null
+          created_at?: string | null
+          id?: string
+          job_id?: string
+          matched_on?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_recommendations_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       jobs: {
         Row: {
           application_deadline: string | null
@@ -591,6 +629,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_text_similarity: {
+        Args: { text1: string; text2: string }
+        Returns: number
+      }
       can_post_job: {
         Args: { user_id: string }
         Returns: boolean

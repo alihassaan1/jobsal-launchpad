@@ -134,9 +134,18 @@ const Index = () => {
                       {userRole === 'employer' || userRole === 'admin' ? 'Dashboard' : 'Profile'}
                     </DropdownMenuItem>
                     {userRole === 'job_seeker' && (
-                      <DropdownMenuItem onClick={() => navigate('/my-applications')}>
-                        My Applications
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuItem onClick={() => navigate('/recommended-jobs')}>
+                          <Sparkles className="mr-2 h-4 w-4" />
+                          AI Recommended Jobs
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/my-applications')}>
+                          My Applications
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/resume-builder')}>
+                          Resume Builder
+                        </DropdownMenuItem>
+                      </>
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => signOut()}>
