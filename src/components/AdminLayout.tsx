@@ -80,16 +80,16 @@ function AdminSidebar() {
   const isCollapsed = state === 'collapsed';
 
   return (
-    <Sidebar className={isCollapsed ? "w-14" : "w-60"}>
+    <Sidebar collapsible="icon">
       <SidebarContent>
         {adminMenuItems.map((section) => (
           <SidebarGroup key={section.group}>
-            {!isCollapsed && <SidebarGroupLabel>{section.group}</SidebarGroupLabel>}
+            <SidebarGroupLabel>{section.group}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {section.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton asChild tooltip={item.title}>
                       <NavLink
                         to={item.url}
                         className={({ isActive }) =>
@@ -99,7 +99,7 @@ function AdminSidebar() {
                         }
                       >
                         <item.icon className="h-4 w-4" />
-                        {!isCollapsed && <span>{item.title}</span>}
+                        <span>{item.title}</span>
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -112,11 +112,11 @@ function AdminSidebar() {
         <div className="mt-auto p-4">
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full justify-start"
             onClick={handleSignOut}
           >
-            <LogOut className="h-4 w-4" />
-            {!isCollapsed && <span className="ml-2">Sign Out</span>}
+            <LogOut className="h-4 w-4 mr-2" />
+            <span>Sign Out</span>
           </Button>
         </div>
       </SidebarContent>
@@ -141,13 +141,13 @@ export default function AdminLayout() {
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
         <AdminSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-14 border-b flex items-center px-4 bg-card">
+          <header className="h-14 border-b flex items-center px-4 bg-card gap-4">
             <SidebarTrigger />
-            <div className="ml-4">
+            <div className="flex-1">
               <h1 className="text-lg font-semibold">Jobs.al Admin</h1>
             </div>
           </header>
