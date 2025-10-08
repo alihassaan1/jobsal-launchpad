@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import RichTextEditor from "@/components/RichTextEditor";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -42,6 +43,7 @@ const AdminBlog = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
+  const [isSeeding, setIsSeeding] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -191,6 +193,20 @@ const AdminBlog = () => {
     });
   };
 
+  const seedSamplePosts = async () => {
+    setIsSeeding(true);
+    try {
+      const { error } = await supabase.functions.invoke('seed-blog-posts');
+      if (error) throw error;
+      toast.success('Sample blog posts created successfully!');
+      fetchPosts();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to seed sample posts');
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -199,11 +215,21 @@ const AdminBlog = () => {
             <h1 className="text-3xl font-bold">Blog Management</h1>
             <p className="text-muted-foreground mt-1">Create and manage blog posts</p>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={(open) => {
-            setDialogOpen(open);
-            if (!open) resetForm();
-          }}>
-            <DialogTrigger asChild>
+          <div className="flex gap-2">
+            {posts.length === 0 && (
+              <Button 
+                variant="outline" 
+                onClick={seedSamplePosts}
+                disabled={isSeeding}
+              >
+                {isSeeding ? 'Creating...' : 'Create Sample Posts'}
+              </Button>
+            )}
+            <Dialog open={dialogOpen} onOpenChange={(open) => {
+              setDialogOpen(open);
+              if (!open) resetForm();
+            }}>
+              <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
                 New Post
@@ -240,14 +266,14 @@ const AdminBlog = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="content">Content * (HTML supported)</Label>
-                  <Textarea
-                    id="content"
-                    value={formData.content}
-                    onChange={(e) => handleInputChange('content', e.target.value)}
-                    placeholder="Enter post content (HTML tags supported)"
-                    rows={12}
+                  <Label htmlFor="content">Content *</Label>
+                  <RichTextEditor
+                    content={formData.content}
+                    onChange={(content) => handleInputChange('content', content)}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Use the toolbar to format text, add images, and create links
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -351,6 +377,7 @@ const AdminBlog = () => {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         <Card>
