@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import AdminLayout from "@/components/AdminLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Jobs from "./pages/Jobs";
@@ -14,8 +15,13 @@ import ATSJobApplications from "./pages/ATSJobApplications";
 import ResumeTemplates from "./pages/ResumeTemplates";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import MyResumes from "./pages/MyResumes";
+import AdminDashboard from "./pages/AdminDashboard";
 import AdminSubscriptions from "./pages/AdminSubscriptions";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminRevenue from "./pages/AdminRevenue";
+import AdminCompanies from "./pages/AdminCompanies";
+import AdminUsers from "./pages/AdminUsers";
+import AdminSettings from "./pages/AdminSettings";
 import EmployerAnalytics from "./pages/EmployerAnalytics";
 import EmployerSubscription from "./pages/EmployerSubscription";
 import RecommendedJobs from "./pages/RecommendedJobs";
@@ -51,8 +57,19 @@ const App = () => (
             <Route path="/resume-templates" element={<ResumeTemplates />} />
             <Route path="/resume-builder" element={<ResumeBuilder />} />
             <Route path="/my-resumes" element={<MyResumes />} />
-            <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
-            <Route path="/admin/analytics" element={<AdminAnalytics />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="revenue" element={<AdminRevenue />} />
+              <Route path="companies" element={<AdminCompanies />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="subscriptions" element={<AdminSubscriptions />} />
+              <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="blog" element={<AdminBlog />} />
+              <Route path="settings" element={<AdminSettings />} />
+            </Route>
+            
             <Route path="/employer/analytics" element={<EmployerAnalytics />} />
             <Route path="/employer/subscription" element={<EmployerSubscription />} />
             <Route path="/recommended-jobs" element={<RecommendedJobs />} />
@@ -61,7 +78,6 @@ const App = () => (
             <Route path="/resume-builder-al" element={<ResumeBuilderLandingAL />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/admin/blog" element={<AdminBlog />} />
             <Route path="/companies" element={<Companies />} />
             <Route path="/companies/:slug" element={<CompanyProfile />} />
             <Route path="/dashboard/company" element={<EmployerCompanyProfile />} />
