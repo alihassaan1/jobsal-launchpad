@@ -114,8 +114,12 @@ export default function MyResumes() {
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="hover:scale-105 transition-transform duration-200">
-                      <User className="h-5 w-5" />
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="hover:scale-105 transition-transform duration-200 border-2 border-primary/20 bg-primary/5 hover:bg-primary/10"
+                    >
+                      <User className="h-5 w-5 text-primary" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -126,8 +130,14 @@ export default function MyResumes() {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/dashboard')}>
-                      Dashboard
+                    <DropdownMenuItem onClick={() => {
+                      if (userRole === 'employer' || userRole === 'admin') {
+                        navigate('/dashboard');
+                      } else {
+                        navigate('/my-applications');
+                      }
+                    }}>
+                      {userRole === 'employer' || userRole === 'admin' ? 'Dashboard' : 'My Applications'}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/my-resumes')}>
                       My Resumes
