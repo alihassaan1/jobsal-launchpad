@@ -22,6 +22,7 @@ import AdminRevenue from "./pages/AdminRevenue";
 import AdminCompanies from "./pages/AdminCompanies";
 import AdminUsers from "./pages/AdminUsers";
 import AdminSettings from "./pages/AdminSettings";
+import AdminJobs from "./pages/AdminJobs";
 import EmployerAnalytics from "./pages/EmployerAnalytics";
 import EmployerSubscription from "./pages/EmployerSubscription";
 import RecommendedJobs from "./pages/RecommendedJobs";
@@ -61,11 +62,12 @@ const App = () => (
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="revenue" element={<AdminRevenue />} />
-              <Route path="companies" element={<AdminCompanies />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="companies" element={<AdminCompanies />} />
+              <Route path="jobs" element={<AdminJobs />} />
+              <Route path="revenue" element={<AdminRevenue />} />
+              <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="blog" element={<AdminBlog />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>

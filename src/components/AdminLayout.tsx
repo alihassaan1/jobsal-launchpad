@@ -11,7 +11,8 @@ import {
   BarChart3,
   CreditCard,
   LogOut,
-  Menu
+  Menu,
+  Briefcase
 } from "lucide-react";
 import {
   Sidebar,
@@ -30,14 +31,40 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const adminMenuItems = [
-  { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
-  { title: "Revenue", url: "/admin/revenue", icon: DollarSign },
-  { title: "Companies", url: "/admin/companies", icon: Building2 },
-  { title: "Users", url: "/admin/users", icon: Users },
-  { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
-  { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
-  { title: "Blog", url: "/admin/blog", icon: FileText },
-  { title: "Settings", url: "/admin/settings", icon: Settings },
+  { 
+    group: "Overview",
+    items: [
+      { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
+      { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
+    ]
+  },
+  {
+    group: "Management",
+    items: [
+      { title: "Users", url: "/admin/users", icon: Users },
+      { title: "Companies", url: "/admin/companies", icon: Building2 },
+      { title: "Jobs", url: "/admin/jobs", icon: Briefcase },
+    ]
+  },
+  {
+    group: "Finance",
+    items: [
+      { title: "Revenue", url: "/admin/revenue", icon: DollarSign },
+      { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
+    ]
+  },
+  {
+    group: "Content",
+    items: [
+      { title: "Blog", url: "/admin/blog", icon: FileText },
+    ]
+  },
+  {
+    group: "System",
+    items: [
+      { title: "Settings", url: "/admin/settings", icon: Settings },
+    ]
+  }
 ];
 
 function AdminSidebar() {
@@ -55,30 +82,32 @@ function AdminSidebar() {
   return (
     <Sidebar className={isCollapsed ? "w-14" : "w-60"}>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Admin Panel</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {adminMenuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      className={({ isActive }) =>
-                        isActive
-                          ? "bg-primary text-primary-foreground font-medium"
-                          : "hover:bg-muted/50"
-                      }
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {!isCollapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {adminMenuItems.map((section) => (
+          <SidebarGroup key={section.group}>
+            {!isCollapsed && <SidebarGroupLabel>{section.group}</SidebarGroupLabel>}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {section.items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.url}
+                        className={({ isActive }) =>
+                          isActive
+                            ? "bg-primary text-primary-foreground font-medium"
+                            : "hover:bg-muted/50"
+                        }
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {!isCollapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
 
         <div className="mt-auto p-4">
           <Button
