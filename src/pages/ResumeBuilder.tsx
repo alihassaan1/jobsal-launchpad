@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Sparkles, Download, Save } from "lucide-react";
+import html2pdf from "html2pdf.js";
 
 interface ResumeData {
   personal_info: {
@@ -178,6 +179,33 @@ export default function ResumeBuilder() {
     }));
   };
 
+  const exportToPDF = () => {
+    const element = document.getElementById('resume-preview');
+    if (!element) {
+      toast({
+        title: "Error",
+        description: "Resume preview not found",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const opt = {
+      margin: 0.5,
+      filename: `${resumeData.personal_info.full_name || 'Resume'}.pdf`,
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const }
+    };
+
+    html2pdf().set(opt).from(element).save();
+
+    toast({
+      title: "PDF Export Started",
+      description: "Your resume is being downloaded",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <div className="container mx-auto px-4 py-8">
@@ -199,7 +227,7 @@ export default function ResumeBuilder() {
                 <><Save className="mr-2 h-4 w-4" /> Save Resume</>
               )}
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" onClick={exportToPDF}>
               <Download className="mr-2 h-4 w-4" /> Export PDF
             </Button>
           </div>
@@ -521,7 +549,7 @@ export default function ResumeBuilder() {
                 <CardTitle>Preview</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-white p-8 shadow-lg rounded-lg min-h-[600px] text-foreground">
+                <div id="resume-preview" className="bg-white p-8 shadow-lg rounded-lg min-h-[600px] text-foreground">
                   <div className="text-center mb-6">
                     <h2 className="text-3xl font-bold text-gray-900">
                       {resumeData.personal_info.full_name || "Your Name"}
