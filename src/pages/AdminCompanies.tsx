@@ -41,19 +41,42 @@ export default function AdminCompanies() {
   }, []);
 
   const fetchCompanies = async () => {
-    const { data, error } = await supabase
-      .from('companies')
-      .select(`
-        *,
-        profiles!companies_owner_id_fkey(full_name, email),
-        jobs(count)
-      `)
-      .order('created_at', { ascending: false });
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('companies')
+        .select(`
+          *,
+          profiles!companies_owner_id_fkey(full_name, email)
+        `)
+        .order('created_at', { ascending: false });
 
-    if (!error && data) {
-      setCompanies(data);
+      if (error) {
+        console.error('Error fetching companies:', error);
+        toast.error("Failed to load companies");
+      } else if (data) {
+        // Count jobs for each company
+        const companiesWithCounts = await Promise.all(
+          data.map(async (company) => {
+            const { count } = await supabase
+              .from('jobs')
+              .select('*', { count: 'exact', head: true })
+              .eq('company_id', company.id);
+            
+            return {
+              ...company,
+              jobs_count: count || 0
+            };
+          })
+        );
+        setCompanies(companiesWithCounts);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Failed to load companies");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const toggleVerification = async (companyId: string, currentStatus: boolean) => {
@@ -195,7 +218,7 @@ export default function AdminCompanies() {
                       </Select>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{company.jobs?.[0]?.count || 0}</Badge>
+                      <Badge variant="outline">{company.jobs_count || 0}</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">

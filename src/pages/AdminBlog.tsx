@@ -69,12 +69,16 @@ const AdminBlog = () => {
   }, [userRole]);
 
   const fetchPosts = async () => {
+    setLoading(true);
     const { data, error } = await supabase
       .from('posts')
       .select('*, profiles!posts_author_id_fkey(full_name)')
       .order('created_at', { ascending: false });
 
-    if (!error && data) {
+    if (error) {
+      console.error('Error fetching posts:', error);
+      toast.error("Failed to load posts");
+    } else if (data) {
       setPosts(data);
     }
     setLoading(false);
@@ -130,7 +134,7 @@ const AdminBlog = () => {
 
     setDialogOpen(false);
     resetForm();
-    fetchPosts();
+    await fetchPosts(); // Wait for the posts to be fetched
   };
 
   const handleEdit = (post: any) => {
@@ -196,11 +200,12 @@ const AdminBlog = () => {
   const seedSamplePosts = async () => {
     setIsSeeding(true);
     try {
-      const { error } = await supabase.functions.invoke('seed-blog-posts');
+      const { data, error } = await supabase.functions.invoke('seed-blog-posts');
       if (error) throw error;
       toast.success('Sample blog posts created successfully!');
-      fetchPosts();
+      await fetchPosts(); // Ensure we wait for the fetch to complete
     } catch (error: any) {
+      console.error('Seeding error:', error);
       toast.error(error.message || 'Failed to seed sample posts');
     } finally {
       setIsSeeding(false);

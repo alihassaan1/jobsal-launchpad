@@ -44,20 +44,43 @@ export default function AdminUsers() {
   }, []);
 
   const fetchUsers = async () => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select(`
-        *,
-        user_roles(role),
-        subscriptions(tier, status),
-        applications(count)
-      `)
-      .order('created_at', { ascending: false });
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          *,
+          user_roles(role),
+          subscriptions(tier, status)
+        `)
+        .order('created_at', { ascending: false });
 
-    if (!error && data) {
-      setUsers(data);
+      if (error) {
+        console.error('Error fetching users:', error);
+        toast.error("Failed to load users");
+      } else if (data) {
+        // Count applications for each user
+        const usersWithCounts = await Promise.all(
+          data.map(async (user) => {
+            const { count } = await supabase
+              .from('applications')
+              .select('*', { count: 'exact', head: true })
+              .eq('applicant_id', user.id);
+            
+            return {
+              ...user,
+              applications_count: count || 0
+            };
+          })
+        );
+        setUsers(usersWithCounts);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Failed to load users");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const changeUserRole = async () => {
@@ -161,13 +184,13 @@ export default function AdminUsers() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredUsers.map((user) => {
+                 {filteredUsers.map((user) => {
                   const role = user.user_roles?.[0]?.role || 'none';
                   const subscription = user.subscriptions?.[0];
-                  const applicationsCount = user.applications?.[0]?.count || 0;
+                  const applicationsCount = user.applications_count || 0;
 
                   return (
-                    <TableRow key={user.id}>
+                    <TableRow key={user.id} className="cursor-pointer hover:bg-muted/50">
                       <TableCell>
                         <div className="font-medium">{user.full_name || 'N/A'}</div>
                       </TableCell>
