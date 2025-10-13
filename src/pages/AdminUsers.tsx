@@ -46,35 +46,66 @@ export default function AdminUsers() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // 1) Load profiles first (no relations to avoid missing FK issues)
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          user_roles(role),
-          subscriptions(tier, status)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching users:', error);
+      if (profilesError) {
+        console.error('Error fetching users:', profilesError);
         toast.error("Failed to load users");
-      } else if (data) {
-        // Count applications for each user
-        const usersWithCounts = await Promise.all(
-          data.map(async (user) => {
-            const { count } = await supabase
-              .from('applications')
-              .select('*', { count: 'exact', head: true })
-              .eq('applicant_id', user.id);
-            
-            return {
-              ...user,
-              applications_count: count || 0
-            };
-          })
-        );
-        setUsers(usersWithCounts);
+        setUsers([]);
+        return;
       }
+
+      const userIds = (profiles || []).map((u: any) => u.id);
+      if (!userIds.length) {
+        setUsers([]);
+        return;
+      }
+
+      // 2) Fetch roles and subscriptions in bulk
+      const [rolesRes, subsRes] = await Promise.all([
+        supabase.from('user_roles').select('user_id, role').in('user_id', userIds),
+        supabase.from('subscriptions').select('user_id, tier, status').in('user_id', userIds),
+      ]);
+
+      const roles = rolesRes.data || [];
+      const subs = subsRes.data || [];
+
+      const roleMap = new Map<string, any[]>();
+      roles.forEach((r: any) => {
+        const arr = roleMap.get(r.user_id) || [];
+        arr.push({ role: r.role });
+        roleMap.set(r.user_id, arr);
+      });
+
+      const subsMap = new Map<string, any[]>();
+      subs.forEach((s: any) => {
+        const arr = subsMap.get(s.user_id) || [];
+        arr.push({ tier: s.tier, status: s.status });
+        subsMap.set(s.user_id, arr);
+      });
+
+      // 3) Count applications per user (RLS allows admins to read all)
+      const usersWithCounts = await Promise.all(
+        (profiles || []).map(async (user: any) => {
+          const { count } = await supabase
+            .from('applications')
+            .select('*', { count: 'exact', head: true })
+            .eq('applicant_id', user.id);
+
+          return {
+            ...user,
+            user_roles: roleMap.get(user.id) || [],
+            subscriptions: subsMap.get(user.id) || [],
+            applications_count: count || 0,
+          };
+        })
+      );
+
+      setUsers(usersWithCounts);
     } catch (error) {
       console.error('Error:', error);
       toast.error("Failed to load users");
