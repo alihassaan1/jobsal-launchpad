@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate, Outlet, NavLink } from "react-router-dom";
+import { useNavigate, Outlet, NavLink, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import {
   LayoutDashboard,
@@ -72,6 +72,8 @@ function AdminSidebar() {
   const { state } = useSidebar();
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const collapsed = state === 'collapsed';
 
   const handleSignOut = async () => {
     await signOut();
@@ -89,7 +91,7 @@ function AdminSidebar() {
               <SidebarMenu>
                 {section.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild tooltip={item.title}>
+                    <SidebarMenuButton asChild tooltip={item.title} isActive={location.pathname === item.url}>
                       <NavLink
                         to={item.url}
                         className={({ isActive }) =>
@@ -99,7 +101,7 @@ function AdminSidebar() {
                         }
                       >
                         <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
+                        {!collapsed && <span>{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -142,18 +144,20 @@ export default function AdminLayout() {
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <AdminSidebar />
-      <SidebarInset>
-        <header className="h-14 border-b flex items-center px-4 bg-card gap-4">
-          <SidebarTrigger />
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold">Jobs.al Admin</h1>
-          </div>
-        </header>
-        <main className="flex-1 overflow-auto">
-          <Outlet />
-        </main>
-      </SidebarInset>
+      <div className="min-h-screen flex w-full">
+        <AdminSidebar />
+        <SidebarInset>
+          <header className="h-14 border-b flex items-center px-4 bg-card gap-4">
+            <SidebarTrigger />
+            <div className="flex-1">
+              <h1 className="text-lg font-semibold">Jobs.al Admin</h1>
+            </div>
+          </header>
+          <main className="flex-1 overflow-auto">
+            <Outlet />
+          </main>
+        </SidebarInset>
+      </div>
     </SidebarProvider>
   );
 }
