@@ -560,6 +560,9 @@ export type Database = {
           extracted_data: Json | null
           id: string
           is_active: boolean | null
+          is_uploaded: boolean | null
+          resume_file_url: string | null
+          resume_type: string | null
           template_id: string | null
           title: string
           updated_at: string
@@ -572,6 +575,9 @@ export type Database = {
           extracted_data?: Json | null
           id?: string
           is_active?: boolean | null
+          is_uploaded?: boolean | null
+          resume_file_url?: string | null
+          resume_type?: string | null
           template_id?: string | null
           title?: string
           updated_at?: string
@@ -584,6 +590,9 @@ export type Database = {
           extracted_data?: Json | null
           id?: string
           is_active?: boolean | null
+          is_uploaded?: boolean | null
+          resume_file_url?: string | null
+          resume_type?: string | null
           template_id?: string | null
           title?: string
           updated_at?: string

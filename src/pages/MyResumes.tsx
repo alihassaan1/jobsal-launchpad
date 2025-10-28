@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Plus, FileText, Trash2, Edit, Download, LogOut, User, Building2 } from "lucide-react";
+import { ResumeUploadDialog } from "@/components/ResumeUploadDialog";
+import { ResumeListCard } from "@/components/ResumeListCard";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -167,10 +169,13 @@ export default function MyResumes() {
             <h1 className="text-4xl font-bold mb-2">My Resumes</h1>
             <p className="text-muted-foreground">Manage and create your professional resumes</p>
           </div>
-          <Button onClick={() => navigate('/resume-builder')} size="lg">
-            <Plus className="mr-2 h-5 w-5" />
-            Create New Resume
-          </Button>
+          <div className="flex gap-3">
+            <ResumeUploadDialog onUploadSuccess={() => queryClient.invalidateQueries({ queryKey: ["user-resumes"] })} />
+            <Button onClick={() => navigate('/resume-builder')} size="lg">
+              <Plus className="mr-2 h-5 w-5" />
+              Build Resume
+            </Button>
+          </div>
         </div>
 
         {isLoading ? (
@@ -194,35 +199,11 @@ export default function MyResumes() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {resumes.map((resume) => (
-              <Card key={resume.id} className="hover:shadow-lg transition-shadow duration-300">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span className="truncate">{resume.title}</span>
-                    <FileText className="h-5 w-5 text-muted-foreground" />
-                  </CardTitle>
-                  <CardDescription>
-                    Updated {formatDate(resume.updated_at)}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="default"
-                      className="flex-1"
-                      onClick={() => navigate(`/resume-builder?id=${resume.id}`)}
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setDeleteId(resume.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <ResumeListCard
+                key={resume.id}
+                resume={resume}
+                onDelete={() => queryClient.invalidateQueries({ queryKey: ["user-resumes"] })}
+              />
             ))}
           </div>
         )}

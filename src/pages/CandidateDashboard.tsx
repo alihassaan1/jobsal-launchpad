@@ -74,6 +74,9 @@ const CandidateDashboard = () => {
             <span className="text-xl font-bold">Jobs.al</span>
           </Link>
           <div className="flex gap-2">
+            <Link to="/my-resumes">
+              <Button variant="ghost">My Resumes</Button>
+            </Link>
             <Link to="/jobs">
               <Button variant="ghost">Browse Jobs</Button>
             </Link>

@@ -53,7 +53,7 @@ const ATSJobApplications = () => {
     },
   });
 
-  // Fetch applications for this job
+  // Fetch applications for this job with resumes
   const { data: applications, isLoading } = useQuery({
     queryKey: ["jobApplications", jobId],
     queryFn: async () => {
@@ -72,7 +72,25 @@ const ATSJobApplications = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+
+      // Fetch resumes for each applicant
+      const applicationsWithResumes = await Promise.all(
+        (data || []).map(async (app: any) => {
+          const { data: resumes } = await supabase
+            .from("resumes")
+            .select("*")
+            .eq("user_id", app.applicant_id)
+            .eq("is_active", true)
+            .order("updated_at", { ascending: false });
+          
+          return {
+            ...app,
+            resumes: resumes || []
+          };
+        })
+      );
+
+      return applicationsWithResumes;
     },
   });
 
@@ -396,7 +414,53 @@ const ATSJobApplications = () => {
                     </Select>
                   </div>
 
-                  {/* Resume */}
+                  {/* Resumes */}
+                  <div className="space-y-2">
+                    <Label>Candidate Resumes ({selectedApplication.resumes?.length || 0})</Label>
+                    {selectedApplication.resumes && selectedApplication.resumes.length > 0 ? (
+                      <div className="space-y-2">
+                        {selectedApplication.resumes.map((resume: any) => (
+                          <Card key={resume.id} className="p-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <FileText className="h-4 w-4 text-primary flex-shrink-0" />
+                                  <div className="min-w-0 flex-1">
+                                    <p className="font-medium text-sm truncate">{resume.title}</p>
+                                    {resume.resume_type && (
+                                      <p className="text-xs text-muted-foreground truncate">{resume.resume_type}</p>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge variant={resume.is_uploaded ? "default" : "secondary"} className="text-xs">
+                                    {resume.is_uploaded ? "Uploaded" : "Builder"}
+                                  </Badge>
+                                  <span className="text-xs text-muted-foreground">
+                                    {new Date(resume.updated_at).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              </div>
+                              {resume.resume_file_url && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => window.open(resume.resume_file_url, '_blank')}
+                                  className="flex-shrink-0"
+                                >
+                                  <Download className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No resumes available</p>
+                    )}
+                  </div>
+
+                  {/* Legacy Resume URL (if exists) */}
                   {selectedApplication.resume_url && (
                     <Button
                       variant="outline"
@@ -404,7 +468,7 @@ const ATSJobApplications = () => {
                       onClick={() => downloadResume(selectedApplication.resume_url)}
                     >
                       <Download className="h-4 w-4 mr-2" />
-                      Download Resume
+                      Download Application Resume
                     </Button>
                   )}
 

@@ -88,19 +88,20 @@ export default function AdminUsers() {
         subsMap.set(s.user_id, arr);
       });
 
-      // 3) Count applications per user (RLS allows admins to read all)
+      // 3) Count applications and resumes per user (RLS allows admins to read all)
       const usersWithCounts = await Promise.all(
         (profiles || []).map(async (user: any) => {
-          const { count } = await supabase
-            .from('applications')
-            .select('*', { count: 'exact', head: true })
-            .eq('applicant_id', user.id);
+          const [appsResult, resumesResult] = await Promise.all([
+            supabase.from('applications').select('*', { count: 'exact', head: true }).eq('applicant_id', user.id),
+            supabase.from('resumes').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_active', true),
+          ]);
 
           return {
             ...user,
             user_roles: roleMap.get(user.id) || [],
             subscriptions: subsMap.get(user.id) || [],
-            applications_count: count || 0,
+            applications_count: appsResult.count || 0,
+            resumes_count: resumesResult.count || 0,
           };
         })
       );
@@ -210,6 +211,7 @@ export default function AdminUsers() {
                   <TableHead>Role</TableHead>
                   <TableHead>Joined</TableHead>
                   <TableHead>Applications</TableHead>
+                  <TableHead>Resumes</TableHead>
                   <TableHead>Subscription</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -236,6 +238,9 @@ export default function AdminUsers() {
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">{applicationsCount}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{user.resumes_count || 0}</Badge>
                       </TableCell>
                       <TableCell>
                         {subscription ? (
