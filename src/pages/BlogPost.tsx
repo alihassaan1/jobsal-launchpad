@@ -33,6 +33,7 @@ const BlogPost = () => {
       .single();
 
     if (error) {
+      console.error('Error fetching post:', error);
       toast.error("Post not found");
       navigate('/blog');
       return;
@@ -40,7 +41,8 @@ const BlogPost = () => {
 
     if (data) {
       setPost(data);
-      setAuthor(data.profiles);
+      // Handle case where author profile might not exist
+      setAuthor(data.profiles || { full_name: 'Anonymous', avatar_url: null });
       fetchRelatedPosts(data.category, data.id);
     }
     setLoading(false);
