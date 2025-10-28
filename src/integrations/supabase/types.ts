@@ -814,10 +814,7 @@ export type Database = {
         Args: { text1: string; text2: string }
         Returns: number
       }
-      can_post_job: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
+      can_post_job: { Args: { user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -829,14 +826,8 @@ export type Database = {
         Args: { company_slug: string }
         Returns: undefined
       }
-      increment_job_views: {
-        Args: { job_id: string }
-        Returns: undefined
-      }
-      increment_post_views: {
-        Args: { post_slug: string }
-        Returns: undefined
-      }
+      increment_job_views: { Args: { job_id: string }; Returns: undefined }
+      increment_post_views: { Args: { post_slug: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "employer" | "job_seeker" | "editor"

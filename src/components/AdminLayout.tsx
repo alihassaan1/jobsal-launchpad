@@ -82,7 +82,7 @@ function AdminSidebar() {
 
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="border-r">
       <SidebarContent>
         {adminMenuItems.map((section) => (
           <SidebarGroup key={section.group}>
@@ -91,17 +91,10 @@ function AdminSidebar() {
               <SidebarMenu>
                 {section.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild tooltip={item.title} isActive={location.pathname === item.url}>
-                      <NavLink
-                        to={item.url}
-                        className={({ isActive }) =>
-                          isActive
-                            ? "bg-primary text-primary-foreground font-medium"
-                            : "hover:bg-muted/50"
-                        }
-                      >
+                    <SidebarMenuButton asChild isActive={location.pathname === item.url}>
+                      <NavLink to={item.url}>
                         <item.icon className="h-4 w-4" />
-                        {!collapsed && <span>{item.title}</span>}
+                        <span>{item.title}</span>
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -118,7 +111,7 @@ function AdminSidebar() {
             onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4 mr-2" />
-            <span>Sign Out</span>
+            {!collapsed && <span>Sign Out</span>}
           </Button>
         </div>
       </SidebarContent>
