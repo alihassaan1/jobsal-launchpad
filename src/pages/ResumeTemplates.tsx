@@ -7,9 +7,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Crown, Search, FileText } from "lucide-react";
+import { Crown, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import resumeModern from "@/assets/resume-modern.jpg";
+import resumeClassic from "@/assets/resume-classic.jpg";
+import resumeCreative from "@/assets/resume-creative.jpg";
+import resumeExecutive from "@/assets/resume-executive.jpg";
 
 export default function ResumeTemplates() {
   const { user } = useAuth();
@@ -65,16 +69,20 @@ export default function ResumeTemplates() {
       return;
     }
 
-    if (template.is_premium && userSubscription?.tier === "free") {
-      toast({
-        title: "Premium template",
-        description: "This template requires a premium subscription",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    // Premium templates are currently free for promotional purposes
     navigate(`/resume-builder?template=${template.id}`);
+  };
+
+  // Map template categories to preview images
+  const getPreviewImage = (category: string) => {
+    const categoryMap: Record<string, string> = {
+      professional: resumeModern,
+      creative: resumeCreative,
+      executive: resumeExecutive,
+      tech: resumeModern,
+      academic: resumeClassic,
+    };
+    return categoryMap[category?.toLowerCase()] || resumeModern;
   };
 
   const categories = Array.from(new Set(templates?.map(t => t.category).filter(Boolean)));
@@ -154,19 +162,23 @@ export default function ResumeTemplates() {
                   )}
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-[3/4] bg-muted rounded flex items-center justify-center">
-                    <FileText className="h-16 w-16 text-muted-foreground" />
+                  <div className="aspect-[3/4] bg-muted rounded overflow-hidden">
+                    <img 
+                      src={getPreviewImage(template.category)} 
+                      alt={template.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </CardContent>
                 <CardFooter>
                   <Button 
                     className="w-full" 
                     onClick={() => handleSelectTemplate(template)}
-                    variant={template.is_premium && userSubscription?.tier === "free" ? "outline" : "default"}
                   >
-                    {template.is_premium && userSubscription?.tier === "free" 
-                      ? "Premium Required" 
-                      : "Use Template"}
+                    Use Template
+                    {template.is_premium && (
+                      <Badge variant="secondary" className="ml-2">Free Preview</Badge>
+                    )}
                   </Button>
                 </CardFooter>
               </Card>
