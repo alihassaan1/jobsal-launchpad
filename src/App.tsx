@@ -23,6 +23,7 @@ import AdminCompanies from "./pages/AdminCompanies";
 import AdminUsers from "./pages/AdminUsers";
 import AdminSettings from "./pages/AdminSettings";
 import AdminJobs from "./pages/AdminJobs";
+import AdminTemplates from "./pages/AdminTemplates";
 import EmployerAnalytics from "./pages/EmployerAnalytics";
 import EmployerSubscription from "./pages/EmployerSubscription";
 import RecommendedJobs from "./pages/RecommendedJobs";
@@ -68,6 +69,7 @@ const App = () => (
               <Route path="jobs" element={<AdminJobs />} />
               <Route path="revenue" element={<AdminRevenue />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
+              <Route path="templates" element={<AdminTemplates />} />
               <Route path="blog" element={<AdminBlog />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
