@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Sparkles, Download, Save, LogOut, User, Building2 } from "lucide-react";
+import { Loader2, Sparkles, Download, Save, LogOut, User, Palette } from "lucide-react";
 import html2pdf from "html2pdf.js";
 import {
   DropdownMenu,
@@ -20,6 +20,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import TemplateSelector from "@/components/TemplateSelector";
+import ModernTemplate from "@/components/resume-templates/ModernTemplate";
+import ClassicTemplate from "@/components/resume-templates/ClassicTemplate";
+import CreativeTemplate from "@/components/resume-templates/CreativeTemplate";
+import ExecutiveTemplate from "@/components/resume-templates/ExecutiveTemplate";
 
 interface ResumeData {
   personal_info: {
@@ -82,6 +87,8 @@ export default function ResumeBuilder() {
   });
 
   const [aiLoading, setAiLoading] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState("modern");
+  const [templateSelectorOpen, setTemplateSelectorOpen] = useState(false);
 
   const { data: template } = useQuery({
     queryKey: ["resume-template", templateId],
@@ -277,19 +284,51 @@ export default function ResumeBuilder() {
     }
 
     const opt = {
-      margin: 0.5,
+      margin: 0,
       filename: `${resumeData.personal_info.full_name || 'Resume'}.pdf`,
-      image: { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const }
+      image: { type: 'jpeg' as const, quality: 1.0 },
+      html2canvas: { 
+        scale: 3, 
+        useCORS: true,
+        letterRendering: true,
+        logging: false,
+        dpi: 300,
+        backgroundColor: '#ffffff'
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait' as const,
+        compress: false
+      }
     };
 
-    html2pdf().set(opt).from(element).save();
-
     toast({
-      title: "PDF Export Started",
-      description: "Your resume is being downloaded",
+      title: "Generating PDF",
+      description: "Please wait while we create your high-quality resume...",
     });
+
+    html2pdf().set(opt).from(element).save().then(() => {
+      toast({
+        title: "PDF Export Complete",
+        description: "Your resume has been downloaded successfully",
+      });
+    });
+  };
+
+  const renderTemplate = () => {
+    switch (selectedTemplate) {
+      case "modern":
+        return <ModernTemplate data={resumeData} />;
+      case "classic":
+        return <ClassicTemplate data={resumeData} />;
+      case "creative":
+        return <CreativeTemplate data={resumeData} />;
+      case "executive":
+        return <ExecutiveTemplate data={resumeData} />;
+      default:
+        return <ModernTemplate data={resumeData} />;
+    }
   };
 
   return (
@@ -400,6 +439,12 @@ export default function ResumeBuilder() {
               onClick={() => navigate('/my-resumes')}
             >
               View All Resumes
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setTemplateSelectorOpen(true)}
+            >
+              <Palette className="mr-2 h-4 w-4" /> Change Template
             </Button>
             <Button
               onClick={() => saveResumeMutation.mutate()}
@@ -730,83 +775,13 @@ export default function ResumeBuilder() {
           <div>
             <Card className="sticky top-4">
               <CardHeader>
-                <CardTitle>Preview</CardTitle>
+                <CardTitle>Live Preview - {selectedTemplate.charAt(0).toUpperCase() + selectedTemplate.slice(1)} Template</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div id="resume-preview" className="bg-white p-8 shadow-lg rounded-lg min-h-[600px] text-foreground">
-                  <div className="text-center mb-6">
-                    <h2 className="text-3xl font-bold text-gray-900">
-                      {resumeData.personal_info.full_name || "Your Name"}
-                    </h2>
-                    <div className="text-sm text-gray-600 mt-2">
-                      {resumeData.personal_info.email && <span>{resumeData.personal_info.email}</span>}
-                      {resumeData.personal_info.phone && <span className="mx-2">•</span>}
-                      {resumeData.personal_info.phone && <span>{resumeData.personal_info.phone}</span>}
-                      {resumeData.personal_info.location && <span className="mx-2">•</span>}
-                      {resumeData.personal_info.location && <span>{resumeData.personal_info.location}</span>}
-                    </div>
+              <CardContent className="p-0">
+                <div className="overflow-auto max-h-[800px] bg-gray-100 p-4">
+                  <div id="resume-preview" className="transform scale-75 origin-top">
+                    {renderTemplate()}
                   </div>
-
-                  {resumeData.summary && (
-                    <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Summary</h3>
-                      <p className="text-sm text-gray-700">{resumeData.summary}</p>
-                    </div>
-                  )}
-
-                  {resumeData.experience.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Experience</h3>
-                      {resumeData.experience.map((exp, idx) => (
-                        <div key={idx} className="mb-4">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className="font-semibold text-gray-900">{exp.position}</h4>
-                              <p className="text-sm text-gray-600">{exp.company}</p>
-                            </div>
-                            <span className="text-sm text-gray-500">
-                              {exp.start_date} - {exp.end_date || "Present"}
-                            </span>
-                          </div>
-                          {exp.description && (
-                            <p className="text-sm text-gray-700 mt-2 whitespace-pre-line">{exp.description}</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {resumeData.education.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Education</h3>
-                      {resumeData.education.map((edu, idx) => (
-                        <div key={idx} className="mb-3">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className="font-semibold text-gray-900">{edu.degree} in {edu.field}</h4>
-                              <p className="text-sm text-gray-600">{edu.institution}</p>
-                            </div>
-                            <span className="text-sm text-gray-500">
-                              {edu.start_date} - {edu.end_date}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {resumeData.skills.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Skills</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {resumeData.skills.map((skill, idx) => (
-                          <span key={idx} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
@@ -814,6 +789,15 @@ export default function ResumeBuilder() {
         </div>
         </div>
       </div>
+
+      {/* Template Selector Dialog */}
+      <TemplateSelector
+        open={templateSelectorOpen}
+        onOpenChange={setTemplateSelectorOpen}
+        onSelectTemplate={setSelectedTemplate}
+        currentTemplate={selectedTemplate}
+        resumeData={resumeData}
+      />
 
       {/* Footer */}
       <footer className="bg-secondary py-12">
