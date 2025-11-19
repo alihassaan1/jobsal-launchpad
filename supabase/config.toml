@@ -11,3 +11,9 @@ verify_jwt = true
 
 [functions.match-candidates]
 verify_jwt = true
+
+[functions.generate-blog-post]
+verify_jwt = false
+
+[functions.scrape-jobs]
+verify_jwt = true

@@ -98,41 +98,38 @@ const BlogSection = () => {
 const Index = () => {
   const { user, signOut, userRole } = useAuth();
   const navigate = useNavigate();
-  const featuredJobs = [
-    {
-      id: 1,
-      title: "Senior Frontend Developer",
-      company: "TechCorp Albania",
-      location: "Tirana, Albania",
-      salary: "€3,000 - €4,500",
-      type: "Full-time",
-      logo: "TC",
-      featured: true,
-      skills: ["React", "TypeScript", "Node.js"]
-    },
-    {
-      id: 2,
-      title: "Marketing Manager",
-      company: "Digital Agency",
-      location: "Durres, Albania",
-      salary: "€2,200 - €3,000",
-      type: "Full-time",
-      logo: "DA",
-      featured: false,
-      skills: ["Digital Marketing", "SEO", "Analytics"]
-    },
-    {
-      id: 3,
-      title: "UX/UI Designer",
-      company: "Creative Studio",
-      location: "Remote",
-      salary: "€2,500 - €3,500",
-      type: "Remote",
-      logo: "CS",
-      featured: true,
-      skills: ["Figma", "Sketch", "Prototyping"]
+  const [featuredJobs, setFeaturedJobs] = useState<any[]>([]);
+  const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+
+  useEffect(() => {
+    fetchFeaturedJobs();
+  }, []);
+
+  const fetchFeaturedJobs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('jobs')
+        .select(`
+          *,
+          companies:company_id (
+            name,
+            logo_url,
+            location
+          )
+        `)
+        .eq('is_active', true)
+        .eq('is_featured', true)
+        .order('created_at', { ascending: false })
+        .limit(6);
+
+      if (error) throw error;
+      setFeaturedJobs(data || []);
+    } catch (error) {
+      console.error('Error fetching featured jobs:', error);
+    } finally {
+      setIsLoadingJobs(false);
     }
-  ];
+  };
 
   const jobCategories = [
     { name: "Technology", count: 245, icon: "💻" },
@@ -343,65 +340,76 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredJobs.map((job) => (
-              <Card key={job.id} className="hover:shadow-xl transition-all duration-300 border border-border/50 bg-card">
-                <CardHeader className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="h-12 w-12 border-2 border-primary/20">
-                        <AvatarFallback className="bg-primary text-white font-semibold text-sm">
-                          {job.logo}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <CardTitle className="text-lg font-semibold text-foreground">
-                          {job.title}
-                        </CardTitle>
-                        <CardDescription className="text-sm">
-                          {job.company}
-                        </CardDescription>
+          {isLoadingJobs ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="mt-4 text-muted-foreground">Loading featured jobs...</p>
+            </div>
+          ) : featuredJobs.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No featured jobs available at the moment.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredJobs.map((job) => (
+                <Card 
+                  key={job.id} 
+                  className="hover:shadow-xl transition-all duration-300 border border-border/50 bg-card cursor-pointer"
+                  onClick={() => navigate(`/jobs/${job.slug}`)}
+                >
+                  <CardHeader className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-12 w-12 border-2 border-primary/20">
+                          <AvatarImage src={job.companies?.logo_url} alt={job.companies?.name} />
+                          <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                            {job.companies?.name?.charAt(0) || 'J'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="font-semibold text-foreground">{job.companies?.name}</h3>
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <MapPin className="h-3 w-3 mr-1" />
+                            {job.location}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    {job.featured && (
-                      <Badge variant="default" className="bg-primary text-white border-0 shadow-sm">
-                        <Star className="w-3 h-3 mr-1 fill-current" />
+                      <Badge className="bg-yellow-500/10 text-yellow-700 border-yellow-200">
+                        <Star className="h-3 w-3 mr-1 fill-yellow-500" />
                         Featured
                       </Badge>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4 mr-2 text-primary" />
-                    {job.location}
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center text-success font-semibold">
-                      <DollarSign className="h-4 w-4 mr-1" />
-                      {job.salary}
                     </div>
-                    <div className="flex items-center text-muted-foreground">
-                      <Clock className="h-4 w-4 mr-1" />
-                      {job.type}
+                    <div>
+                      <h4 className="text-lg font-bold text-foreground mb-2">{job.title}</h4>
+                      <p className="text-sm text-muted-foreground line-clamp-2">{job.description}</p>
                     </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {job.skills.map((skill) => (
-                      <Badge key={skill} variant="secondary" className="text-xs font-normal">
-                        {skill}
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        <Briefcase className="h-3 w-3 mr-1" />
+                        {job.job_type?.replace('_', ' ')}
                       </Badge>
-                    ))}
-                  </div>
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-white shadow-sm">
-                    <Briefcase className="mr-2 h-4 w-4" />
-                    Apply Now
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                      <Badge variant="secondary" className="text-xs">
+                        <Clock className="h-3 w-3 mr-1" />
+                        {job.experience_level}
+                      </Badge>
+                      {job.is_salary_visible && job.salary_min && (
+                        <Badge variant="secondary" className="text-xs">
+                          <DollarSign className="h-3 w-3 mr-1" />
+                          {job.salary_min}-{job.salary_max} {job.salary_currency}
+                        </Badge>
+                      )}
+                    </div>
+                    <Button className="w-full" variant="outline">
+                      View Details
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
           <div className="text-center mt-12">
             <Button variant="outline" size="lg" className="shadow-sm hover:bg-accent">
