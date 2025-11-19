@@ -137,8 +137,8 @@ export default function AdminAnalytics() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8 flex justify-between items-center">
+    <div className="p-6 space-y-6">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold mb-2">Platform Analytics</h1>
           <p className="text-muted-foreground">Overview of platform performance and revenue</p>

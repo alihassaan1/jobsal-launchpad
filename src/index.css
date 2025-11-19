@@ -17,7 +17,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 15%;
 
-    --primary: 0 85% 60%;
+    --primary: 0 92% 55%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 97%;
@@ -26,7 +26,7 @@ All colors MUST be HSL.
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 0 85% 60%;
+    --accent: 0 92% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -38,14 +38,14 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    /* Albanian Red & White Theme */
-    --albanian-red: 0 85% 60%;
-    --albanian-red-dark: 0 85% 50%;
-    --albanian-red-light: 0 85% 70%;
-    --primary-glow: 0 85% 70%;
-    --gradient-primary: linear-gradient(135deg, hsl(var(--albanian-red)), hsl(var(--primary-glow)));
-    --gradient-hero: linear-gradient(135deg, hsl(0 85% 60%), hsl(0 85% 70%));
-    --gradient-accent: linear-gradient(45deg, hsl(0 85% 60%), hsl(0 0% 100%));
+    /* Albanian Red & White Theme - More vibrant red */
+    --albanian-red: 0 92% 55%;
+    --albanian-red-dark: 0 92% 45%;
+    --albanian-red-light: 0 92% 65%;
+    --primary-glow: 0 92% 70%;
+    --gradient-primary: linear-gradient(135deg, hsl(0 92% 55%), hsl(0 92% 70%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 92% 55%) 0%, hsl(0 92% 65%) 50%, hsl(0 85% 70%) 100%);
+    --gradient-accent: linear-gradient(45deg, hsl(0 92% 55%), hsl(0 0% 100%));
     --success: 120 60% 50%;
     --success-foreground: 0 0% 100%;
     --warning: 45 100% 51%;
