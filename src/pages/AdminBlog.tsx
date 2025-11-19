@@ -213,9 +213,8 @@ const AdminBlog = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
+    <div className="p-6 space-y-6">
+      <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Blog Management</h1>
             <p className="text-muted-foreground mt-1">Create and manage blog posts</p>
@@ -382,10 +381,10 @@ const AdminBlog = () => {
               </div>
             </DialogContent>
           </Dialog>
-          </div>
         </div>
+      </div>
 
-        <Card>
+      <Card>
           <CardHeader>
             <CardTitle>All Posts</CardTitle>
             <CardDescription>Manage your blog posts</CardDescription>
@@ -475,7 +474,6 @@ const AdminBlog = () => {
             )}
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 };

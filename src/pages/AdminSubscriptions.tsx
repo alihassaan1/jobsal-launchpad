@@ -165,9 +165,9 @@ export default function AdminSubscriptions() {
   const activeSubscribers = revenueStats?.length || 0;
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Subscription Management</h1>
+    <div className="p-6 space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Subscription Management</h1>
         <p className="text-muted-foreground">Manage pricing plans and payment settings</p>
       </div>
 

@@ -77,9 +77,8 @@ export default function AdminTemplates() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-4">
-        <div className="mb-6">
+    <div className="p-6 space-y-6">
+      <div>
           <Button
             variant="ghost"
             onClick={() => navigate("/admin/dashboard")}
@@ -148,14 +147,13 @@ export default function AdminTemplates() {
           ))}
         </div>
 
-        {templates.length === 0 && (
-          <Card>
-            <CardContent className="py-12 text-center text-muted-foreground">
-              No templates found
-            </CardContent>
-          </Card>
-        )}
-      </div>
+      {templates.length === 0 && (
+        <Card>
+          <CardContent className="py-12 text-center text-muted-foreground">
+            No templates found
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
