@@ -289,19 +289,28 @@ export default function ResumeBuilder() {
       filename: `${resumeData.personal_info.full_name || 'Resume'}.pdf`,
       image: { type: 'jpeg' as const, quality: 1.0 },
       html2canvas: { 
-        scale: 3, 
+        scale: 4,
         useCORS: true,
         letterRendering: true,
         logging: false,
         dpi: 300,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        windowWidth: 794,
+        windowHeight: 1123,
+        scrollY: 0,
+        scrollX: 0,
+        allowTaint: false,
+        removeContainer: true,
+        imageTimeout: 0
       },
       jsPDF: { 
         unit: 'mm', 
         format: 'a4', 
         orientation: 'portrait' as const,
-        compress: false
-      }
+        compress: false,
+        precision: 16
+      },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
     toast({
@@ -314,21 +323,30 @@ export default function ResumeBuilder() {
         title: "PDF Export Complete",
         description: "Your resume has been downloaded successfully",
       });
+    }).catch((error) => {
+      console.error('PDF Export Error:', error);
+      toast({
+        title: "Export Failed",
+        description: "There was an error generating your PDF. Please try again.",
+        variant: "destructive",
+      });
     });
   };
 
   const renderTemplate = () => {
+    const templateProps = { data: resumeData };
+    
     switch (selectedTemplate) {
       case "modern":
-        return <ModernTemplate data={resumeData} />;
+        return <ModernTemplate {...templateProps} />;
       case "classic":
-        return <ClassicTemplate data={resumeData} />;
+        return <ClassicTemplate {...templateProps} />;
       case "creative":
-        return <CreativeTemplate data={resumeData} />;
+        return <CreativeTemplate {...templateProps} />;
       case "executive":
-        return <ExecutiveTemplate data={resumeData} />;
+        return <ExecutiveTemplate {...templateProps} />;
       default:
-        return <ModernTemplate data={resumeData} />;
+        return <ModernTemplate {...templateProps} />;
     }
   };
 
@@ -688,12 +706,30 @@ export default function ResumeBuilder() {
           {/* Preview */}
           <div>
             <Card className="sticky top-4">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Live Preview - {selectedTemplate.charAt(0).toUpperCase() + selectedTemplate.slice(1)} Template</CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setTemplateSelectorOpen(true)}
+                >
+                  <Palette className="w-4 h-4 mr-2" />
+                  Change Template
+                </Button>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="overflow-auto max-h-[800px] bg-gray-100 p-4">
-                  <div id="resume-preview" className="transform scale-75 origin-top">
+                  <div 
+                    id="resume-preview" 
+                    className="bg-white shadow-2xl mx-auto"
+                    style={{
+                      width: '210mm',
+                      minHeight: '297mm',
+                      transform: 'scale(0.7)',
+                      transformOrigin: 'top center',
+                      marginBottom: '-30%'
+                    }}
+                  >
                     {renderTemplate()}
                   </div>
                 </div>
@@ -708,7 +744,14 @@ export default function ResumeBuilder() {
       <TemplateSelector
         open={templateSelectorOpen}
         onOpenChange={setTemplateSelectorOpen}
-        onSelectTemplate={setSelectedTemplate}
+        onSelectTemplate={(template) => {
+          setSelectedTemplate(template);
+          setTemplateSelectorOpen(false);
+          toast({
+            title: "Template Changed",
+            description: `Switched to ${template.charAt(0).toUpperCase() + template.slice(1)} template`,
+          });
+        }}
         currentTemplate={selectedTemplate}
         resumeData={resumeData}
       />
