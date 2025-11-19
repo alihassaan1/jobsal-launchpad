@@ -12,7 +12,8 @@ import {
   CreditCard,
   LogOut,
   Menu,
-  Briefcase
+  Briefcase,
+  Sparkles
 } from "lucide-react";
 import {
   Sidebar,
@@ -59,6 +60,7 @@ const adminMenuItems = [
     items: [
       { title: "Blog", url: "/admin/blog", icon: FileText },
       { title: "Templates", url: "/admin/templates", icon: FileText },
+      { title: "AI Agent", url: "/admin/ai-agent", icon: Sparkles },
     ]
   },
   {
