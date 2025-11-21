@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Calendar, Eye, ArrowLeft, Share2, Facebook, Linkedin } from "lucide-react";
 import { Helmet } from "react-helmet";
 import { toast } from "sonner";
+import Navigation from "@/components/Navigation";
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -94,19 +95,22 @@ const BlogPost = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-4xl mx-auto animate-pulse">
-            <div className="h-8 bg-muted rounded w-3/4 mb-4"></div>
-            <div className="h-64 bg-muted rounded mb-8"></div>
-            <div className="space-y-3">
-              {[...Array(10)].map((_, i) => (
-                <div key={i} className="h-4 bg-muted rounded"></div>
-              ))}
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-4 py-12">
+            <div className="max-w-4xl mx-auto animate-pulse">
+              <div className="h-8 bg-muted rounded w-3/4 mb-4"></div>
+              <div className="h-64 bg-muted rounded mb-8"></div>
+              <div className="space-y-3">
+                {[...Array(10)].map((_, i) => (
+                  <div key={i} className="h-4 bg-muted rounded"></div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -114,6 +118,7 @@ const BlogPost = () => {
 
   return (
     <>
+      <Navigation />
       <Helmet>
         <html lang={post.language} />
         <title>{post.meta_title || post.title} | Jobs.al Blog</title>
@@ -220,11 +225,14 @@ const BlogPost = () => {
 
               {/* Featured Image */}
               {post.featured_image && (
-                <div className="mb-8 rounded-lg overflow-hidden">
+                <div className="mb-8 rounded-lg overflow-hidden bg-muted">
                   <img 
                     src={post.featured_image} 
                     alt={post.title}
                     className="w-full h-auto"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                 </div>
               )}
@@ -263,11 +271,14 @@ const BlogPost = () => {
                       onClick={() => navigate(`/blog/${relatedPost.slug}`)}
                     >
                       {relatedPost.featured_image && (
-                        <div className="h-40 overflow-hidden">
+                        <div className="h-40 overflow-hidden bg-muted">
                           <img
                             src={relatedPost.featured_image}
                             alt={relatedPost.title}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
                           />
                         </div>
                       )}

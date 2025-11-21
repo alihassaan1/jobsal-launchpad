@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Search, Calendar, Eye, ArrowRight, Tag } from "lucide-react";
 import { Helmet } from "react-helmet";
+import Navigation from "@/components/Navigation";
 import {
   Select,
   SelectContent,
@@ -136,6 +137,7 @@ const Blog = () => {
         <link rel="canonical" href="https://jobs.al/blog" />
       </Helmet>
 
+      <Navigation />
       <div className="min-h-screen bg-background">
         {/* Header */}
         <section className="bg-gradient-hero py-16">
@@ -218,11 +220,14 @@ const Blog = () => {
                         onClick={() => navigate(`/blog/${post.slug}`)}
                       >
                         {post.featured_image && (
-                          <div className="overflow-hidden h-48">
+                          <div className="overflow-hidden h-48 bg-muted">
                             <img 
                               src={post.featured_image} 
                               alt={post.title}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
                             />
                           </div>
                         )}
