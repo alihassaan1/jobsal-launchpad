@@ -59,11 +59,15 @@ const BlogSection = () => {
               onClick={() => navigate(`/blog/${post.slug}`)}
             >
               {post.featured_image && (
-                <div className="h-40 overflow-hidden">
+                <div className="h-48 overflow-hidden bg-muted">
                   <img 
                     src={post.featured_image} 
                     alt={post.title}
-                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
                 </div>
               )}

@@ -225,11 +225,12 @@ const BlogPost = () => {
 
               {/* Featured Image */}
               {post.featured_image && (
-                <div className="mb-8 rounded-lg overflow-hidden bg-muted">
+                <div className="mb-8 rounded-lg overflow-hidden bg-muted shadow-lg">
                   <img 
                     src={post.featured_image} 
                     alt={post.title}
-                    className="w-full h-auto"
+                    loading="lazy"
+                    className="w-full h-auto max-h-[500px] object-cover"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
@@ -271,11 +272,12 @@ const BlogPost = () => {
                       onClick={() => navigate(`/blog/${relatedPost.slug}`)}
                     >
                       {relatedPost.featured_image && (
-                        <div className="h-40 overflow-hidden bg-muted">
+                        <div className="h-48 overflow-hidden bg-muted">
                           <img
                             src={relatedPost.featured_image}
                             alt={relatedPost.title}
-                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                             }}
