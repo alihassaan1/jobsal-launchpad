@@ -190,8 +190,8 @@ const BlogPost = () => {
                         {author?.full_name?.charAt(0) || 'A'}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <p className="font-medium">{author?.full_name || 'Jobs.al Team'}</p>
+                     <div>
+                      <p className="font-medium">{author?.full_name || 'Ethan'}</p>
                       <div className="flex items-center gap-3 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
@@ -239,7 +239,18 @@ const BlogPost = () => {
               )}
 
               {/* Content */}
-              <div className="prose prose-lg max-w-none mb-12">
+              <div className="prose prose-lg max-w-none mb-12 
+                [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-4 
+                [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-3 
+                [&_p]:mb-4 [&_p]:leading-relaxed
+                [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ul]:space-y-2
+                [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol]:space-y-2
+                [&_table]:w-full [&_table]:border-collapse [&_table]:my-6
+                [&_th]:border [&_th]:border-border [&_th]:bg-muted [&_th]:p-3 [&_th]:text-left [&_th]:font-semibold
+                [&_td]:border [&_td]:border-border [&_td]:p-3
+                [&_strong]:font-semibold [&_strong]:text-foreground
+                [&_em]:italic
+                [&_a]:text-primary [&_a]:underline [&_a]:hover:text-primary/80">
                 <div dangerouslySetInnerHTML={{ __html: post.content }} />
               </div>
 

@@ -52,12 +52,13 @@ serve(async (req) => {
 Your content must be:
 - Professionally written with perfect grammar and engaging tone
 - Fully optimized for search engines (SEO best practices)
-- Structured with clear H2 and H3 headings
+- Structured with clear H2 and H3 headings with GENEROUS spacing between sections
 - Rich with actionable insights and data-driven advice
-- Formatted in clean, semantic HTML
+- Formatted in clean, semantic HTML with proper spacing and readability
 - Targeted to both job seekers and employers in Albania
 - Including internal linking opportunities where relevant
-- Written in a conversational yet authoritative voice`
+- Written in a conversational yet authoritative voice
+- Look like it was written by a human with natural paragraph breaks and visual structure`
           },
           {
             role: "user",
@@ -71,22 +72,35 @@ Requirements:
 3. Meta Title: Optimized for Google SERP, 50-60 characters
 4. Meta Description: Persuasive with keywords, 150-160 characters
 5. Excerpt: Engaging hook, 180-200 characters
-6. Structure: 
-   - Opening paragraph with hook and keyword
+6. Structure & Formatting (CRITICAL):
+   - Opening paragraph with hook and keyword (2-3 paragraphs)
    - Multiple H2 sections with 2-3 H3 subsections each
-   - Bullet points and numbered lists for readability
+   - GENEROUS spacing: wrap each paragraph in <p> tags with margin-bottom classes
+   - Use <br> tags sparingly for extra visual breaks between major sections
+   - Bullet points (<ul><li>) and numbered lists (<ol><li>) for readability
+   - Use tables (<table>) where data comparison makes sense (e.g., salary comparisons, skill requirements, company benefits)
+   - Bold key terms with <strong> tags
+   - Italicize emphasis with <em> tags
    - Internal linking suggestions (use placeholder URLs like /jobs, /resume-builder)
    - Strong conclusion with call-to-action
-7. SEO Elements:
+7. HTML Formatting Standards:
+   - Each paragraph must be in <p class="mb-4"> or <p class="mb-6"> for spacing
+   - Each H2 must have <h2 class="text-2xl font-bold mt-8 mb-4">
+   - Each H3 must have <h3 class="text-xl font-semibold mt-6 mb-3">
+   - Lists must have proper spacing: <ul class="list-disc pl-6 mb-4 space-y-2">
+   - Tables must use: <table class="w-full border-collapse border border-gray-300 my-6">
+   - Make it look professionally formatted and human-written, not compressed AI text
+8. SEO Elements:
    - Primary keyword in first 100 words
    - Secondary keywords naturally distributed
    - LSI keywords related to Albanian job market
    - Rich snippets opportunities (FAQs, How-tos)
-8. Content Quality:
+9. Content Quality:
    - Actionable advice with specific examples
-   - Albanian market statistics and trends
+   - Albanian market statistics and trends (use realistic 2025 data)
    - Real-world scenarios
    - Expert tips and best practices
+   - When appropriate, include comparison tables (e.g., job roles vs salaries, skills vs industries)
 
 Return ONLY a valid JSON object with this exact structure:
 {
@@ -95,7 +109,7 @@ Return ONLY a valid JSON object with this exact structure:
   "metaDescription": "Persuasive meta description with keywords (150-160 chars)",
   "metaKeywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
   "excerpt": "Engaging excerpt that hooks readers (180-200 chars)",
-  "content": "Full HTML content with <h2>, <h3>, <p>, <ul>, <ol>, <strong>, <a> tags. Use semantic HTML. Include 5-7 major sections with subsections.",
+  "content": "Full HTML content with proper spacing classes, <h2>, <h3>, <p class='mb-4'>, <ul class='list-disc pl-6 mb-4 space-y-2'>, <ol>, <table>, <strong>, <em>, <a> tags. Must look professionally formatted with generous spacing. Include 5-7 major sections with subsections.",
   "category": "One of: Career Advice, Job Market Trends, Interview Tips, Resume Building, Employer Insights, Salary Guide, Industry Analysis",
   "tags": ["primary-keyword", "secondary-keyword", "related-keyword", "albania-jobs", "specific-industry"]
 }`
