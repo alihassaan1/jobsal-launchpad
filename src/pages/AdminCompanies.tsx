@@ -27,8 +27,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Search, CheckCircle, Star, Ban, Eye } from "lucide-react";
+import { Search, CheckCircle, Star, Ban, Eye, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
+import { LoadingState } from "@/components/admin/LoadingState";
+import { EmptyState } from "@/components/admin/EmptyState";
 
 export default function AdminCompanies() {
   const [companies, setCompanies] = useState<any[]>([]);
@@ -162,7 +165,13 @@ export default function AdminCompanies() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-8">Loading companies...</div>
+            <LoadingState type="table" rows={6} />
+          ) : filteredCompanies.length === 0 ? (
+            <EmptyState
+              icon={Building2}
+              title="No companies found"
+              description="There are no companies matching your search criteria."
+            />
           ) : (
             <Table>
               <TableHeader>

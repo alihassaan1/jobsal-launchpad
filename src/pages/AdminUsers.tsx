@@ -28,8 +28,11 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Search, UserCog, Trash2, Mail } from "lucide-react";
+import { Search, UserCog, Users as UsersIcon } from "lucide-react";
 import { toast } from "sonner";
+import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
+import { LoadingState } from "@/components/admin/LoadingState";
+import { EmptyState } from "@/components/admin/EmptyState";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
@@ -160,7 +163,8 @@ export default function AdminUsers() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <ErrorBoundary>
+      <div className="p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">User Management</h1>
         <p className="text-muted-foreground mt-1">Manage user accounts and roles</p>
@@ -201,7 +205,13 @@ export default function AdminUsers() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-8">Loading users...</div>
+            <LoadingState type="table" rows={8} />
+          ) : filteredUsers.length === 0 ? (
+            <EmptyState
+              icon={UsersIcon}
+              title="No users found"
+              description="There are no users matching your search criteria."
+            />
           ) : (
             <Table>
               <TableHeader>
@@ -300,5 +310,6 @@ export default function AdminUsers() {
         </CardContent>
       </Card>
     </div>
+    </ErrorBoundary>
   );
 }
