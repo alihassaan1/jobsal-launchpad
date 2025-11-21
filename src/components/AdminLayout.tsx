@@ -66,7 +66,6 @@ const adminMenuItems = [
     items: [
       { title: "Blog", url: "/admin/blog", icon: FileText },
       { title: "Templates", url: "/admin/templates", icon: FileText },
-      { title: "AI Agent", url: "/admin/ai-agent", icon: Sparkles },
       { title: "Marketing Agent", url: "/admin/marketing-agent", icon: Sparkles },
     ]
   },

@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Table,
   TableBody,
@@ -33,7 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Eye, Calendar } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, Calendar, Sparkles, FileText, Facebook, Instagram, TrendingUp, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 const AdminBlog = () => {
@@ -44,6 +46,17 @@ const AdminBlog = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
   const [isSeeding, setIsSeeding] = useState(false);
+  
+  // AI Agent State
+  const [blogTopic, setBlogTopic] = useState("");
+  const [blogKeywords, setBlogKeywords] = useState("");
+  const [generateFacebookPost, setGenerateFacebookPost] = useState(true);
+  const [generateInfographic, setGenerateInfographic] = useState(false);
+  const [isGeneratingBlog, setIsGeneratingBlog] = useState(false);
+  const [generatedBlogSlug, setGeneratedBlogSlug] = useState<string | null>(null);
+  const [generatedFacebookPost, setGeneratedFacebookPost] = useState<string | null>(null);
+  const [generatedInfographic, setGeneratedInfographic] = useState<string | null>(null);
+  
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -201,6 +214,64 @@ const AdminBlog = () => {
     });
   };
 
+  const generateBlogPost = async () => {
+    if (!blogTopic || !blogKeywords) {
+      toast.error("Please provide both topic and keywords");
+      return;
+    }
+
+    if (!user) {
+      toast.error("You must be logged in");
+      return;
+    }
+
+    setIsGeneratingBlog(true);
+    setGeneratedBlogSlug(null);
+    setGeneratedFacebookPost(null);
+    setGeneratedInfographic(null);
+
+    try {
+      console.log("Calling generate-blog-post function...");
+      const { data, error } = await supabase.functions.invoke("generate-blog-post", {
+        body: {
+          topic: blogTopic,
+          keywords: blogKeywords,
+          userId: user.id,
+          generateFacebookPost,
+          generateInfographic
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        setGeneratedBlogSlug(data.post.slug);
+        setGeneratedFacebookPost(data.facebookPost);
+        setGeneratedInfographic(data.infographic);
+
+        toast.success("Blog post generated successfully!", {
+          description: "Check the table below to review it."
+        });
+
+        // Reset form
+        setBlogTopic("");
+        setBlogKeywords("");
+        
+        // Refresh posts list
+        await fetchPosts();
+      } else {
+        throw new Error(data.error || "Failed to generate blog post");
+      }
+    } catch (error: any) {
+      console.error("Error generating blog post:", error);
+      toast.error("Failed to generate blog post", {
+        description: error.message
+      });
+    } finally {
+      setIsGeneratingBlog(false);
+    }
+  };
+
   const seedSamplePosts = async () => {
     setIsSeeding(true);
     try {
@@ -218,6 +289,145 @@ const AdminBlog = () => {
 
   return (
     <div className="p-6 space-y-6">
+      {/* AI Blog Generator Card */}
+      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <CardTitle>AI Blog Post Generator</CardTitle>
+          </div>
+          <CardDescription>
+            Generate SEO-optimized blog posts with AI-created images, Facebook posts, and infographics
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="blog-topic">Topic</Label>
+              <Input
+                id="blog-topic"
+                value={blogTopic}
+                onChange={(e) => setBlogTopic(e.target.value)}
+                placeholder="e.g., Top Skills for Tech Jobs in Albania 2025"
+                disabled={isGeneratingBlog}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="blog-keywords">Keywords (comma-separated)</Label>
+              <Input
+                id="blog-keywords"
+                value={blogKeywords}
+                onChange={(e) => setBlogKeywords(e.target.value)}
+                placeholder="e.g., tech jobs Albania, programming skills"
+                disabled={isGeneratingBlog}
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="facebook-post"
+                checked={generateFacebookPost}
+                onCheckedChange={(checked) => setGenerateFacebookPost(checked as boolean)}
+                disabled={isGeneratingBlog}
+              />
+              <label htmlFor="facebook-post" className="text-sm font-medium flex items-center gap-2">
+                <Facebook className="h-4 w-4 text-blue-600" />
+                Facebook Post
+              </label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="infographic"
+                checked={generateInfographic}
+                onCheckedChange={(checked) => setGenerateInfographic(checked as boolean)}
+                disabled={isGeneratingBlog}
+              />
+              <label htmlFor="infographic" className="text-sm font-medium flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-green-600" />
+                Generate Infographic
+              </label>
+            </div>
+          </div>
+
+          <Button
+            onClick={generateBlogPost}
+            disabled={isGeneratingBlog || !blogTopic || !blogKeywords}
+            className="w-full"
+            size="lg"
+          >
+            {isGeneratingBlog ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating Content with AI...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Generate Blog Post
+              </>
+            )}
+          </Button>
+
+          {generatedBlogSlug && (
+            <Alert className="bg-green-50 border-green-200">
+              <AlertDescription className="space-y-3">
+                <p className="font-semibold text-green-800 flex items-center gap-2">
+                  ✅ Blog post generated successfully!
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="ml-auto"
+                    onClick={() => window.open(`/blog/${generatedBlogSlug}`, '_blank')}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-1" />
+                    View Post
+                  </Button>
+                </p>
+                <p className="text-sm text-green-700">
+                  URL: <a href={`/blog/${generatedBlogSlug}`} target="_blank" rel="noopener noreferrer" className="underline hover:text-green-900">/blog/{generatedBlogSlug}</a>
+                </p>
+                {generatedFacebookPost && (
+                  <div className="p-3 bg-white rounded border border-green-200">
+                    <p className="text-xs font-semibold text-green-800 mb-1 flex items-center gap-1">
+                      <Facebook className="h-3 w-3" /> Facebook Post:
+                    </p>
+                    <Textarea 
+                      value={generatedFacebookPost} 
+                      readOnly 
+                      className="text-sm h-20 resize-none"
+                    />
+                  </div>
+                )}
+                {generatedInfographic && (
+                  <div className="p-3 bg-white rounded border border-green-200">
+                    <p className="text-xs font-semibold text-green-800 mb-2 flex items-center gap-1">
+                      <Instagram className="h-3 w-3" /> Infographic:
+                    </p>
+                    <img 
+                      src={generatedInfographic} 
+                      alt="Job Market Infographic" 
+                      className="w-full max-w-sm rounded border"
+                    />
+                    <a 
+                      href={generatedInfographic} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 hover:underline mt-2 inline-block"
+                    >
+                      Open full image
+                    </a>
+                  </div>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Blog Management</h1>

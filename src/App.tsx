@@ -24,7 +24,6 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminSettings from "./pages/AdminSettings";
 import AdminJobs from "./pages/AdminJobs";
 import AdminTemplates from "./pages/AdminTemplates";
-import AdminAIAgent from "./pages/AdminAIAgent";
 import AdminMarketingAgent from "./pages/AdminMarketingAgent";
 import EmployerAnalytics from "./pages/EmployerAnalytics";
 import EmployerSubscription from "./pages/EmployerSubscription";
@@ -72,8 +71,6 @@ const App = () => (
               <Route path="jobs" element={<AdminJobs />} />
               <Route path="revenue" element={<AdminRevenue />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
-              <Route path="templates" element={<AdminTemplates />} />
-              <Route path="ai-agent" element={<AdminAIAgent />} />
               <Route path="marketing-agent" element={<AdminMarketingAgent />} />
               <Route path="blog" element={<AdminBlog />} />
               <Route path="settings" element={<AdminSettings />} />
