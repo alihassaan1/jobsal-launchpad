@@ -406,6 +406,160 @@ export type Database = {
           },
         ]
       }
+      marketing_conversions: {
+        Row: {
+          conversion_type: string
+          conversion_value: number | null
+          converted_at: string | null
+          id: string
+          lead_id: string
+          notes: string | null
+          user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          conversion_type: string
+          conversion_value?: number | null
+          converted_at?: string | null
+          id?: string
+          lead_id: string
+          notes?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          conversion_type?: string
+          conversion_value?: number | null
+          converted_at?: string | null
+          id?: string
+          lead_id?: string
+          notes?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_conversions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketing_leads: {
+        Row: {
+          company_name: string | null
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string | null
+          created_by_agent_run_id: string | null
+          current_stage: string
+          draft_email: string
+          draft_linkedin: string
+          id: string
+          industry: string | null
+          lead_type: string
+          linkedin_url: string | null
+          priority: string
+          relevance_notes: string | null
+          university_name: string | null
+          updated_at: string | null
+          utm_campaign: string
+        }
+        Insert: {
+          company_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string | null
+          created_by_agent_run_id?: string | null
+          current_stage?: string
+          draft_email: string
+          draft_linkedin: string
+          id?: string
+          industry?: string | null
+          lead_type: string
+          linkedin_url?: string | null
+          priority: string
+          relevance_notes?: string | null
+          university_name?: string | null
+          updated_at?: string | null
+          utm_campaign: string
+        }
+        Update: {
+          company_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string | null
+          created_by_agent_run_id?: string | null
+          current_stage?: string
+          draft_email?: string
+          draft_linkedin?: string
+          id?: string
+          industry?: string | null
+          lead_type?: string
+          linkedin_url?: string | null
+          priority?: string
+          relevance_notes?: string | null
+          university_name?: string | null
+          updated_at?: string | null
+          utm_campaign?: string
+        }
+        Relationships: []
+      }
+      marketing_outreach_attempts: {
+        Row: {
+          attempt_type: string
+          created_at: string | null
+          email_clicked: boolean | null
+          email_delivered: boolean | null
+          email_opened: boolean | null
+          id: string
+          lead_id: string
+          notes: string | null
+          response_received: boolean | null
+          sent_at: string | null
+        }
+        Insert: {
+          attempt_type: string
+          created_at?: string | null
+          email_clicked?: boolean | null
+          email_delivered?: boolean | null
+          email_opened?: boolean | null
+          id?: string
+          lead_id: string
+          notes?: string | null
+          response_received?: boolean | null
+          sent_at?: string | null
+        }
+        Update: {
+          attempt_type?: string
+          created_at?: string | null
+          email_clicked?: boolean | null
+          email_delivered?: boolean | null
+          email_opened?: boolean | null
+          id?: string
+          lead_id?: string
+          notes?: string | null
+          response_received?: boolean | null
+          sent_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_outreach_attempts_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author_id: string
