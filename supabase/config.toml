@@ -15,6 +15,9 @@ verify_jwt = true
 [functions.generate-blog-post]
 verify_jwt = false
 
+[functions.auto-generate-blog]
+verify_jwt = false
+
 [functions.scrape-jobs]
 verify_jwt = true
 
