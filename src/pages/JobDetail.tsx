@@ -9,6 +9,7 @@ import { Briefcase, MapPin, DollarSign, Building2, Calendar, Users, Share2, Arro
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import ApplyToJobDialog from "@/components/ApplyToJobDialog";
+import { Helmet } from "react-helmet";
 
 const JobDetail = () => {
   const { slug } = useParams();
@@ -137,7 +138,50 @@ const JobDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>{job.seo_title || `${job.title} at ${job.companies?.name} | Jobs.al`}</title>
+        <meta name="description" content={job.seo_description || `Apply for ${job.title} position at ${job.companies?.name} in ${job.location}. ${job.description.substring(0, 150)}...`} />
+        <meta name="keywords" content={`${job.title}, ${job.category}, ${job.location}, ${job.companies?.name}, ${job.skills?.slice(0, 5).join(', ')}`} />
+        <link rel="canonical" href={`https://jobs.al/jobs/${job.slug}`} />
+        <meta property="og:title" content={`${job.title} at ${job.companies?.name}`} />
+        <meta property="og:description" content={job.description.substring(0, 200)} />
+        <meta property="og:type" content="article" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "JobPosting",
+            "title": job.title,
+            "description": job.description,
+            "datePosted": job.created_at,
+            "employmentType": job.job_type.toUpperCase(),
+            "hiringOrganization": {
+              "@type": "Organization",
+              "name": job.companies?.name,
+              "logo": job.companies?.logo_url
+            },
+            "jobLocation": {
+              "@type": "Place",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": job.location,
+                "addressCountry": "AL"
+              }
+            },
+            "baseSalary": job.salary_min && job.salary_max ? {
+              "@type": "MonetaryAmount",
+              "currency": job.salary_currency,
+              "value": {
+                "@type": "QuantitativeValue",
+                "minValue": job.salary_min,
+                "maxValue": job.salary_max,
+                "unitText": "YEAR"
+              }
+            } : undefined
+          })}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -413,6 +457,7 @@ const JobDetail = () => {
         />
       )}
     </div>
+    </>
   );
 };
 
