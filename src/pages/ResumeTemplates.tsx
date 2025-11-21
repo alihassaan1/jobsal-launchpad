@@ -14,6 +14,7 @@ import resumeModern from "@/assets/resume-modern.jpg";
 import resumeClassic from "@/assets/resume-classic.jpg";
 import resumeCreative from "@/assets/resume-creative.jpg";
 import resumeExecutive from "@/assets/resume-executive.jpg";
+import resumeTech from "@/assets/resume-tech.jpg";
 
 export default function ResumeTemplates() {
   const { user } = useAuth();
@@ -79,7 +80,7 @@ export default function ResumeTemplates() {
       professional: resumeModern,
       creative: resumeCreative,
       executive: resumeExecutive,
-      tech: resumeModern,
+      tech: resumeTech,
       academic: resumeClassic,
     };
     return categoryMap[category?.toLowerCase()] || resumeModern;
