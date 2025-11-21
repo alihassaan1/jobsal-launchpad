@@ -88,7 +88,13 @@ Return a JSON object with this structure:
     }
 
     const contentData = await contentResponse.json();
-    const generatedContent = JSON.parse(contentData.choices[0].message.content);
+    let rawContent = contentData.choices[0].message.content;
+    console.log("Raw DeepSeek response:", rawContent);
+
+    // Strip markdown code blocks if present
+    rawContent = rawContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+    const generatedContent = JSON.parse(rawContent);
     console.log("Content generated successfully");
 
     // Generate featured image using Lovable AI
@@ -212,7 +218,12 @@ Return a JSON object with this structure:
 
       if (fbResponse.ok) {
         const fbData = await fbResponse.json();
-        facebookPostContent = fbData.choices[0].message.content;
+        let fbContent = fbData.choices[0].message.content;
+        
+        // Strip markdown code blocks if present
+        fbContent = fbContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        
+        facebookPostContent = fbContent;
         console.log("Facebook post generated:", facebookPostContent);
       }
     }
