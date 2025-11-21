@@ -420,6 +420,7 @@ export type Database = {
           is_sponsored: boolean | null
           language: string
           meta_description: string | null
+          meta_keywords: string[] | null
           meta_title: string | null
           published_at: string | null
           slug: string
@@ -441,6 +442,7 @@ export type Database = {
           is_sponsored?: boolean | null
           language?: string
           meta_description?: string | null
+          meta_keywords?: string[] | null
           meta_title?: string | null
           published_at?: string | null
           slug: string
@@ -462,6 +464,7 @@ export type Database = {
           is_sponsored?: boolean | null
           language?: string
           meta_description?: string | null
+          meta_keywords?: string[] | null
           meta_title?: string | null
           published_at?: string | null
           slug?: string
