@@ -39,7 +39,7 @@ interface TemplateProps {
 
 export default function ExecutiveTemplate({ data }: TemplateProps) {
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-white text-gray-900 p-12 shadow-2xl min-h-[297mm] w-[210mm]">
+    <div className="bg-gradient-to-br from-gray-50 to-white text-gray-900 p-12 shadow-2xl min-h-[297mm] w-[210mm] mx-auto">
       {/* Header - Executive Style */}
       <div className="mb-10 pb-8 border-b-2 border-gray-900">
         <h1 className="text-6xl font-light text-gray-900 mb-4 tracking-tight">
