@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Users, Building2, Briefcase, FileText, DollarSign, CreditCard, Star, TrendingUp, Settings, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
+import { LoadingState } from "@/components/admin/LoadingState";
+import { toast } from "sonner";
 import {
   LineChart,
   Line,
@@ -22,6 +25,7 @@ import {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalEmployers: 0,
@@ -49,6 +53,7 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchDashboardStats = async () => {
+    setLoading(true);
     try {
       // Fetch total users
       const { count: usersCount } = await supabase
@@ -128,7 +133,7 @@ export default function AdminDashboard() {
       }));
 
       // Fetch jobs by category
-      const { data: jobsData } = await supabase
+      const { data: jobsData} = await supabase
         .from('jobs')
         .select('category')
         .eq('is_active', true);
@@ -209,7 +214,7 @@ export default function AdminDashboard() {
         publishedPosts: postsCount || 0,
         sponsoredCompanies: sponsoredCount || 0,
         activeSubscriptions: subsCount || 0,
-        totalRevenue: 0, // Will be calculated from actual subscription data
+        totalRevenue: 0,
         monthRevenue: 0,
         resumesCreated: resumesCount || 0
       });
@@ -219,7 +224,7 @@ export default function AdminDashboard() {
       setRecentActivity(activity);
       setUserGrowth(growthData);
 
-      // Generate revenue data for demonstration (replace with actual subscription revenue)
+      // Generate revenue data for demonstration
       const mockRevenue = Array.from({ length: 12 }, (_, i) => {
         const date = new Date();
         date.setMonth(date.getMonth() - (11 - i));
@@ -232,13 +237,21 @@ export default function AdminDashboard() {
 
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
+      toast.error("Failed to load dashboard stats");
+    } finally {
+      setLoading(false);
     }
   };
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
+  if (loading) {
+    return <LoadingState type="dashboard" />;
+  }
+
   return (
-    <div className="p-6 space-y-6">
+    <ErrorBoundary>
+      <div className="p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <p className="text-muted-foreground mt-1">Overview of Jobs.al platform</p>
@@ -451,5 +464,6 @@ export default function AdminDashboard() {
         </Card>
       </div>
     </div>
+    </ErrorBoundary>
   );
 }
