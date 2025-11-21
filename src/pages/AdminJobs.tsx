@@ -34,6 +34,7 @@ import { useNavigate } from "react-router-dom";
 import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
 import { LoadingState } from "@/components/admin/LoadingState";
 import { EmptyState } from "@/components/admin/EmptyState";
+import { AdminGuard } from "@/components/admin/AdminGuard";
 
 export default function AdminJobs() {
   const navigate = useNavigate();
@@ -140,62 +141,62 @@ export default function AdminJobs() {
   const categories = Array.from(new Set(jobs.map(job => job.category))).filter(Boolean);
 
   return (
-    <ErrorBoundary>
-      <div className="p-6 space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Briefcase className="h-5 w-5" />
-              Job Management
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {loading ? (
-              <LoadingState type="table" />
-            ) : filteredJobs.length === 0 ? (
-              <EmptyState 
-                icon={Briefcase}
-                title="No jobs found"
-                description="No jobs match your current filters"
-              />
-            ) : (
-              <>
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search jobs or companies..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full md:w-[180px]">
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                      <SelectItem value="featured">Featured</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                    <SelectTrigger className="w-full md:w-[180px]">
-                      <SelectValue placeholder="Filter by category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+    <AdminGuard>
+      <ErrorBoundary>
+        <div className="p-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Briefcase className="h-5 w-5" />
+                Job Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search jobs or companies..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full md:w-[180px]">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="featured">Featured</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-full md:w-[180px]">
+                    <SelectValue placeholder="Filter by category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
+              {loading ? (
+                <LoadingState type="table" />
+              ) : filteredJobs.length === 0 ? (
+                <EmptyState 
+                  icon={Briefcase}
+                  title="No jobs found"
+                  description="No jobs match your current filters"
+                />
+              ) : (
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
@@ -297,11 +298,11 @@ export default function AdminJobs() {
                     </TableBody>
                   </Table>
                 </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </ErrorBoundary>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </ErrorBoundary>
+    </AdminGuard>
   );
 }
