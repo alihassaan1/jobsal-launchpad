@@ -163,6 +163,7 @@ export type Database = {
           id: string
           industry: string | null
           is_sponsored: boolean | null
+          is_top_employer: boolean | null
           is_verified: boolean | null
           location: string | null
           logo_url: string | null
@@ -172,6 +173,9 @@ export type Database = {
           slug: string
           social_links: Json | null
           sponsorship_plan: string | null
+          top_employer_end_date: string | null
+          top_employer_plan_type: string | null
+          top_employer_start_date: string | null
           updated_at: string
           views_count: number | null
           website: string | null
@@ -187,6 +191,7 @@ export type Database = {
           id?: string
           industry?: string | null
           is_sponsored?: boolean | null
+          is_top_employer?: boolean | null
           is_verified?: boolean | null
           location?: string | null
           logo_url?: string | null
@@ -196,6 +201,9 @@ export type Database = {
           slug: string
           social_links?: Json | null
           sponsorship_plan?: string | null
+          top_employer_end_date?: string | null
+          top_employer_plan_type?: string | null
+          top_employer_start_date?: string | null
           updated_at?: string
           views_count?: number | null
           website?: string | null
@@ -211,6 +219,7 @@ export type Database = {
           id?: string
           industry?: string | null
           is_sponsored?: boolean | null
+          is_top_employer?: boolean | null
           is_verified?: boolean | null
           location?: string | null
           logo_url?: string | null
@@ -220,6 +229,9 @@ export type Database = {
           slug?: string
           social_links?: Json | null
           sponsorship_plan?: string | null
+          top_employer_end_date?: string | null
+          top_employer_plan_type?: string | null
+          top_employer_start_date?: string | null
           updated_at?: string
           views_count?: number | null
           website?: string | null
@@ -468,6 +480,65 @@ export type Database = {
           },
           {
             foreignKeyName: "posts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      premium_placements: {
+        Row: {
+          amount_paid: number
+          company_id: string | null
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          end_date: string
+          id: string
+          notes: string | null
+          payment_method: string | null
+          payment_reference: string | null
+          placement_type: string
+          start_date: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount_paid: number
+          company_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          end_date: string
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          placement_type: string
+          start_date: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          company_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          end_date?: string
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          placement_type?: string
+          start_date?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premium_placements_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
