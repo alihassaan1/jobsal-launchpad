@@ -18,69 +18,73 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are the Marketing & Outreach AI Agent for Jobs.al, Albania's premier job portal.
+    const systemPrompt = `You are an AI Marketing Agent for Jobs.al, Albania's premier job portal.
+Your role is to automatically find, qualify, draft outreach, and generate leads.
 
-Your responsibility is to help grow Jobs.al by creating outreach messages, identifying leads, and generating marketing content.
+CRITICAL: For every lead you generate, you MUST provide ALL required fields in valid JSON format.
 
-Your Main Goals:
-- Bring Albanian universities onto Jobs.al as partners
-- Reach out to employers and HR managers
-- Help grow student registrations
-- Increase job postings from Albanian companies
-- Prepare content for LinkedIn, email, and social media
+Lead Types:
+1. Employers - Albanian companies + remote-friendly EU companies hiring Albanian talent
+2. Universities - Albanian universities and Balkan institutions with career centers
 
-Tone & Style:
-- Professional, friendly, and clear
-- No exaggerated language
-- Keep messages short and direct
-- Avoid pressure tactics
-- Focus on value for employers, students, and universities
+Required Fields for EVERY Lead:
+- lead_type: "employer" OR "university"
+- company_name: (for employers, leave empty for universities)
+- university_name: (for universities, leave empty for employers)
+- industry: specific industry/sector
+- contact_name: person's name or null if unknown
+- contact_email: email address or null if unavailable
+- linkedin_url: company/person LinkedIn URL or null
+- relevance_notes: one sentence explaining why this lead matters to Jobs.al
+- draft_email: full personalized outreach message with CTA and signup link
+- draft_linkedin: under 300 chars, no links, friendly request
+- priority: "high" (active hiring, direct contact) / "medium" (occasional hiring) / "low" (hard to contact)
+- utm_campaign: unique slug format "employer_companyname_location_date" or "university_name_date"
+- created_by_agent_run_id: use current timestamp as run ID
 
-IMPORTANT: Generate REAL Albanian companies, universities, and organizations. Use your knowledge of Albania's business landscape.`;
+Draft Email Requirements:
+- Personalized based on relevance
+- Include: https://jobs.al/signup?utm_source=outreach&utm_campaign={CAMPAIGN_SLUG}
+- Professional, friendly, short
+- Clear CTA to create free account
+
+Validation:
+- Use REAL companies and universities
+- No duplicates (same company + type + email)
+- Fill all fields (use null for unknown contact info)
+- Generate 10-15 high-quality leads per run
+
+IMPORTANT: Return ONLY valid JSON array of lead objects, no markdown formatting.`;
 
     let userPrompt = '';
+    const agentRunId = `run_${Date.now()}`;
     
     if (taskType === 'daily') {
-      userPrompt = `Generate today's daily outreach tasks in JSON format with this exact structure:
+      userPrompt = `Generate 10-15 marketing leads for Jobs.al today.
+
+Return a JSON array where each object has this EXACT structure:
 
 {
-  "employerLeads": [
-    {
-      "companyName": "Company name",
-      "industry": "Industry type",
-      "jobTypes": "Types of jobs they hire",
-      "relevance": "Why Jobs.al is relevant to them",
-      "emailDraft": "Professional email outreach message",
-      "linkedinDraft": "LinkedIn message (max 300 chars)"
-    }
-  ],
-  "universityLeads": [
-    {
-      "universityName": "University or Faculty name",
-      "department": "Department to target",
-      "contactInfo": "Email or contact department",
-      "emailDraft": "Collaboration invitation email",
-      "pitch": "Short pitch explaining student benefits"
-    }
-  ],
-  "marketingContent": {
-    "linkedinPost": "Engaging LinkedIn post for Jobs.al",
-    "instagramCaption": "Instagram caption with hashtags",
-    "websitePromo": "Short promotional message for website/Facebook"
-  },
-  "followUpTemplates": {
-    "day2": "Follow-up template after 2 days",
-    "day7": "Follow-up template after 7 days",
-    "day14": "Follow-up template after 14 days"
-  },
-  "studentGrowthIdeas": [
-    "Actionable idea 1",
-    "Actionable idea 2",
-    "Actionable idea 3"
-  ]
+  "lead_type": "employer" or "university",
+  "company_name": "Company Name" or null,
+  "university_name": "University Name" or null,
+  "industry": "Industry/Sector",
+  "contact_name": "Contact Person" or null,
+  "contact_email": "email@example.com" or null,
+  "linkedin_url": "https://linkedin.com/company/..." or null,
+  "relevance_notes": "One sentence why this lead matters",
+  "draft_email": "Full personalized email with signup link",
+  "draft_linkedin": "Short LinkedIn message under 300 chars",
+  "priority": "high" or "medium" or "low",
+  "utm_campaign": "unique_campaign_slug",
+  "created_by_agent_run_id": "${agentRunId}"
 }
 
-Provide 10 real Albanian employer leads and 3-5 real Albanian universities.`;
+Mix of:
+- 7-10 Albanian employers (tech companies, retailers, banks, hospitality, etc.)
+- 3-5 Albanian/Balkan universities
+
+Make leads realistic, diverse, and high-quality. Return ONLY the JSON array.`;
     } else if (taskType === 'weekly') {
       userPrompt = `Generate this week's strategic outreach plan in JSON format:
 
@@ -157,6 +161,75 @@ Provide 10 real Albanian employer leads and 3-5 real Albanian universities.`;
     const generatedContent = JSON.parse(contentText);
     
     console.log('Marketing content generated successfully');
+
+    // Save leads to database if daily task
+    if (taskType === 'daily' && Array.isArray(generatedContent)) {
+      const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+      const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+      console.log(`Saving ${generatedContent.length} leads to database...`);
+      
+      const saveResults = [];
+      for (const lead of generatedContent) {
+        try {
+          const saveResponse = await fetch(`${SUPABASE_URL}/rest/v1/marketing_leads`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+              'apikey': SUPABASE_SERVICE_ROLE_KEY,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              lead_type: lead.lead_type,
+              company_name: lead.company_name,
+              university_name: lead.university_name,
+              industry: lead.industry,
+              contact_name: lead.contact_name,
+              contact_email: lead.contact_email,
+              linkedin_url: lead.linkedin_url,
+              relevance_notes: lead.relevance_notes,
+              draft_email: lead.draft_email,
+              draft_linkedin: lead.draft_linkedin,
+              current_stage: 'generated',
+              priority: lead.priority,
+              utm_campaign: lead.utm_campaign,
+              created_by_agent_run_id: lead.created_by_agent_run_id || agentRunId
+            })
+          });
+
+          if (saveResponse.ok) {
+            const savedLead = await saveResponse.json();
+            saveResults.push({ success: true, lead: savedLead });
+            console.log(`✓ Saved: ${lead.company_name || lead.university_name}`);
+          } else {
+            const error = await saveResponse.text();
+            console.error(`✗ Failed to save ${lead.company_name || lead.university_name}:`, error);
+            saveResults.push({ success: false, error });
+          }
+        } catch (err) {
+          console.error(`Error saving lead:`, err);
+          const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+          saveResults.push({ success: false, error: errorMessage });
+        }
+      }
+
+      const successCount = saveResults.filter(r => r.success).length;
+      console.log(`Saved ${successCount}/${generatedContent.length} leads successfully`);
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          content: generatedContent,
+          taskType,
+          savedLeads: successCount,
+          totalLeads: generatedContent.length
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
 
     return new Response(
       JSON.stringify({
