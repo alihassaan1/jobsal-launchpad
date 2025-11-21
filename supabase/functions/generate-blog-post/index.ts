@@ -47,37 +47,61 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are an expert content writer specializing in the Albanian job market, career advice, and employment trends. Write engaging, informative blog posts in English with SEO optimization in mind."
+            content: `You are an expert SEO content writer and career advisor specializing in the Albanian job market. 
+
+Your content must be:
+- Professionally written with perfect grammar and engaging tone
+- Fully optimized for search engines (SEO best practices)
+- Structured with clear H2 and H3 headings
+- Rich with actionable insights and data-driven advice
+- Formatted in clean, semantic HTML
+- Targeted to both job seekers and employers in Albania
+- Including internal linking opportunities where relevant
+- Written in a conversational yet authoritative voice`
           },
           {
             role: "user",
-            content: `Write a comprehensive blog post about "${topic}" for the Albanian job market. 
-            
-Focus on these keywords: ${keywords}.
+            content: `Write a comprehensive, SEO-optimized blog post about "${topic}" for the Albanian job market. 
 
-The blog post should:
-1. Be 800-1200 words
-2. Include an engaging title (max 60 characters)
-3. Have a compelling meta description (max 160 characters)
-4. Include a brief excerpt (150-200 characters)
-5. Be structured with clear headings
-6. Provide actionable insights
-7. Be relevant to job seekers and employers in Albania
+Target Keywords: ${keywords}
 
-Return a JSON object with this structure:
+Requirements:
+1. Length: 1200-1800 words (comprehensive and authoritative)
+2. Title: Compelling, keyword-rich, under 60 characters
+3. Meta Title: Optimized for Google SERP, 50-60 characters
+4. Meta Description: Persuasive with keywords, 150-160 characters
+5. Excerpt: Engaging hook, 180-200 characters
+6. Structure: 
+   - Opening paragraph with hook and keyword
+   - Multiple H2 sections with 2-3 H3 subsections each
+   - Bullet points and numbered lists for readability
+   - Internal linking suggestions (use placeholder URLs like /jobs, /resume-builder)
+   - Strong conclusion with call-to-action
+7. SEO Elements:
+   - Primary keyword in first 100 words
+   - Secondary keywords naturally distributed
+   - LSI keywords related to Albanian job market
+   - Rich snippets opportunities (FAQs, How-tos)
+8. Content Quality:
+   - Actionable advice with specific examples
+   - Albanian market statistics and trends
+   - Real-world scenarios
+   - Expert tips and best practices
+
+Return ONLY a valid JSON object with this exact structure:
 {
-  "title": "SEO-optimized title",
-  "metaTitle": "Meta title for SEO",
-  "metaDescription": "Meta description for SEO",
-  "excerpt": "Brief excerpt",
-  "content": "Full blog post content in HTML format with proper headings and paragraphs",
-  "category": "One of: Career Advice, Job Market Trends, Interview Tips, Resume Building, Employer Insights",
-  "tags": ["tag1", "tag2", "tag3"]
+  "title": "SEO-optimized title with primary keyword",
+  "metaTitle": "Meta title for Google SERP (50-60 chars)",
+  "metaDescription": "Persuasive meta description with keywords (150-160 chars)",
+  "excerpt": "Engaging excerpt that hooks readers (180-200 chars)",
+  "content": "Full HTML content with <h2>, <h3>, <p>, <ul>, <ol>, <strong>, <a> tags. Use semantic HTML. Include 5-7 major sections with subsections.",
+  "category": "One of: Career Advice, Job Market Trends, Interview Tips, Resume Building, Employer Insights, Salary Guide, Industry Analysis",
+  "tags": ["primary-keyword", "secondary-keyword", "related-keyword", "albania-jobs", "specific-industry"]
 }`
           }
         ],
         temperature: 0.7,
-        max_tokens: 3000
+        max_tokens: 4000
       })
     });
 
@@ -110,7 +134,25 @@ Return a JSON object with this structure:
         messages: [
           {
             role: "user",
-            content: `Generate a professional, high-quality featured image for a blog post about "${topic}" in the Albanian job market. The image should be modern, professional, and relevant to career/employment themes. Size: 1200x630px for optimal social media sharing.`
+            content: `Create a high-quality, professional featured image for a blog post titled "${generatedContent.title}".
+
+Topic: ${topic}
+Keywords: ${keywords}
+
+Requirements:
+- Professional and modern design aesthetic
+- Directly related to ${topic} in the Albanian job market context
+- High resolution and crisp quality (1200x630px optimal for social media)
+- Engaging composition that attracts clicks
+- Use professional business/career imagery
+- Incorporate subtle Albanian elements if relevant (colors, landmarks, cultural touches)
+- Clean, uncluttered layout
+- Text overlay should be minimal or none
+- Suitable for LinkedIn, Facebook, and blog headers
+- Color palette: Professional blues, greens, or warm tones
+- Style: Contemporary, corporate, trustworthy
+
+The image should make viewers want to read the article about ${topic}.`
           }
         ],
         modalities: ["image", "text"]
@@ -204,15 +246,34 @@ Return a JSON object with this structure:
           messages: [
             {
               role: "system",
-              content: "You are a social media expert creating engaging Facebook posts for Albanian job market content."
+              content: "You are a social media expert creating engaging, viral-worthy Facebook posts for Albanian job market content. Your posts drive clicks and engagement."
             },
             {
               role: "user",
-              content: `Create an engaging Facebook post (max 250 characters) for this blog: "${generatedContent.title}". Include relevant emojis and a call-to-action. Make it engaging for the Albanian audience.`
+              content: `Create a highly engaging Facebook post for this blog article.
+
+Blog Title: "${generatedContent.title}"
+Topic: ${topic}
+Target Audience: Albanian job seekers, employers, and HR professionals
+
+Requirements:
+- Length: 200-280 characters (Facebook optimal length)
+- Include 2-4 relevant emojis strategically placed
+- Start with a hook that grabs attention
+- Include the main benefit/value proposition
+- End with a strong call-to-action
+- Use conversational Albanian-friendly language
+- Create urgency or curiosity
+- Mention "Jobs.al" naturally
+
+Tone: Professional yet friendly, encouraging, action-oriented
+Goal: Maximum clicks and shares
+
+Return ONLY the Facebook post text, no JSON, no explanations.`
             }
           ],
           temperature: 0.8,
-          max_tokens: 150
+          max_tokens: 200
         })
       });
 
@@ -242,7 +303,29 @@ Return a JSON object with this structure:
           messages: [
             {
               role: "user",
-              content: `Create a professional infographic about Albanian job market trends and statistics. The infographic should be visually appealing, data-driven, and suitable for Instagram and Facebook posting. Include charts, statistics, and key insights about employment in Albania. Size: 1080x1080px (square format for Instagram). Use professional colors and modern design.`
+              content: `Create a professional, data-driven infographic about Albanian job market trends and statistics.
+
+Topic Focus: ${topic}
+Keywords: ${keywords}
+
+Requirements:
+- Square format: 1080x1080px (Instagram/Facebook optimized)
+- Professional design with modern aesthetics
+- Include 5-7 key data points or statistics
+- Use charts/graphs (pie charts, bar graphs, trend lines)
+- Color scheme: Professional blues, teals, or brand colors
+- Clean typography and hierarchy
+- Incorporate Albanian flag colors subtly (red/black accents)
+- Include Jobs.al branding
+- Data visualization best practices
+- White space and readability
+- Mobile-friendly text sizes
+- Shareable and engaging design
+- Include year "2025" in statistics
+- Focus on: employment rates, salary ranges, top industries, job growth, skills in demand
+
+Style: Corporate infographic, modern, trustworthy, data-focused
+The infographic should be highly shareable and valuable for job seekers and employers in Albania.`
             }
           ],
           modalities: ["image", "text"]
