@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.scrape-jobs]
 verify_jwt = true
+
+[functions.marketing-outreach]
+verify_jwt = false
