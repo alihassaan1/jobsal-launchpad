@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import heroBg from "@/assets/hero-bg.jpg";
 import patternBg from "@/assets/pattern-bg.jpg";
 import FeaturedCompanies from "./FeaturedCompanies";
+import { Helmet } from "react-helmet";
 
 // Blog section component
 const BlogSection = () => {
@@ -160,7 +161,18 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>Jobs.al - Find Your Dream Job in Albania | Top Albanian Job Portal</title>
+        <meta name="description" content="Discover thousands of job opportunities in Albania. Jobs.al is Albania's leading job portal connecting talented professionals with top employers across Tirana, Durres, and major Albanian cities." />
+        <meta name="keywords" content="jobs albania, pune shqiperi, job vacancies albania, career opportunities albania, employment tirana, jobs tirana, albanian job market" />
+        <link rel="canonical" href="https://jobs.al" />
+        <meta property="og:title" content="Jobs.al - Albania's Premier Job Search Platform" />
+        <meta property="og:description" content="Find your next career opportunity in Albania. Browse 1,200+ active job listings from 500+ verified companies." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://jobs.al" />
+      </Helmet>
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4">
@@ -618,6 +630,7 @@ const Index = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 

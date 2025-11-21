@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Briefcase, MapPin, DollarSign, Building2, Search, Clock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { Helmet } from "react-helmet";
 
 const Jobs = () => {
   const navigate = useNavigate();
@@ -72,7 +73,16 @@ const Jobs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <Helmet>
+        <title>Browse All Jobs in Albania | Jobs.al Job Search</title>
+        <meta name="description" content="Search and filter through hundreds of job opportunities across Albania. Find full-time, part-time, remote, and contract positions in Technology, Marketing, Finance, and more sectors." />
+        <meta name="keywords" content="job search albania, browse jobs, job listings albania, career search, employment opportunities albania" />
+        <link rel="canonical" href="https://jobs.al/jobs" />
+        <meta property="og:title" content="Browse All Jobs in Albania - Jobs.al" />
+        <meta property="og:description" content="Filter jobs by location, category, and type. Find your perfect match from hundreds of active positions." />
+      </Helmet>
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -262,6 +272,7 @@ const Jobs = () => {
         )}
       </section>
     </div>
+    </>
   );
 };
 
