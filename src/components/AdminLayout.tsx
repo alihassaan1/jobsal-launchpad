@@ -13,7 +13,8 @@ import {
   LogOut,
   Menu,
   Briefcase,
-  Sparkles
+  Sparkles,
+  ChevronDown
 } from "lucide-react";
 import {
   Sidebar,
@@ -28,7 +29,12 @@ import {
   SidebarTrigger,
   SidebarInset,
   useSidebar,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -77,10 +83,19 @@ function AdminSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const collapsed = state === 'collapsed';
+  const [openSections, setOpenSections] = useState<string[]>(['Overview', 'Management', 'Finance', 'Content', 'System']);
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => 
+      prev.includes(section) 
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
   };
 
 
@@ -88,23 +103,39 @@ function AdminSidebar() {
     <Sidebar collapsible="icon" className="border-r">
       <SidebarContent>
         {adminMenuItems.map((section) => (
-          <SidebarGroup key={section.group}>
-            <SidebarGroupLabel>{section.group}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {section.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                      <NavLink to={item.url}>
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <Collapsible
+            key={section.group}
+            open={openSections.includes(section.group)}
+            onOpenChange={() => toggleSection(section.group)}
+            className="group/collapsible"
+          >
+            <SidebarGroup>
+              <SidebarGroupLabel asChild>
+                <CollapsibleTrigger className="flex w-full items-center justify-between hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2 py-1.5">
+                  <span className="text-xs font-semibold">{section.group}</span>
+                  {!collapsed && (
+                    <ChevronDown className="h-3 w-3 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                  )}
+                </CollapsibleTrigger>
+              </SidebarGroupLabel>
+              <CollapsibleContent>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {section.items.map((item) => (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton asChild isActive={location.pathname === item.url}>
+                          <NavLink to={item.url}>
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.title}</span>
+                          </NavLink>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </CollapsibleContent>
+            </SidebarGroup>
+          </Collapsible>
         ))}
 
         <div className="mt-auto p-4">
