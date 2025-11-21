@@ -39,7 +39,7 @@ interface TemplateProps {
 
 export default function ModernTemplate({ data }: TemplateProps) {
   return (
-    <div className="bg-white text-gray-900 p-12 shadow-2xl min-h-[297mm] w-[210mm] font-sans relative overflow-hidden">
+    <div className="bg-white text-gray-900 p-12 shadow-2xl min-h-[297mm] w-[210mm] font-sans relative overflow-hidden mx-auto">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-full blur-3xl opacity-30 -z-10"></div>
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-50 to-blue-50 rounded-full blur-3xl opacity-30 -z-10"></div>

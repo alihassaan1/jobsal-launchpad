@@ -39,9 +39,9 @@ interface TemplateProps {
 
 export default function CreativeTemplate({ data }: TemplateProps) {
   return (
-    <div className="bg-white text-gray-900 shadow-2xl min-h-[297mm] w-[210mm] flex">
-      {/* Left Sidebar */}
-      <div className="w-1/3 bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 text-white p-8 relative overflow-hidden">
+    <div className="bg-white text-gray-900 shadow-2xl min-h-[297mm] w-[210mm] flex mx-auto">
+      {/* Left Sidebar - Fixed width to prevent layout shifts */}
+      <div className="w-[70mm] bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 text-white p-6 relative overflow-hidden flex-shrink-0">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full -ml-12 -mb-12"></div>
         <div className="mb-10 relative z-10">
@@ -125,8 +125,8 @@ export default function CreativeTemplate({ data }: TemplateProps) {
         )}
       </div>
 
-      {/* Right Content */}
-      <div className="w-2/3 p-10 bg-gradient-to-br from-gray-50 to-white">
+      {/* Right Content - Fixed width to prevent layout shifts */}
+      <div className="w-[140mm] p-8 bg-gradient-to-br from-gray-50 to-white flex-shrink-0">
         {/* Summary */}
         {data.summary && (
           <div className="mb-8">

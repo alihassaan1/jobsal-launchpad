@@ -39,7 +39,7 @@ interface TemplateProps {
 
 export default function ClassicTemplate({ data }: TemplateProps) {
   return (
-    <div className="bg-white text-gray-900 p-12 shadow-xl min-h-[297mm] w-[210mm]">
+    <div className="bg-white text-gray-900 p-12 shadow-xl min-h-[297mm] w-[210mm] mx-auto">
       {/* Header - Elegant Classic Style */}
       <div className="text-center border-b border-t border-gray-800 py-6 mb-8">
         <h1 className="text-5xl font-serif font-bold text-gray-900 mb-3 tracking-wide">

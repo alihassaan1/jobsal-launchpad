@@ -284,24 +284,46 @@ export default function ResumeBuilder() {
       return;
     }
 
+    // Create a wrapper to ensure proper sizing
+    const wrapper = document.createElement('div');
+    wrapper.style.width = '210mm';
+    wrapper.style.minHeight = '297mm';
+    wrapper.style.backgroundColor = '#ffffff';
+    wrapper.style.margin = '0';
+    wrapper.style.padding = '0';
+    wrapper.style.position = 'relative';
+    wrapper.appendChild(element.cloneNode(true));
+
     const opt = {
       margin: 0,
       filename: `${resumeData.personal_info.full_name || 'Resume'}.pdf`,
       image: { type: 'jpeg' as const, quality: 1.0 },
       html2canvas: { 
-        scale: 4,
+        scale: 3,
         useCORS: true,
         letterRendering: true,
         logging: false,
         dpi: 300,
         backgroundColor: '#ffffff',
-        windowWidth: 794,
-        windowHeight: 1123,
-        scrollY: 0,
-        scrollX: 0,
+        width: 794, // A4 width in pixels at 96 DPI
+        height: 1123, // A4 height in pixels at 96 DPI
+        scrollY: -window.scrollY,
+        scrollX: -window.scrollX,
         allowTaint: false,
         removeContainer: true,
-        imageTimeout: 0
+        imageTimeout: 0,
+        onclone: (clonedDoc: Document) => {
+          const clonedElement = clonedDoc.getElementById('resume-preview');
+          if (clonedElement) {
+            // Force exact dimensions
+            clonedElement.style.width = '210mm';
+            clonedElement.style.minHeight = '297mm';
+            clonedElement.style.maxWidth = '210mm';
+            clonedElement.style.margin = '0 auto';
+            clonedElement.style.display = 'block';
+            clonedElement.style.boxSizing = 'border-box';
+          }
+        }
       },
       jsPDF: { 
         unit: 'mm', 
@@ -718,16 +740,18 @@ export default function ResumeBuilder() {
                 </Button>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="overflow-auto max-h-[800px] bg-gray-100 p-4">
+                <div className="overflow-auto max-h-[800px] bg-gray-100 p-4 flex justify-center">
                   <div 
                     id="resume-preview" 
-                    className="bg-white shadow-2xl mx-auto"
+                    className="bg-white shadow-2xl"
                     style={{
                       width: '210mm',
                       minHeight: '297mm',
                       transform: 'scale(0.7)',
                       transformOrigin: 'top center',
-                      marginBottom: '-30%'
+                      marginBottom: '-30%',
+                      display: 'flex',
+                      justifyContent: 'center'
                     }}
                   >
                     {renderTemplate()}
