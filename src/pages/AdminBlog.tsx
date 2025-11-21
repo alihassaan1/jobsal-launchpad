@@ -52,6 +52,7 @@ const AdminBlog = () => {
     featured_image: '',
     category: '',
     tags: '',
+    meta_keywords: '',
     language: 'en',
     is_published: false,
     meta_title: '',
@@ -105,6 +106,7 @@ const AdminBlog = () => {
     const postData = {
       ...formData,
       tags: formData.tags ? formData.tags.split(',').map(t => t.trim()) : [],
+      meta_keywords: formData.meta_keywords ? formData.meta_keywords.split(',').map(k => k.trim()) : [],
       author_id: user?.id,
       published_at: formData.is_published ? new Date().toISOString() : null
     };
@@ -147,6 +149,7 @@ const AdminBlog = () => {
       featured_image: post.featured_image || '',
       category: post.category,
       tags: post.tags?.join(', ') || '',
+      meta_keywords: post.meta_keywords?.join(', ') || '',
       language: post.language,
       is_published: post.is_published,
       meta_title: post.meta_title || '',
@@ -181,6 +184,7 @@ const AdminBlog = () => {
       featured_image: '',
       category: '',
       tags: '',
+      meta_keywords: '',
       language: 'en',
       is_published: false,
       meta_title: '',
@@ -366,6 +370,15 @@ const AdminBlog = () => {
                       placeholder="SEO description (160 chars max)"
                       rows={3}
                       maxLength={160}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="meta_keywords">Meta Keywords (comma-separated)</Label>
+                    <Input
+                      id="meta_keywords"
+                      value={formData.meta_keywords}
+                      onChange={(e) => handleInputChange('meta_keywords', e.target.value)}
+                      placeholder="job search, albania jobs, resume tips"
                     />
                   </div>
                 </div>
