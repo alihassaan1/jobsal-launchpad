@@ -13,17 +13,41 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Eye, Calendar } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Plus, Pencil, Trash2, Eye, Calendar, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
+import { EditPostDialog } from "@/components/EditPostDialog";
+
+interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string | null;
+  featured_image: string | null;
+  category: string;
+  tags: string[] | null;
+  meta_keywords: string[] | null;
+  language: string;
+  is_published: boolean;
+  meta_title: string | null;
+  meta_description: string | null;
+  views_count: number;
+  created_at: string;
+  profiles?: { full_name: string | null };
+}
 
 const AdminBlog = () => {
   const { user, userRole } = useAuth();
   const navigate = useNavigate();
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [togglingPublish, setTogglingPublish] = useState<string | null>(null);
 
   useEffect(() => {
     const allowedRoles = ['admin', 'editor'];
@@ -46,9 +70,37 @@ const AdminBlog = () => {
       console.error('Error fetching posts:', error);
       toast.error("Failed to load posts");
     } else if (data) {
-      setPosts(data);
+      setPosts(data as Post[]);
     }
     setLoading(false);
+  };
+
+  const togglePublish = async (post: Post) => {
+    setTogglingPublish(post.id);
+    
+    const newPublishedState = !post.is_published;
+    const updateData: any = {
+      is_published: newPublishedState,
+      updated_at: new Date().toISOString()
+    };
+
+    // Set published_at when publishing for first time
+    if (newPublishedState && !post.is_published) {
+      updateData.published_at = new Date().toISOString();
+    }
+
+    const { error } = await supabase
+      .from('posts')
+      .update(updateData)
+      .eq('id', post.id);
+
+    if (error) {
+      toast.error("Failed to update post status");
+    } else {
+      toast.success(newPublishedState ? "Post published!" : "Post unpublished");
+      fetchPosts();
+    }
+    setTogglingPublish(null);
   };
 
   const deletePost = async (id: string) => {
@@ -65,6 +117,11 @@ const AdminBlog = () => {
       toast.success("Post deleted successfully");
       fetchPosts();
     }
+  };
+
+  const openEditDialog = (post: Post) => {
+    setSelectedPost(post);
+    setEditDialogOpen(true);
   };
 
   const formatDate = (dateString: string) => {
@@ -90,12 +147,30 @@ const AdminBlog = () => {
     }
   };
 
+  const runScheduledGenerator = async () => {
+    toast.info("Starting content generation...");
+    try {
+      const { data, error } = await supabase.functions.invoke('scheduled-content-generator');
+      if (error) throw error;
+      
+      if (data?.success) {
+        toast.success(`Generated: ${data.result?.title || 'New content'}`);
+        fetchPosts();
+      } else {
+        toast.info(data?.message || 'Content generation completed');
+      }
+    } catch (error: any) {
+      console.error('Generation error:', error);
+      toast.error(error.message || 'Failed to generate content');
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Blog Management</h1>
-          <p className="text-muted-foreground mt-1">Create and manage blog posts</p>
+          <p className="text-muted-foreground mt-1">Create, edit, and manage blog posts</p>
         </div>
         <div className="flex gap-2">
           {posts.length === 0 && (
@@ -107,6 +182,10 @@ const AdminBlog = () => {
               {isSeeding ? 'Creating...' : 'Create Sample Posts'}
             </Button>
           )}
+          <Button variant="outline" onClick={runScheduledGenerator}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Generate Content
+          </Button>
           <Button onClick={() => setCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             New Post
@@ -121,14 +200,23 @@ const AdminBlog = () => {
         userId={user?.id || ''}
       />
 
+      <EditPostDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSuccess={fetchPosts}
+        post={selectedPost}
+      />
+
       <Card>
         <CardHeader>
-          <CardTitle>All Posts</CardTitle>
-          <CardDescription>Manage your blog posts</CardDescription>
+          <CardTitle>All Posts ({posts.length})</CardTitle>
+          <CardDescription>Manage your blog posts - edit content, toggle publish status</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-8">Loading...</div>
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
           ) : posts.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               No posts yet. Create your first post!
@@ -137,10 +225,10 @@ const AdminBlog = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Title</TableHead>
+                  <TableHead className="w-[40%]">Title</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Lang</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Published</TableHead>
                   <TableHead>Views</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -149,8 +237,11 @@ const AdminBlog = () => {
               <TableBody>
                 {posts.map((post) => (
                   <TableRow key={post.id}>
-                    <TableCell className="font-medium max-w-md truncate">
-                      {post.title}
+                    <TableCell className="font-medium">
+                      <div className="max-w-md">
+                        <p className="truncate">{post.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">/blog/{post.slug}</p>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary">{post.category}</Badge>
@@ -159,11 +250,16 @@ const AdminBlog = () => {
                       <span className="text-lg">{post.language === 'en' ? '🇬🇧' : '🇦🇱'}</span>
                     </TableCell>
                     <TableCell>
-                      {post.is_published ? (
-                        <Badge className="bg-green-600">Published</Badge>
-                      ) : (
-                        <Badge variant="outline">Draft</Badge>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={post.is_published}
+                          onCheckedChange={() => togglePublish(post)}
+                          disabled={togglingPublish === post.id}
+                        />
+                        {togglingPublish === post.id && (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <span className="flex items-center gap-1">
@@ -178,12 +274,21 @@ const AdminBlog = () => {
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openEditDialog(post)}
+                          title="Edit post"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
                         {post.is_published && (
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => navigate(`/blog/${post.slug}`)}
+                            onClick={() => window.open(`/blog/${post.slug}`, '_blank')}
+                            title="View post"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -192,6 +297,7 @@ const AdminBlog = () => {
                           size="sm"
                           variant="ghost"
                           onClick={() => deletePost(post.id)}
+                          title="Delete post"
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>

@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.seed-blog-posts]
 verify_jwt = false
+
+[functions.scheduled-content-generator]
+verify_jwt = false
