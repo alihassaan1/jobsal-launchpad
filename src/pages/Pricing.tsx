@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Briefcase, Check, Star, Users, BarChart, Building2, Headphones } from "lucide-react";
 import { useState } from "react";
+import { Helmet } from "react-helmet";
 
 export default function Pricing() {
   const { user, userRole } = useAuth();
@@ -70,9 +71,18 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
+    <>
+      <Helmet>
+        <title>Employer Pricing Plans | Recruit on Jobs.al</title>
+        <meta name="description" content="Choose the perfect hiring plan for your business. From free job posts to enterprise recruitment solutions with ATS, AI matching, and unlimited job listings." />
+        <meta name="keywords" content="employer pricing, recruitment plans, job posting pricing albania, ATS system, hiring solutions" />
+        <link rel="canonical" href="https://jobs.al/pricing" />
+        <meta property="og:title" content="Employer Pricing Plans | Jobs.al" />
+        <meta property="og:description" content="Affordable recruitment solutions for businesses of all sizes. Start hiring in Albania today." />
+      </Helmet>
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <Briefcase className="h-6 w-6 text-primary" />
@@ -398,6 +408,7 @@ export default function Pricing() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

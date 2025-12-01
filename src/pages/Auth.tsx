@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Briefcase } from 'lucide-react';
+import { Helmet } from 'react-helmet';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -48,8 +49,17 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <Card className="w-full max-w-md">
+    <>
+      <Helmet>
+        <title>Sign In or Register | Jobs.al - Albania Job Portal</title>
+        <meta name="description" content="Create your free Jobs.al account or sign in to access Albania's top job opportunities. Connect with employers, build your resume, and track your applications." />
+        <meta name="keywords" content="jobs albania login, register job seeker, employer sign in, albania job portal account" />
+        <link rel="canonical" href="https://jobs.al/auth" />
+        <meta property="og:title" content="Sign In or Create Account | Jobs.al" />
+        <meta property="og:description" content="Join Albania's premier job portal. Access thousands of job opportunities and connect with top employers." />
+      </Helmet>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
+        <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <div className="p-3 bg-primary/10 rounded-full">
@@ -240,7 +250,8 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 };
 
