@@ -50,6 +50,8 @@ const Companies = () => {
       <Helmet>
         <title>Top Companies Hiring in Albania | Jobs.al Company Directory</title>
         <meta name="description" content="Explore verified companies hiring in Albania. Find employer profiles, company culture, benefits, and open positions at Albania's top employers." />
+        <meta name="keywords" content="companies albania, employers albania, top companies hiring, company directory, verified employers" />
+        <link rel="canonical" href="https://jobs.al/companies" />
         <meta property="og:title" content="Top Companies Hiring in Albania | Jobs.al" />
         <meta property="og:description" content="Discover Albania's best employers and their open positions" />
       </Helmet>

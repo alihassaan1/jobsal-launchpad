@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Crown, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { Helmet } from "react-helmet";
 import resumeModern from "@/assets/resume-modern.jpg";
 import resumeClassic from "@/assets/resume-classic.jpg";
 import resumeCreative from "@/assets/resume-creative.jpg";
@@ -89,11 +90,20 @@ export default function ResumeTemplates() {
   const categories = Array.from(new Set(templates?.map(t => t.category).filter(Boolean)));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="container mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Professional Resume Templates</h1>
+    <>
+      <Helmet>
+        <title>Free Resume Templates | Professional CV Designs | Jobs.al</title>
+        <meta name="description" content="Browse our collection of free, ATS-friendly resume templates. Professional, creative, executive, and tech designs to help you stand out and land interviews in Albania." />
+        <meta name="keywords" content="resume templates, CV templates, professional resume, ATS-friendly templates, free resume designs" />
+        <link rel="canonical" href="https://jobs.al/resume-templates" />
+        <meta property="og:title" content="Free Professional Resume Templates | Jobs.al" />
+        <meta property="og:description" content="Choose from our collection of ATS-friendly resume templates designed to help you land your dream job." />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+        <div className="container mx-auto px-4 py-12">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4">Professional Resume Templates</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Choose from our collection of ATS-friendly templates designed to help you land your dream job
           </p>
@@ -192,7 +202,8 @@ export default function ResumeTemplates() {
             <p className="text-muted-foreground">No templates found matching your criteria</p>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
