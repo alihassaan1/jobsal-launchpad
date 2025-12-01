@@ -79,6 +79,7 @@ const App = () => (
               <Route path="marketing-agent" element={<AdminMarketingAgent />} />
               <Route path="content-generator" element={<AdminContentGenerator />} />
               <Route path="blog" element={<AdminBlog />} />
+              <Route path="templates" element={<AdminTemplates />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             
