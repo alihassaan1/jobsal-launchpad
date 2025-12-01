@@ -28,7 +28,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Search, UserCog, Users as UsersIcon } from "lucide-react";
+import { Search, UserCog, Users as UsersIcon, FileText, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
 import { LoadingState } from "@/components/admin/LoadingState";
@@ -91,12 +91,12 @@ export default function AdminUsers() {
         subsMap.set(s.user_id, arr);
       });
 
-      // 3) Count applications and resumes per user (RLS allows admins to read all)
+      // 3) Count applications and fetch resumes with file URLs per user
       const usersWithCounts = await Promise.all(
         (profiles || []).map(async (user: any) => {
           const [appsResult, resumesResult] = await Promise.all([
             supabase.from('applications').select('*', { count: 'exact', head: true }).eq('applicant_id', user.id),
-            supabase.from('resumes').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_active', true),
+            supabase.from('resumes').select('id, title, resume_file_url, is_uploaded, created_at').eq('user_id', user.id).eq('is_active', true).order('created_at', { ascending: false }),
           ]);
 
           return {
@@ -104,7 +104,8 @@ export default function AdminUsers() {
             user_roles: roleMap.get(user.id) || [],
             subscriptions: subsMap.get(user.id) || [],
             applications_count: appsResult.count || 0,
-            resumes_count: resumesResult.count || 0,
+            resumes_count: resumesResult.data?.length || 0,
+            resumes: resumesResult.data || [],
           };
         })
       );
@@ -214,14 +215,14 @@ export default function AdminUsers() {
             />
           ) : (
             <Table>
-              <TableHeader>
+                <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Joined</TableHead>
                   <TableHead>Applications</TableHead>
-                  <TableHead>Resumes</TableHead>
+                  <TableHead>Resume</TableHead>
                   <TableHead>Subscription</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -250,7 +251,37 @@ export default function AdminUsers() {
                         <Badge variant="outline">{applicationsCount}</Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{user.resumes_count || 0}</Badge>
+                        {user.resumes && user.resumes.length > 0 ? (
+                          <div className="flex flex-col gap-1">
+                            {user.resumes.slice(0, 2).map((resume: any) => (
+                              <div key={resume.id} className="flex items-center gap-1">
+                                {resume.resume_file_url ? (
+                                  <a
+                                    href={resume.resume_file_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1 text-xs text-primary hover:underline"
+                                    title={resume.title}
+                                  >
+                                    <FileText className="h-3 w-3" />
+                                    <span className="max-w-[80px] truncate">{resume.title}</span>
+                                    <ExternalLink className="h-3 w-3" />
+                                  </a>
+                                ) : (
+                                  <span className="flex items-center gap-1 text-xs text-muted-foreground" title="Builder resume (no file)">
+                                    <FileText className="h-3 w-3" />
+                                    <span className="max-w-[80px] truncate">{resume.title}</span>
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                            {user.resumes.length > 2 && (
+                              <span className="text-xs text-muted-foreground">+{user.resumes.length - 2} more</span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">None</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         {subscription ? (
