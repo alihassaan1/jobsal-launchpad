@@ -9,8 +9,8 @@ const INDEXNOW_ENDPOINTS = [
   'https://yandex.com/indexnow',
 ];
 
-// Generate a simple API key for IndexNow (store this in env in production)
-const INDEXNOW_KEY = '1a2b3c4d5e6f7g8h9i0j'; // Replace with actual key in production
+// IndexNow API key from Bing Webmaster Tools
+const INDEXNOW_KEY = 'ae69c2bfc62b455f9c9f1835b5ac084f';
 
 interface IndexNowParams {
   url: string | string[];
