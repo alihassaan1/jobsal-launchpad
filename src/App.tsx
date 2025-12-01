@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
+import JobsByCategory from "./pages/JobsByCategory";
+import JobsByLocation from "./pages/JobsByLocation";
 import EmployerDashboard from "./pages/EmployerDashboard";
 import CandidateDashboard from "./pages/CandidateDashboard";
 import ATSJobApplications from "./pages/ATSJobApplications";
@@ -25,6 +27,7 @@ import AdminSettings from "./pages/AdminSettings";
 import AdminJobs from "./pages/AdminJobs";
 import AdminTemplates from "./pages/AdminTemplates";
 import AdminMarketingAgent from "./pages/AdminMarketingAgent";
+import AdminContentGenerator from "./pages/AdminContentGenerator";
 import EmployerAnalytics from "./pages/EmployerAnalytics";
 import EmployerSubscription from "./pages/EmployerSubscription";
 import RecommendedJobs from "./pages/RecommendedJobs";
@@ -53,6 +56,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/jobs" element={<Jobs />} />
+            <Route path="/jobs/category/:category" element={<JobsByCategory />} />
+            <Route path="/jobs/location/:city" element={<JobsByLocation />} />
             <Route path="/jobs/:slug" element={<JobDetail />} />
             <Route path="/dashboard" element={<EmployerDashboard />} />
             <Route path="/my-applications" element={<CandidateDashboard />} />
@@ -72,6 +77,7 @@ const App = () => (
               <Route path="revenue" element={<AdminRevenue />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="marketing-agent" element={<AdminMarketingAgent />} />
+              <Route path="content-generator" element={<AdminContentGenerator />} />
               <Route path="blog" element={<AdminBlog />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>

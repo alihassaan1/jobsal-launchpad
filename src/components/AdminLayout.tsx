@@ -65,6 +65,7 @@ const adminMenuItems = [
     group: "Content",
     items: [
       { title: "Blog", url: "/admin/blog", icon: FileText },
+      { title: "Content Generator", url: "/admin/content-generator", icon: Sparkles },
       { title: "Templates", url: "/admin/templates", icon: FileText },
       { title: "Marketing Agent", url: "/admin/marketing-agent", icon: Sparkles },
     ]
