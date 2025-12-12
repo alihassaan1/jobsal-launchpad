@@ -40,7 +40,24 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const adminMenuItems = [
+import { 
+  FileText as FileTextIcon,
+  Activity
+} from "lucide-react";
+
+interface MenuItem {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+  subItems?: { title: string; url: string; icon: React.ComponentType<{ className?: string }> }[];
+}
+
+interface MenuGroup {
+  group: string;
+  items: MenuItem[];
+}
+
+const adminMenuItems: MenuGroup[] = [
   { 
     group: "Overview",
     items: [
@@ -68,7 +85,16 @@ const adminMenuItems = [
     items: [
       { title: "Blog", url: "/admin/blog", icon: FileText },
       { title: "Content Generator", url: "/admin/content-generator", icon: Sparkles },
-      { title: "AI Agent", url: "/admin/ai-agent", icon: Bot },
+      { 
+        title: "AI Agent", 
+        url: "/admin/ai-agent", 
+        icon: Bot,
+        subItems: [
+          { title: "Dashboard", url: "/admin/ai-agent", icon: LayoutDashboard },
+          { title: "API Logs", url: "/admin/ai-agent/logs", icon: FileTextIcon },
+          { title: "Analytics", url: "/admin/ai-agent/analytics", icon: Activity },
+        ]
+      },
       { title: "Templates", url: "/admin/templates", icon: FileText },
       { title: "Marketing Agent", url: "/admin/marketing-agent", icon: Sparkles },
       { title: "Email Marketing", url: "/admin/emails", icon: Mail },
@@ -128,12 +154,49 @@ function AdminSidebar() {
                   <SidebarMenu>
                     {section.items.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                          <NavLink to={item.url}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.title}</span>
-                          </NavLink>
-                        </SidebarMenuButton>
+                        {item.subItems ? (
+                          <Collapsible 
+                            defaultOpen={item.subItems.some(sub => location.pathname === sub.url)}
+                            className="w-full"
+                          >
+                            <CollapsibleTrigger asChild>
+                              <SidebarMenuButton 
+                                className="w-full justify-between"
+                                isActive={location.pathname.startsWith(item.url)}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <item.icon className="h-4 w-4" />
+                                  <span>{item.title}</span>
+                                </span>
+                                <ChevronDown className="h-3 w-3 transition-transform group-data-[state=open]:rotate-180" />
+                              </SidebarMenuButton>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent>
+                              <SidebarMenuSub>
+                                {item.subItems.map((subItem) => (
+                                  <SidebarMenuSubItem key={subItem.title}>
+                                    <SidebarMenuSubButton 
+                                      asChild 
+                                      isActive={location.pathname === subItem.url}
+                                    >
+                                      <NavLink to={subItem.url}>
+                                        <subItem.icon className="h-3 w-3" />
+                                        <span>{subItem.title}</span>
+                                      </NavLink>
+                                    </SidebarMenuSubButton>
+                                  </SidebarMenuSubItem>
+                                ))}
+                              </SidebarMenuSub>
+                            </CollapsibleContent>
+                          </Collapsible>
+                        ) : (
+                          <SidebarMenuButton asChild isActive={location.pathname === item.url}>
+                            <NavLink to={item.url}>
+                              <item.icon className="h-4 w-4" />
+                              <span>{item.title}</span>
+                            </NavLink>
+                          </SidebarMenuButton>
+                        )}
                       </SidebarMenuItem>
                     ))}
                   </SidebarMenu>

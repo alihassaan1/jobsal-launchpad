@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.scheduled-ai-content]
 verify_jwt = false
+
+[functions.aggregate-jobs]
+verify_jwt = false
