@@ -50,8 +50,11 @@ import NotFound from "./pages/NotFound";
 import AdminAds from "./pages/AdminAds";
 import AdminAdAnalytics from "./pages/AdminAdAnalytics";
 import AdminPromoCodes from "./pages/AdminPromoCodes";
+import AdminInvoices from "./pages/AdminInvoices";
+import AdminBillingSettings from "./pages/AdminBillingSettings";
 import EmployerAds from "./pages/EmployerAds";
 import EmployerAdCheckout from "./pages/EmployerAdCheckout";
+import EmployerBilling from "./pages/EmployerBilling";
 
 const queryClient = new QueryClient();
 
@@ -97,12 +100,15 @@ const App = () => (
               <Route path="ads" element={<AdminAds />} />
               <Route path="ad-analytics" element={<AdminAdAnalytics />} />
               <Route path="promo-codes" element={<AdminPromoCodes />} />
+              <Route path="invoices" element={<AdminInvoices />} />
+              <Route path="billing-settings" element={<AdminBillingSettings />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             <Route path="/employer/analytics" element={<EmployerAnalytics />} />
             <Route path="/employer/subscription" element={<EmployerSubscription />} />
             <Route path="/employer/ads" element={<EmployerAds />} />
             <Route path="/employer/ads/checkout" element={<EmployerAdCheckout />} />
+            <Route path="/employer/billing" element={<EmployerBilling />} />
             <Route path="/recommended-jobs" element={<RecommendedJobs />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/ai-resume-builder" element={<ResumeBuilderLanding />} />
