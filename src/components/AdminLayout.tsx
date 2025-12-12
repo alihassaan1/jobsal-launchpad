@@ -98,6 +98,7 @@ const adminMenuItems: MenuGroup[] = [
         icon: Megaphone,
         subItems: [
           { title: "Ad Products", url: "/admin/ads", icon: Package },
+          { title: "Ad Analytics", url: "/admin/ad-analytics", icon: Activity },
           { title: "Promo Codes", url: "/admin/promo-codes", icon: Ticket },
         ]
       },
