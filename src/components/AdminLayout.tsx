@@ -15,7 +15,8 @@ import {
   Briefcase,
   Sparkles,
   ChevronDown,
-  Mail
+  Mail,
+  Bot
 } from "lucide-react";
 import {
   Sidebar,
@@ -67,6 +68,7 @@ const adminMenuItems = [
     items: [
       { title: "Blog", url: "/admin/blog", icon: FileText },
       { title: "Content Generator", url: "/admin/content-generator", icon: Sparkles },
+      { title: "AI Agent", url: "/admin/ai-agent", icon: Bot },
       { title: "Templates", url: "/admin/templates", icon: FileText },
       { title: "Marketing Agent", url: "/admin/marketing-agent", icon: Sparkles },
       { title: "Email Marketing", url: "/admin/emails", icon: Mail },
