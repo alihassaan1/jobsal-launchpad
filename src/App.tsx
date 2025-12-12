@@ -83,7 +83,7 @@ const App = () => (
               <Route path="emails" element={<AdminEmails />} />
               <Route path="templates" element={<AdminTemplates />} />
               <Route path="settings" element={<AdminSettings />} />
-            
+            </Route>
             <Route path="/employer/analytics" element={<EmployerAnalytics />} />
             <Route path="/employer/subscription" element={<EmployerSubscription />} />
             <Route path="/recommended-jobs" element={<RecommendedJobs />} />

@@ -14,7 +14,8 @@ import {
   Menu,
   Briefcase,
   Sparkles,
-  ChevronDown
+  ChevronDown,
+  Mail
 } from "lucide-react";
 import {
   Sidebar,
@@ -68,6 +69,7 @@ const adminMenuItems = [
       { title: "Content Generator", url: "/admin/content-generator", icon: Sparkles },
       { title: "Templates", url: "/admin/templates", icon: FileText },
       { title: "Marketing Agent", url: "/admin/marketing-agent", icon: Sparkles },
+      { title: "Email Marketing", url: "/admin/emails", icon: Mail },
     ]
   },
   {
