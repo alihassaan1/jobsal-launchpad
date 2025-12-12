@@ -84,27 +84,32 @@ export function CreatePostDialog({ open, onOpenChange, onSuccess, userId }: Crea
     setGeneratedInfographic(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke('generate-blog-post', {
+      // Use DeepSeek agent with human-style writing and API logging
+      const { data, error } = await supabase.functions.invoke('deepseek-agent', {
         body: {
+          action: 'generate_blog',
           topic: blogTopic,
-          keywords: blogKeywords,
+          keywords: blogKeywords.split(',').map(k => k.trim()),
           userId: userId,
-          generateFacebookPost,
-          generateInfographic
+          options: {
+            generateFacebookPost,
+            generateInfographic,
+            humanStyle: true // Enable human-style writing
+          }
         }
       });
 
       if (error) throw error;
 
-      if (data?.post?.slug) {
-        setGeneratedBlogSlug(data.post.slug);
-        toast.success("Blog post generated successfully!");
+      if (data?.slug) {
+        setGeneratedBlogSlug(data.slug);
+        toast.success("Blog post generated with human-style writing!");
         
         if (data.facebookPost) {
           setGeneratedFacebookPost(data.facebookPost);
         }
-        if (data.infographic) {
-          setGeneratedInfographic(data.infographic);
+        if (data.infographicUrl) {
+          setGeneratedInfographic(data.infographicUrl);
         }
 
         // Reset form
@@ -116,6 +121,8 @@ export function CreatePostDialog({ open, onOpenChange, onSuccess, userId }: Crea
           onSuccess();
           onOpenChange(false);
         }, 2000);
+      } else if (data?.error) {
+        throw new Error(data.error);
       }
     } catch (error: any) {
       console.error('Error generating blog post:', error);
