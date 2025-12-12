@@ -45,6 +45,7 @@ import Sitemap from "./pages/Sitemap";
 import Companies from "./pages/Companies";
 import CompanyProfile from "./pages/CompanyProfile";
 import EmployerCompanyProfile from "./pages/EmployerCompanyProfile";
+import SetupCompany from "./pages/SetupCompany";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -101,6 +102,7 @@ const App = () => (
             <Route path="/companies" element={<Companies />} />
             <Route path="/companies/:slug" element={<CompanyProfile />} />
             <Route path="/dashboard/company" element={<EmployerCompanyProfile />} />
+            <Route path="/setup-company" element={<SetupCompany />} />
             <Route path="/sitemap.xml" element={<Sitemap />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
