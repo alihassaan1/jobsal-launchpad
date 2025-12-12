@@ -14,7 +14,6 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
     
     const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -37,61 +36,45 @@ serve(async (req) => {
 
     const results = [];
 
-    for (const post of posts) {
+    for (let i = 0; i < posts.length; i++) {
+      const post = posts[i];
       try {
-        console.log(`Generating image for: ${post.title}`);
+        console.log(`Fetching image for: ${post.title}`);
 
-        // Create category-specific prompts for realistic blog images
-        const categoryPrompts: Record<string, string> = {
-          'Career Advice': 'Professional business person at modern office desk reviewing documents, laptop open, clean corporate environment, natural lighting, realistic photography style',
-          'Job Search Tips': 'Job seeker preparing resume at home office, laptop and notebook, focused and determined expression, warm natural lighting, realistic photography',
-          'Industry News': 'Modern Albanian business district skyline, contemporary office buildings, professional urban environment, daytime, realistic photography',
-          'Interview Tips': 'Professional job interview scene, two people in business attire at meeting table, modern office background, natural lighting, realistic photography',
-          'Workplace Culture': 'Diverse team collaborating in modern open office space, casual professional attire, engaged discussion, natural lighting, realistic photography',
-          'default': 'Professional Albanian business environment, modern office setting, career development theme, natural lighting, realistic photography style'
-        };
-
-        const prompt = `${categoryPrompts[post.category] || categoryPrompts['default']}. Related to: ${post.title}. Ultra high resolution, 16:9 aspect ratio, professional blog header image.`;
-
-        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-          method: 'POST',
+        // Use Lorem Picsum for random professional-looking images
+        // Use a seed based on the post id for consistent but varied images
+        const seed = post.id.replace(/-/g, '').substring(0, 8);
+        const picsumUrl = `https://picsum.photos/seed/${seed}/1200/630`;
+        
+        // Fetch the image
+        const imageResponse = await fetch(picsumUrl, { 
+          redirect: 'follow',
           headers: {
-            'Authorization': `Bearer ${lovableApiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'google/gemini-2.5-flash-image-preview',
-            messages: [{ role: 'user', content: prompt }],
-            modalities: ['image', 'text'],
-          }),
+            'User-Agent': 'Jobs.al Blog Image Generator'
+          }
         });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`Image generation failed for ${post.slug}: ${errorText}`);
-          results.push({ slug: post.slug, success: false, error: errorText });
+        
+        if (!imageResponse.ok) {
+          console.error(`Failed to fetch image for ${post.slug}: ${imageResponse.status}`);
+          results.push({ slug: post.slug, success: false, error: `HTTP ${imageResponse.status}` });
           continue;
         }
 
-        const data = await response.json();
-        const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-        if (!imageData) {
-          console.error(`No image data returned for ${post.slug}`);
-          results.push({ slug: post.slug, success: false, error: 'No image data' });
+        // Download the image
+        const imageBuffer = new Uint8Array(await imageResponse.arrayBuffer());
+        
+        if (imageBuffer.length < 1000) {
+          console.error(`Image too small for ${post.slug}`);
+          results.push({ slug: post.slug, success: false, error: 'Image too small' });
           continue;
         }
-
-        // Extract base64 data and upload to storage
-        const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
-        const imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
-
-        const fileName = `blog-${post.slug}-${Date.now()}.png`;
+        
+        const fileName = `blog-${post.slug}-${Date.now()}.jpg`;
         
         const { error: uploadError } = await supabase.storage
           .from('blog-images')
           .upload(fileName, imageBuffer, {
-            contentType: 'image/png',
+            contentType: 'image/jpeg',
             upsert: true,
           });
 
@@ -118,11 +101,11 @@ serve(async (req) => {
           continue;
         }
 
-        console.log(`Successfully generated image for: ${post.title}`);
+        console.log(`Successfully added image for: ${post.title}`);
         results.push({ slug: post.slug, success: true, imageUrl: publicUrlData.publicUrl });
 
-        // Small delay between generations
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Small delay between requests
+        await new Promise(resolve => setTimeout(resolve, 500));
 
       } catch (postError) {
         console.error(`Error processing ${post.slug}:`, postError);
