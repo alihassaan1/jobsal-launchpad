@@ -14,6 +14,210 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_analytics: {
+        Row: {
+          ad_purchase_id: string
+          company_id: string | null
+          created_at: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          job_id: string | null
+          referrer: string | null
+          user_agent: string | null
+          user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          ad_purchase_id: string
+          company_id?: string | null
+          created_at?: string | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          job_id?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          ad_purchase_id?: string
+          company_id?: string | null
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          job_id?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_analytics_ad_purchase_id_fkey"
+            columns: ["ad_purchase_id"]
+            isOneToOne: false
+            referencedRelation: "ad_purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_analytics_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_analytics_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_products: {
+        Row: {
+          created_at: string | null
+          currency: string
+          description: string | null
+          display_order: number | null
+          duration_days: number
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          name: string
+          price: number
+          product_type: Database["public"]["Enums"]["ad_product_type"]
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          display_order?: number | null
+          duration_days?: number
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          price?: number
+          product_type: Database["public"]["Enums"]["ad_product_type"]
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          display_order?: number | null
+          duration_days?: number
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          price?: number
+          product_type?: Database["public"]["Enums"]["ad_product_type"]
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ad_purchases: {
+        Row: {
+          ad_product_id: string
+          amount_paid: number
+          company_id: string
+          created_at: string | null
+          currency: string
+          discount_applied: number | null
+          end_date: string
+          id: string
+          job_id: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
+          payment_reference: string | null
+          promo_code_id: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["ad_purchase_status"] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ad_product_id: string
+          amount_paid?: number
+          company_id: string
+          created_at?: string | null
+          currency?: string
+          discount_applied?: number | null
+          end_date: string
+          id?: string
+          job_id?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          payment_reference?: string | null
+          promo_code_id?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["ad_purchase_status"] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ad_product_id?: string
+          amount_paid?: number
+          company_id?: string
+          created_at?: string | null
+          currency?: string
+          discount_applied?: number | null
+          end_date?: string
+          id?: string
+          job_id?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          payment_reference?: string | null
+          promo_code_id?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["ad_purchase_status"] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_purchases_ad_product_id_fkey"
+            columns: ["ad_product_id"]
+            isOneToOne: false
+            referencedRelation: "ad_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_purchases_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_purchases_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_purchases_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_settings: {
         Row: {
           created_at: string | null
@@ -766,6 +970,79 @@ export type Database = {
           },
         ]
       }
+      payment_transactions: {
+        Row: {
+          ad_purchase_id: string | null
+          amount: number
+          company_id: string | null
+          created_at: string | null
+          currency: string
+          id: string
+          metadata: Json | null
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_provider_id: string | null
+          receipt_url: string | null
+          status: Database["public"]["Enums"]["payment_status"] | null
+          subscription_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ad_purchase_id?: string | null
+          amount: number
+          company_id?: string | null
+          created_at?: string | null
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_provider_id?: string | null
+          receipt_url?: string | null
+          status?: Database["public"]["Enums"]["payment_status"] | null
+          subscription_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ad_purchase_id?: string | null
+          amount?: number
+          company_id?: string | null
+          created_at?: string | null
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          payment_provider_id?: string | null
+          receipt_url?: string | null
+          status?: Database["public"]["Enums"]["payment_status"] | null
+          subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_ad_purchase_id_fkey"
+            columns: ["ad_purchase_id"]
+            isOneToOne: false
+            referencedRelation: "ad_purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author_id: string
@@ -948,6 +1225,60 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          applicable_products: Json | null
+          code: string
+          created_at: string | null
+          created_by: string | null
+          current_uses: number | null
+          description: string | null
+          discount_type: Database["public"]["Enums"]["discount_type"]
+          discount_value: number
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          min_purchase_amount: number | null
+          updated_at: string | null
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          applicable_products?: Json | null
+          code: string
+          created_at?: string | null
+          created_by?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_type?: Database["public"]["Enums"]["discount_type"]
+          discount_value?: number
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_purchase_amount?: number | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          applicable_products?: Json | null
+          code?: string
+          created_at?: string | null
+          created_by?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_type?: Database["public"]["Enums"]["discount_type"]
+          discount_value?: number
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_purchase_amount?: number | null
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
         }
         Relationships: []
       }
@@ -1340,6 +1671,13 @@ export type Database = {
       increment_post_views: { Args: { post_slug: string }; Returns: undefined }
     }
     Enums: {
+      ad_product_type:
+        | "featured_job"
+        | "priority_placement"
+        | "daily_spotlight"
+        | "newsletter_spot"
+        | "social_promotion"
+      ad_purchase_status: "pending" | "active" | "expired" | "cancelled"
       app_role: "admin" | "employer" | "job_seeker" | "editor"
       application_status:
         | "applied"
@@ -1348,6 +1686,7 @@ export type Database = {
         | "interview"
         | "rejected"
         | "hired"
+      discount_type: "percentage" | "fixed"
       experience_level: "entry" | "mid" | "senior" | "executive"
       job_type:
         | "full_time"
@@ -1355,6 +1694,8 @@ export type Database = {
         | "contract"
         | "internship"
         | "freelance"
+      payment_method: "stripe" | "paypal" | "bank_transfer"
+      payment_status: "pending" | "completed" | "failed" | "refunded"
       subscription_status: "active" | "expired" | "cancelled" | "trial"
       subscription_tier: "free" | "basic" | "pro" | "premium"
     }
@@ -1484,6 +1825,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      ad_product_type: [
+        "featured_job",
+        "priority_placement",
+        "daily_spotlight",
+        "newsletter_spot",
+        "social_promotion",
+      ],
+      ad_purchase_status: ["pending", "active", "expired", "cancelled"],
       app_role: ["admin", "employer", "job_seeker", "editor"],
       application_status: [
         "applied",
@@ -1493,6 +1842,7 @@ export const Constants = {
         "rejected",
         "hired",
       ],
+      discount_type: ["percentage", "fixed"],
       experience_level: ["entry", "mid", "senior", "executive"],
       job_type: [
         "full_time",
@@ -1501,6 +1851,8 @@ export const Constants = {
         "internship",
         "freelance",
       ],
+      payment_method: ["stripe", "paypal", "bank_transfer"],
+      payment_status: ["pending", "completed", "failed", "refunded"],
       subscription_status: ["active", "expired", "cancelled", "trial"],
       subscription_tier: ["free", "basic", "pro", "premium"],
     },
