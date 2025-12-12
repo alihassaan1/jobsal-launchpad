@@ -165,8 +165,8 @@ export default function AdminPromoCodes() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Promo Codes</h1>
-        </div>
+        <h1 className="text-3xl font-bold">Promo Codes</h1>
+      </div>
 
         {/* Stats */}
         <div className="grid gap-4 md:grid-cols-3">
@@ -383,6 +383,5 @@ export default function AdminPromoCodes() {
           </Table>
         </Card>
       </div>
-    </div>
   );
 }
