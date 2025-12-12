@@ -9,11 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Briefcase, MapPin, DollarSign, Building2, Search, Clock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Helmet } from "react-helmet";
+import { JOB_CATEGORIES, ALBANIAN_CITIES } from "@/lib/i18n";
 
 const Jobs = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { language, t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("all");
   const [location, setLocation] = useState("all");
@@ -55,7 +58,7 @@ const Jobs = () => {
   });
 
   const formatSalary = (min: number | null, max: number | null, currency: string) => {
-    if (!min && !max) return "Negotiable";
+    if (!min && !max) return t('jobs.negotiable');
     if (min && max) return `${currency}${min.toLocaleString()} - ${currency}${max.toLocaleString()}`;
     if (min) return `From ${currency}${min.toLocaleString()}`;
     return `Up to ${currency}${max?.toLocaleString()}`;
@@ -72,15 +75,26 @@ const Jobs = () => {
     return colors[type] || "bg-gray-100 text-gray-800";
   };
 
+  const getJobTypeLabel = (type: string) => {
+    const labels: Record<string, { sq: string; en: string }> = {
+      full_time: { sq: 'Kohë e Plotë', en: 'Full Time' },
+      part_time: { sq: 'Kohë e Pjesshme', en: 'Part Time' },
+      contract: { sq: 'Kontratë', en: 'Contract' },
+      internship: { sq: 'Praktikë', en: 'Internship' },
+      freelance: { sq: 'Freelance', en: 'Freelance' },
+    };
+    return labels[type]?.[language] || type.replace("_", " ");
+  };
+
   return (
     <>
       <Helmet>
-        <title>Browse All Jobs in Albania | Jobs.al Job Search</title>
-        <meta name="description" content="Search and filter through hundreds of job opportunities across Albania. Find full-time, part-time, remote, and contract positions in Technology, Marketing, Finance, and more sectors." />
-        <meta name="keywords" content="job search albania, browse jobs, job listings albania, career search, employment opportunities albania" />
+        <title>{language === 'sq' ? 'Shfleto të Gjitha Punët në Shqipëri | Jobs.al' : 'Browse All Jobs in Albania | Jobs.al Job Search'}</title>
+        <meta name="description" content={language === 'sq' 
+          ? 'Kërko dhe filtro qindra mundësi punësimi në Shqipëri. Gjej pozicione me kohë të plotë, të pjesshme, në distancë dhe kontrata.'
+          : 'Search and filter through hundreds of job opportunities across Albania. Find full-time, part-time, remote, and contract positions.'
+        } />
         <link rel="canonical" href="https://jobs.al/jobs" />
-        <meta property="og:title" content="Browse All Jobs in Albania - Jobs.al" />
-        <meta property="og:description" content="Filter jobs by location, category, and type. Find your perfect match from hundreds of active positions." />
       </Helmet>
       <div className="min-h-screen bg-background">
       {/* Header */}
@@ -92,15 +106,15 @@ const Jobs = () => {
           </Link>
           <nav className="flex items-center gap-4">
             <Link to="/">
-              <Button variant="ghost">Home</Button>
+              <Button variant="ghost">{t('common.home')}</Button>
             </Link>
             {user ? (
               <Link to="/dashboard">
-                <Button>Dashboard</Button>
+                <Button>{t('nav.dashboard')}</Button>
               </Link>
             ) : (
               <Link to="/auth">
-                <Button>Sign In</Button>
+                <Button>{t('nav.login')}</Button>
               </Link>
             )}
           </nav>
@@ -110,9 +124,9 @@ const Jobs = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary/10 via-background to-background py-12">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-4">Find Your Dream Job</h1>
+          <h1 className="text-4xl font-bold mb-4">{t('jobs.title')}</h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Explore thousands of opportunities across Albania
+            {t('jobs.subtitle')}
           </p>
 
           {/* Search and Filters */}
@@ -122,7 +136,7 @@ const Jobs = () => {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input
-                    placeholder="Search jobs..."
+                    placeholder={t('jobs.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -131,42 +145,43 @@ const Jobs = () => {
               </div>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Category" />
+                  <SelectValue placeholder={t('jobs.allCategories')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="Technology">Technology</SelectItem>
-                  <SelectItem value="Marketing">Marketing</SelectItem>
-                  <SelectItem value="Design">Design</SelectItem>
-                  <SelectItem value="Sales">Sales</SelectItem>
-                  <SelectItem value="Finance">Finance</SelectItem>
+                  <SelectItem value="all">{t('jobs.allCategories')}</SelectItem>
+                  {JOB_CATEGORIES.map((cat) => (
+                    <SelectItem key={cat.key} value={cat.en}>
+                      {cat.icon} {cat[language]}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Select value={location} onValueChange={setLocation}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Location" />
+                  <SelectValue placeholder={t('jobs.allLocations')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="Tirana">Tirana</SelectItem>
-                  <SelectItem value="Durres">Durres</SelectItem>
-                  <SelectItem value="Vlore">Vlore</SelectItem>
-                  <SelectItem value="Shkoder">Shkoder</SelectItem>
+                  <SelectItem value="all">{t('jobs.allLocations')}</SelectItem>
+                  {ALBANIAN_CITIES.map((city) => (
+                    <SelectItem key={city.key} value={city.en}>
+                      {city[language]}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="flex gap-4">
               <Select value={jobType} onValueChange={setJobType}>
                 <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Job Type" />
+                  <SelectValue placeholder={t('jobs.allTypes')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="full_time">Full Time</SelectItem>
-                  <SelectItem value="part_time">Part Time</SelectItem>
-                  <SelectItem value="contract">Contract</SelectItem>
-                  <SelectItem value="internship">Internship</SelectItem>
-                  <SelectItem value="freelance">Freelance</SelectItem>
+                  <SelectItem value="all">{t('jobs.allTypes')}</SelectItem>
+                  <SelectItem value="full_time">{t('jobType.full_time')}</SelectItem>
+                  <SelectItem value="part_time">{t('jobType.part_time')}</SelectItem>
+                  <SelectItem value="contract">{t('jobType.contract')}</SelectItem>
+                  <SelectItem value="internship">{t('jobType.internship')}</SelectItem>
+                  <SelectItem value="freelance">{t('jobType.freelance')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -178,7 +193,7 @@ const Jobs = () => {
       <section className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">
-            {jobs?.length || 0} Jobs Found
+            {jobs?.length || 0} {t('jobs.found')}
           </h2>
         </div>
 
@@ -222,7 +237,7 @@ const Jobs = () => {
                           <span className="flex items-center gap-1">
                             <MapPin className="h-4 w-4" />
                             {job.location}
-                            {job.is_remote && " (Remote)"}
+                            {job.is_remote && ` (${t('jobs.remote')})`}
                           </span>
                           {job.is_salary_visible && (
                             <span className="flex items-center gap-1">
@@ -235,10 +250,10 @@ const Jobs = () => {
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <Badge className={getJobTypeColor(job.job_type)}>
-                        {job.job_type.replace("_", " ")}
+                        {getJobTypeLabel(job.job_type)}
                       </Badge>
                       {job.is_featured && (
-                        <Badge variant="secondary">Featured</Badge>
+                        <Badge variant="secondary">{t('jobs.featured')}</Badge>
                       )}
                     </div>
                   </div>
@@ -257,9 +272,9 @@ const Jobs = () => {
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
-                      Posted {new Date(job.created_at).toLocaleDateString()}
+                      {t('jobs.posted')} {new Date(job.created_at).toLocaleDateString()}
                     </span>
-                    <span>{job.applications_count} applications</span>
+                    <span>{job.applications_count} {t('jobs.applications')}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -267,7 +282,7 @@ const Jobs = () => {
           </div>
         ) : (
           <Card className="p-12 text-center">
-            <p className="text-xl text-muted-foreground">No jobs found matching your criteria</p>
+            <p className="text-xl text-muted-foreground">{t('jobs.noJobs')}</p>
           </Card>
         )}
       </section>

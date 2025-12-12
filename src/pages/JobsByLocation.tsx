@@ -9,10 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Briefcase, MapPin, Building2, Clock, DollarSign, Search, ArrowRight, Users, Home, Car } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const CITY_DATA: Record<string, {
-  title: string;
-  description: string;
+  title: { sq: string; en: string };
+  description: { sq: string; en: string };
   population: string;
   avgSalary: string;
   topIndustries: string[];
@@ -20,88 +21,209 @@ const CITY_DATA: Record<string, {
   commute: string;
 }> = {
   tirana: {
-    title: "Jobs in Tirana",
-    description: "Albania's capital and largest city. Home to most corporate headquarters, tech startups, and international companies.",
+    title: { sq: "Punë në Tiranë", en: "Jobs in Tirana" },
+    description: { 
+      sq: "Kryeqyteti dhe qyteti më i madh i Shqipërisë. Shtëpia e shumicës së selive korporative, startup-eve teknologjike dhe kompanive ndërkombëtare.",
+      en: "Albania's capital and largest city. Home to most corporate headquarters, tech startups, and international companies."
+    },
     population: "900,000+",
     avgSalary: "€600 - €1,500/month",
     topIndustries: ["Technology", "Finance", "Marketing", "Consulting"],
     costOfLiving: "€800-1,200/month",
-    commute: "20-40 min average"
+    commute: "20-40 min"
   },
   durres: {
-    title: "Jobs in Durres",
-    description: "Albania's main port city and second largest urban center. Strong in logistics, tourism, and manufacturing.",
+    title: { sq: "Punë në Durrës", en: "Jobs in Durres" },
+    description: {
+      sq: "Qyteti kryesor portual i Shqipërisë dhe qendra e dytë urbane më e madhe. I fortë në logjistikë, turizëm dhe prodhim.",
+      en: "Albania's main port city and second largest urban center. Strong in logistics, tourism, and manufacturing."
+    },
     population: "200,000+",
     avgSalary: "€450 - €1,200/month",
     topIndustries: ["Logistics", "Tourism", "Manufacturing", "Retail"],
     costOfLiving: "€600-900/month",
-    commute: "15-30 min average"
+    commute: "15-30 min"
   },
   vlore: {
-    title: "Jobs in Vlore",
-    description: "Coastal city with growing tourism and service sectors. Popular destination for hospitality careers.",
+    title: { sq: "Punë në Vlorë", en: "Jobs in Vlore" },
+    description: {
+      sq: "Qytet bregdetar me sektorë turizmi dhe shërbimesh në rritje. Destinacion popullor për karriera në hoteleri.",
+      en: "Coastal city with growing tourism and service sectors. Popular destination for hospitality careers."
+    },
     population: "130,000+",
     avgSalary: "€400 - €1,000/month",
     topIndustries: ["Tourism", "Hospitality", "Retail", "Healthcare"],
     costOfLiving: "€500-800/month",
-    commute: "10-20 min average"
+    commute: "10-20 min"
   },
   shkoder: {
-    title: "Jobs in Shkoder",
-    description: "Historic northern city with growing business sector. Known for education and cultural industries.",
+    title: { sq: "Punë në Shkodër", en: "Jobs in Shkoder" },
+    description: {
+      sq: "Qytet historik verior me sektor biznesi në rritje. I njohur për arsimin dhe industritë kulturore.",
+      en: "Historic northern city with growing business sector. Known for education and cultural industries."
+    },
     population: "140,000+",
     avgSalary: "€400 - €900/month",
     topIndustries: ["Education", "Manufacturing", "Agriculture", "Tourism"],
     costOfLiving: "€450-700/month",
-    commute: "10-25 min average"
+    commute: "10-25 min"
   },
   elbasan: {
-    title: "Jobs in Elbasan",
-    description: "Industrial hub in central Albania. Strong manufacturing and education sector presence.",
+    title: { sq: "Punë në Elbasan", en: "Jobs in Elbasan" },
+    description: {
+      sq: "Qendër industriale në Shqipërinë qendrore. Prezencë e fortë e sektorit të prodhimit dhe arsimit.",
+      en: "Industrial hub in central Albania. Strong manufacturing and education sector presence."
+    },
     population: "140,000+",
     avgSalary: "€400 - €900/month",
     topIndustries: ["Manufacturing", "Education", "Healthcare", "Construction"],
     costOfLiving: "€450-700/month",
-    commute: "10-20 min average"
+    commute: "10-20 min"
   },
   korce: {
-    title: "Jobs in Korce",
-    description: "Eastern Albanian city known for culture and brewing. Growing service and tourism sectors.",
+    title: { sq: "Punë në Korçë", en: "Jobs in Korce" },
+    description: {
+      sq: "Qytet i Shqipërisë lindore i njohur për kulturën. Sektorë shërbimesh dhe turizmi në rritje.",
+      en: "Eastern Albanian city known for culture. Growing service and tourism sectors."
+    },
     population: "75,000+",
     avgSalary: "€380 - €850/month",
     topIndustries: ["Tourism", "Agriculture", "Manufacturing", "Education"],
     costOfLiving: "€400-650/month",
-    commute: "10-15 min average"
+    commute: "10-15 min"
   },
   fier: {
-    title: "Jobs in Fier",
-    description: "Industrial city with oil refineries and agriculture. Key economic center in southwestern Albania.",
+    title: { sq: "Punë në Fier", en: "Jobs in Fier" },
+    description: {
+      sq: "Qytet industrial me rafineri nafte dhe bujqësi. Qendër kryesore ekonomike në jugperëndim të Shqipërisë.",
+      en: "Industrial city with oil refineries and agriculture. Key economic center in southwestern Albania."
+    },
     population: "120,000+",
     avgSalary: "€400 - €950/month",
     topIndustries: ["Oil & Gas", "Agriculture", "Manufacturing", "Retail"],
     costOfLiving: "€450-700/month",
-    commute: "10-20 min average"
+    commute: "10-20 min"
   },
   berat: {
-    title: "Jobs in Berat",
-    description: "UNESCO World Heritage city. Growing tourism industry and traditional crafts.",
+    title: { sq: "Punë në Berat", en: "Jobs in Berat" },
+    description: {
+      sq: "Qytet i Trashëgimisë Botërore të UNESCO. Industri turizmi në rritje dhe zejtari tradicionale.",
+      en: "UNESCO World Heritage city. Growing tourism industry and traditional crafts."
+    },
     population: "60,000+",
     avgSalary: "€350 - €800/month",
     topIndustries: ["Tourism", "Hospitality", "Agriculture", "Crafts"],
     costOfLiving: "€400-600/month",
-    commute: "10-15 min average"
+    commute: "10-15 min"
+  },
+  lushnje: {
+    title: { sq: "Punë në Lushnjë", en: "Jobs in Lushnje" },
+    description: {
+      sq: "Qendër bujqësore në ultësirën perëndimore. E njohur për prodhimin agrar.",
+      en: "Agricultural center in the western lowlands. Known for farming production."
+    },
+    population: "80,000+",
+    avgSalary: "€350 - €800/month",
+    topIndustries: ["Agriculture", "Retail", "Manufacturing"],
+    costOfLiving: "€400-600/month",
+    commute: "10-15 min"
+  },
+  pogradec: {
+    title: { sq: "Punë në Pogradec", en: "Jobs in Pogradec" },
+    description: {
+      sq: "Qytet buzë Liqenit të Ohrit. Turizëm dhe peshkim.",
+      en: "City on Lake Ohrid. Tourism and fishing."
+    },
+    population: "40,000+",
+    avgSalary: "€350 - €750/month",
+    topIndustries: ["Tourism", "Fishing", "Retail"],
+    costOfLiving: "€400-550/month",
+    commute: "10 min"
+  },
+  kavaje: {
+    title: { sq: "Punë në Kavajë", en: "Jobs in Kavaje" },
+    description: {
+      sq: "Qytet bregdetar pranë Tiranës. Turizëm dhe tregti.",
+      en: "Coastal city near Tirana. Tourism and commerce."
+    },
+    population: "50,000+",
+    avgSalary: "€380 - €850/month",
+    topIndustries: ["Tourism", "Retail", "Agriculture"],
+    costOfLiving: "€450-650/month",
+    commute: "15 min"
+  },
+  gjirokaster: {
+    title: { sq: "Punë në Gjirokastër", en: "Jobs in Gjirokaster" },
+    description: {
+      sq: "Qytet i Trashëgimisë Botërore UNESCO në jug. Kulturë dhe turizëm.",
+      en: "UNESCO World Heritage city in the south. Culture and tourism."
+    },
+    population: "40,000+",
+    avgSalary: "€350 - €750/month",
+    topIndustries: ["Tourism", "Education", "Crafts"],
+    costOfLiving: "€400-550/month",
+    commute: "10 min"
+  },
+  sarande: {
+    title: { sq: "Punë në Sarandë", en: "Jobs in Sarande" },
+    description: {
+      sq: "Resort bregdetar në Rivierën Shqiptare. Turizëm dhe hoteleri.",
+      en: "Coastal resort on the Albanian Riviera. Tourism and hospitality."
+    },
+    population: "35,000+",
+    avgSalary: "€400 - €1,000/month",
+    topIndustries: ["Tourism", "Hospitality", "Retail"],
+    costOfLiving: "€500-800/month",
+    commute: "10 min"
+  },
+  lezhe: {
+    title: { sq: "Punë në Lezhë", en: "Jobs in Lezhe" },
+    description: {
+      sq: "Qytet historik në veri. Bujqësi dhe tregti.",
+      en: "Historic city in the north. Agriculture and commerce."
+    },
+    population: "65,000+",
+    avgSalary: "€380 - €850/month",
+    topIndustries: ["Agriculture", "Manufacturing", "Retail"],
+    costOfLiving: "€400-600/month",
+    commute: "10-15 min"
+  },
+  kukes: {
+    title: { sq: "Punë në Kukës", en: "Jobs in Kukes" },
+    description: {
+      sq: "Qytet malor në verilindje. Miniera dhe bujqësi.",
+      en: "Mountain city in the northeast. Mining and agriculture."
+    },
+    population: "45,000+",
+    avgSalary: "€350 - €700/month",
+    topIndustries: ["Mining", "Agriculture", "Construction"],
+    costOfLiving: "€350-500/month",
+    commute: "10 min"
+  },
+  remote: {
+    title: { sq: "Punë nga Shtëpia", en: "Remote Work" },
+    description: {
+      sq: "Mundësi pune në distancë nga kudo në Shqipëri. Teknologji, marketing dhe më shumë.",
+      en: "Remote work opportunities from anywhere in Albania. Technology, marketing, and more."
+    },
+    population: "N/A",
+    avgSalary: "€500 - €2,500/month",
+    topIndustries: ["Technology", "Marketing", "Design", "Customer Service"],
+    costOfLiving: "Varies",
+    commute: "0 min"
   }
 };
 
 export default function JobsByLocation() {
   const { city } = useParams<{ city: string }>();
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
 
   const cityKey = city?.toLowerCase() || "";
   const cityInfo = CITY_DATA[cityKey] || {
-    title: `Jobs in ${city}`,
-    description: `Find job opportunities in ${city}, Albania.`,
+    title: { sq: `Punë në ${city}`, en: `Jobs in ${city}` },
+    description: { sq: `Gjej mundësi punësimi në ${city}, Shqipëri.`, en: `Find job opportunities in ${city}, Albania.` },
     population: "N/A",
     avgSalary: "Varies",
     topIndustries: [],
@@ -145,7 +267,7 @@ export default function JobsByLocation() {
   );
 
   const formatSalary = (min: number | null, max: number | null, currency: string) => {
-    if (!min && !max) return "Negotiable";
+    if (!min && !max) return language === 'sq' ? "E negociueshme" : "Negotiable";
     if (min && max) return `${currency}${min.toLocaleString()} - ${currency}${max.toLocaleString()}`;
     if (min) return `From ${currency}${min.toLocaleString()}`;
     return `Up to ${currency}${max?.toLocaleString()}`;
@@ -156,31 +278,9 @@ export default function JobsByLocation() {
   return (
     <>
       <Helmet>
-        <title>{cityInfo.title}, Albania | Jobs.al</title>
-        <meta name="description" content={`Find jobs in ${capitalizedCity}, Albania. ${cityInfo.description} Browse ${jobs?.length || 0}+ active positions.`} />
-        <meta name="keywords" content={`jobs ${city}, ${city} careers, work in ${city}, ${city} vacancies, employment ${city} albania`} />
+        <title>{cityInfo.title[language]}, {language === 'sq' ? 'Shqipëri' : 'Albania'} | Jobs.al</title>
+        <meta name="description" content={`${cityInfo.description[language]} ${language === 'sq' ? 'Shfleto' : 'Browse'} ${jobs?.length || 0}+ ${language === 'sq' ? 'pozicione aktive' : 'active positions'}.`} />
         <link rel="canonical" href={`https://jobs.al/jobs/location/${city?.toLowerCase()}`} />
-        <meta property="og:title" content={`${cityInfo.title}, Albania | Jobs.al`} />
-        <meta property="og:description" content={cityInfo.description} />
-        
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "CollectionPage",
-            "name": cityInfo.title,
-            "description": cityInfo.description,
-            "url": `https://jobs.al/jobs/location/${city?.toLowerCase()}`,
-            "about": {
-              "@type": "Place",
-              "name": capitalizedCity,
-              "address": {
-                "@type": "PostalAddress",
-                "addressLocality": capitalizedCity,
-                "addressCountry": "Albania"
-              }
-            }
-          })}
-        </script>
       </Helmet>
 
       <Navigation />
@@ -193,15 +293,15 @@ export default function JobsByLocation() {
               <MapPin className="h-10 w-10 text-white" />
               <div>
                 <h1 className="text-4xl md:text-5xl font-bold text-white">
-                  {cityInfo.title}, Albania
+                  {cityInfo.title[language]}, {language === 'sq' ? 'Shqipëri' : 'Albania'}
                 </h1>
                 <p className="text-xl text-white/90 mt-2">
-                  {jobs?.length || 0} open positions available
+                  {jobs?.length || 0} {language === 'sq' ? 'pozicione të hapura' : 'open positions available'}
                 </p>
               </div>
             </div>
             <p className="text-white/80 max-w-3xl mt-4">
-              {cityInfo.description}
+              {cityInfo.description[language]}
             </p>
           </div>
         </section>
@@ -216,7 +316,7 @@ export default function JobsByLocation() {
                 </div>
                 <div>
                   <div className="font-semibold">{cityInfo.population}</div>
-                  <div className="text-sm text-muted-foreground">Population</div>
+                  <div className="text-sm text-muted-foreground">{language === 'sq' ? 'Popullsi' : 'Population'}</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -225,7 +325,7 @@ export default function JobsByLocation() {
                 </div>
                 <div>
                   <div className="font-semibold">{cityInfo.avgSalary}</div>
-                  <div className="text-sm text-muted-foreground">Avg. Salary</div>
+                  <div className="text-sm text-muted-foreground">{language === 'sq' ? 'Rrogë Mes.' : 'Avg. Salary'}</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -234,7 +334,7 @@ export default function JobsByLocation() {
                 </div>
                 <div>
                   <div className="font-semibold">{cityInfo.costOfLiving}</div>
-                  <div className="text-sm text-muted-foreground">Cost of Living</div>
+                  <div className="text-sm text-muted-foreground">{language === 'sq' ? 'Kosto Jetese' : 'Cost of Living'}</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -243,7 +343,7 @@ export default function JobsByLocation() {
                 </div>
                 <div>
                   <div className="font-semibold">{cityInfo.commute}</div>
-                  <div className="text-sm text-muted-foreground">Avg. Commute</div>
+                  <div className="text-sm text-muted-foreground">{language === 'sq' ? 'Udhëtim Mes.' : 'Avg. Commute'}</div>
                 </div>
               </div>
             </div>
@@ -255,7 +355,7 @@ export default function JobsByLocation() {
           <div className="relative max-w-xl">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder={`Search jobs in ${capitalizedCity}...`}
+              placeholder={language === 'sq' ? `Kërko punë në ${capitalizedCity}...` : `Search jobs in ${capitalizedCity}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -267,7 +367,9 @@ export default function JobsByLocation() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Job Listings */}
             <div className="lg:col-span-2">
-              <h2 className="text-2xl font-bold mb-6">Latest Jobs in {capitalizedCity}</h2>
+              <h2 className="text-2xl font-bold mb-6">
+                {language === 'sq' ? `Punë të Fundit në ${capitalizedCity}` : `Latest Jobs in ${capitalizedCity}`}
+              </h2>
               
               {isLoading ? (
                 <div className="space-y-4">
@@ -316,7 +418,7 @@ export default function JobsByLocation() {
                         <div className="flex items-center justify-between text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
-                            Posted {new Date(job.created_at).toLocaleDateString()}
+                            {language === 'sq' ? 'Postuar' : 'Posted'} {new Date(job.created_at).toLocaleDateString()}
                           </span>
                           {job.is_salary_visible && (
                             <span className="flex items-center gap-1">
@@ -331,9 +433,13 @@ export default function JobsByLocation() {
                 </div>
               ) : (
                 <Card className="p-8 text-center">
-                  <p className="text-muted-foreground">No jobs found in {capitalizedCity} at the moment.</p>
+                  <p className="text-muted-foreground">
+                    {language === 'sq' ? `Nuk u gjetën punë në ${capitalizedCity} në këtë moment.` : `No jobs found in ${capitalizedCity} at the moment.`}
+                  </p>
                   <Link to="/jobs">
-                    <Button variant="outline" className="mt-4">Browse All Jobs</Button>
+                    <Button variant="outline" className="mt-4">
+                      {language === 'sq' ? 'Shfleto Të Gjitha Punët' : 'Browse All Jobs'}
+                    </Button>
                   </Link>
                 </Card>
               )}
@@ -344,7 +450,9 @@ export default function JobsByLocation() {
               {/* Top Industries */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Top Industries in {capitalizedCity}</CardTitle>
+                  <CardTitle className="text-lg">
+                    {language === 'sq' ? `Industritë Top në ${capitalizedCity}` : `Top Industries in ${capitalizedCity}`}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
@@ -363,7 +471,7 @@ export default function JobsByLocation() {
               {topCompanies && topCompanies.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Top Employers</CardTitle>
+                    <CardTitle className="text-lg">{language === 'sq' ? 'Punëdhënësit Top' : 'Top Employers'}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {topCompanies.map(company => (
@@ -392,13 +500,18 @@ export default function JobsByLocation() {
               {/* CTA */}
               <Card className="bg-primary text-primary-foreground">
                 <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-2">Hiring in {capitalizedCity}?</h3>
+                  <h3 className="font-semibold mb-2">
+                    {language === 'sq' ? `Po punësoni në ${capitalizedCity}?` : `Hiring in ${capitalizedCity}?`}
+                  </h3>
                   <p className="text-sm opacity-90 mb-4">
-                    Post your job and reach thousands of qualified candidates in {capitalizedCity}.
+                    {language === 'sq' 
+                      ? `Postoni punën tuaj dhe arrini mijëra kandidatë të kualifikuar në ${capitalizedCity}.`
+                      : `Post your job and reach thousands of qualified candidates in ${capitalizedCity}.`
+                    }
                   </p>
                   <Link to="/pricing">
                     <Button variant="secondary" className="w-full">
-                      Post a Job
+                      {language === 'sq' ? 'Posto Punë' : 'Post a Job'}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
@@ -412,24 +525,15 @@ export default function JobsByLocation() {
         <section className="bg-muted/30 py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto prose prose-lg">
-              <h2 className="text-2xl font-bold mb-4">Working in {capitalizedCity}, Albania</h2>
+              <h2 className="text-2xl font-bold mb-4">
+                {language === 'sq' ? `Puna në ${capitalizedCity}, Shqipëri` : `Working in ${capitalizedCity}, Albania`}
+              </h2>
               <p className="text-muted-foreground">
-                {capitalizedCity} is one of Albania's key employment hubs, with a population of {cityInfo.population} 
-                and a diverse job market spanning {cityInfo.topIndustries.join(', ')}. Average salaries range from 
-                {cityInfo.avgSalary}, with a cost of living around {cityInfo.costOfLiving} per month.
+                {language === 'sq'
+                  ? `${capitalizedCity} është një nga qendrat kryesore të punësimit në Shqipëri, me një popullsi prej ${cityInfo.population} dhe një treg pune të larmishëm. Jobs.al ju lidh me punëdhënësit më të mirë në ${capitalizedCity}.`
+                  : `${capitalizedCity} is one of Albania's key employment hubs, with a population of ${cityInfo.population} and a diverse job market. Jobs.al connects you with the best employers in ${capitalizedCity}.`
+                }
               </p>
-              <p className="text-muted-foreground">
-                Whether you're looking for your first job or advancing your career, {capitalizedCity} offers 
-                excellent opportunities across multiple industries. Jobs.al connects you with the top employers 
-                in the city, helping you find the perfect role to match your skills and career goals.
-              </p>
-              <h3 className="text-xl font-semibold mt-6 mb-3">Why Work in {capitalizedCity}?</h3>
-              <ul className="text-muted-foreground list-disc pl-6 space-y-2">
-                <li>Growing economy with diverse job opportunities</li>
-                <li>Competitive salaries relative to cost of living</li>
-                <li>Average commute time of just {cityInfo.commute}</li>
-                <li>Strong presence of {cityInfo.topIndustries[0]} and {cityInfo.topIndustries[1]} sectors</li>
-              </ul>
             </div>
           </div>
         </section>
