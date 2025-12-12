@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
@@ -10,9 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, User, Sparkles } from "lucide-react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navigation() {
   const { user, signOut, userRole } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   return (
@@ -26,28 +29,29 @@ export default function Navigation() {
             </a>
             <nav className="hidden md:flex space-x-6">
               <a href="/jobs" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
-                Find Jobs
+                {t('nav.findJobs')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
               </a>
               <a href="/companies" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
-                Companies
+                {t('nav.companies')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
               </a>
               <a href="/ai-resume-builder" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
-                Resume Builder
+                {t('nav.resumeBuilder')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
               </a>
               <a href="/blog" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
-                Blog
+                {t('nav.blog')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
               </a>
               <a href="/pricing" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
-                Pricing
+                {t('nav.pricing')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
               </a>
             </nav>
           </div>
           <div className="flex items-center space-x-4">
+            <LanguageSwitcher />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -74,38 +78,38 @@ export default function Navigation() {
                       navigate('/my-applications');
                     }
                   }}>
-                    {userRole === 'employer' || userRole === 'admin' ? 'Dashboard' : 'My Applications'}
+                    {userRole === 'employer' || userRole === 'admin' ? t('nav.dashboard') : t('nav.myApplications')}
                   </DropdownMenuItem>
                   {userRole === 'admin' && (
                     <DropdownMenuItem onClick={() => navigate('/admin/dashboard')}>
-                      Admin Panel
+                      {t('nav.adminPanel')}
                     </DropdownMenuItem>
                   )}
                   {userRole === 'job_seeker' && (
                     <>
                       <DropdownMenuItem onClick={() => navigate('/recommended-jobs')}>
                         <Sparkles className="mr-2 h-4 w-4" />
-                        AI Recommended Jobs
+                        {t('nav.aiRecommendedJobs')}
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/my-applications')}>
-                        My Applications
+                        {t('nav.myApplications')}
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/my-resumes')}>
-                        My Resumes
+                        {t('nav.myResumes')}
                       </DropdownMenuItem>
                     </>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => signOut()}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
+                    {t('nav.signOut')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <>
-                <Button variant="ghost" onClick={() => navigate('/auth')} className="hover:scale-105 transition-transform duration-200">Login</Button>
-                <Button onClick={() => navigate('/auth')} className="hover:scale-105 transition-transform duration-200 shadow-lg hover:shadow-xl">Sign Up</Button>
+                <Button variant="ghost" onClick={() => navigate('/auth')} className="hover:scale-105 transition-transform duration-200">{t('nav.login')}</Button>
+                <Button onClick={() => navigate('/auth')} className="hover:scale-105 transition-transform duration-200 shadow-lg hover:shadow-xl">{t('nav.signup')}</Button>
               </>
             )}
           </div>

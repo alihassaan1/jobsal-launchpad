@@ -5,47 +5,40 @@ import { Helmet } from "react-helmet";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Users, Briefcase, Search, CheckCircle, Star, MapPin, Filter } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Building2, Users, Briefcase, Search, CheckCircle, Star, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { ALBANIAN_CITIES } from "@/lib/i18n";
 
 const INDUSTRIES = [
-  "All Industries",
-  "Technology",
-  "Finance & Banking",
-  "Healthcare",
-  "Education",
-  "Retail & E-commerce",
-  "Manufacturing",
-  "Construction",
-  "Tourism & Hospitality",
-  "Telecommunications",
-  "Real Estate",
-  "Marketing & Advertising",
-  "Legal",
-  "Consulting",
-  "Energy",
-  "Transportation & Logistics"
-];
-
-const LOCATIONS = [
-  "All Locations",
-  "Tirana",
-  "Durrës",
-  "Vlorë",
-  "Shkodër",
-  "Elbasan",
-  "Fier",
-  "Korçë",
-  "Berat"
+  { sq: "Të Gjitha Industritë", en: "All Industries" },
+  { sq: "Teknologji", en: "Technology" },
+  { sq: "Financa & Banka", en: "Finance & Banking" },
+  { sq: "Shëndetësi", en: "Healthcare" },
+  { sq: "Arsim", en: "Education" },
+  { sq: "Shitje me Pakicë & E-commerce", en: "Retail & E-commerce" },
+  { sq: "Prodhim", en: "Manufacturing" },
+  { sq: "Ndërtim", en: "Construction" },
+  { sq: "Turizëm & Hoteleri", en: "Tourism & Hospitality" },
+  { sq: "Telekomunikacion", en: "Telecommunications" },
+  { sq: "Pasuri e Patundshme", en: "Real Estate" },
+  { sq: "Marketing & Reklama", en: "Marketing & Advertising" },
+  { sq: "Juridik", en: "Legal" },
+  { sq: "Konsulencë", en: "Consulting" },
+  { sq: "Energji", en: "Energy" },
+  { sq: "Transport & Logjistikë", en: "Transportation & Logistics" },
+  { sq: "HOREKA", en: "HOREKA" },
+  { sq: "Call Center", en: "Call Center" },
+  { sq: "Banka & Sigurime", en: "Banking & Insurance" },
 ];
 
 const Companies = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const { language, t } = useLanguage();
 
   const { data: companies, isLoading } = useQuery({
     queryKey: ["companies", searchTerm],
@@ -91,12 +84,12 @@ const Companies = () => {
   return (
     <>
       <Helmet>
-        <title>Top Companies Hiring in Albania | Jobs.al Company Directory</title>
-        <meta name="description" content="Explore verified companies hiring in Albania. Find employer profiles, company culture, benefits, and open positions at Albania's top employers." />
-        <meta name="keywords" content="companies albania, employers albania, top companies hiring, company directory, verified employers" />
+        <title>{language === 'sq' ? 'Kompanitë Top që Punësojnë në Shqipëri | Jobs.al' : 'Top Companies Hiring in Albania | Jobs.al Company Directory'}</title>
+        <meta name="description" content={language === 'sq' 
+          ? 'Eksploro kompanitë e verifikuara që punësojnë në Shqipëri. Gjej profile punëdhënësish dhe pozicione të hapura.'
+          : 'Explore verified companies hiring in Albania. Find employer profiles, company culture, benefits, and open positions.'
+        } />
         <link rel="canonical" href="https://jobs.al/companies" />
-        <meta property="og:title" content="Top Companies Hiring in Albania | Jobs.al" />
-        <meta property="og:description" content="Discover Albania's best employers and their open positions" />
       </Helmet>
 
       <Navigation />
@@ -105,9 +98,9 @@ const Companies = () => {
         {/* Header */}
         <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-12 md:py-16">
           <div className="container mx-auto px-4">
-            <h1 className="text-3xl md:text-5xl font-bold mb-4">Explore Companies</h1>
+            <h1 className="text-3xl md:text-5xl font-bold mb-4">{t('companies.title')}</h1>
             <p className="text-lg md:text-xl text-primary-foreground/90 mb-8">
-              Discover Albania's top employers and find your next career opportunity
+              {t('companies.subtitle')}
             </p>
 
             {/* Search & Filters */}
@@ -117,7 +110,7 @@ const Companies = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                   <Input
                     type="text"
-                    placeholder="Search companies by name..."
+                    placeholder={t('companies.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 bg-background text-foreground h-11"
@@ -126,22 +119,27 @@ const Companies = () => {
                 <Select value={industryFilter} onValueChange={setIndustryFilter}>
                   <SelectTrigger className="bg-background text-foreground h-11">
                     <Briefcase className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <SelectValue placeholder="Industry" />
+                    <SelectValue placeholder={t('companies.allIndustries')} />
                   </SelectTrigger>
                   <SelectContent>
                     {INDUSTRIES.map((industry) => (
-                      <SelectItem key={industry} value={industry}>{industry}</SelectItem>
+                      <SelectItem key={industry.en} value={industry.en}>
+                        {industry[language]}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 <Select value={locationFilter} onValueChange={setLocationFilter}>
                   <SelectTrigger className="bg-background text-foreground h-11">
                     <MapPin className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <SelectValue placeholder="Location" />
+                    <SelectValue placeholder={t('jobs.allLocations')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {LOCATIONS.map((location) => (
-                      <SelectItem key={location} value={location}>{location}</SelectItem>
+                    <SelectItem value="All Locations">{t('jobs.allLocations')}</SelectItem>
+                    {ALBANIAN_CITIES.map((city) => (
+                      <SelectItem key={city.key} value={city.en}>
+                        {city[language]}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -184,7 +182,7 @@ const Companies = () => {
                         {company.is_verified && (
                           <Badge variant="secondary" className="gap-1">
                             <CheckCircle className="w-3 h-3" />
-                            Verified
+                            {t('companies.verified')}
                           </Badge>
                         )}
                         {company.sponsorship_plan !== 'none' && getSponsorshipBadge(company.sponsorship_plan)}
@@ -211,10 +209,10 @@ const Companies = () => {
                     <div className="flex items-center justify-between mt-4 pt-4 border-t">
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Users className="w-4 h-4" />
-                        {company.followers_count || 0} followers
+                        {company.followers_count || 0} {t('companies.followers')}
                       </div>
                       <div className="text-sm font-medium text-primary">
-                        {company.jobs?.[0]?.count || 0} open jobs
+                        {company.jobs?.[0]?.count || 0} {t('companies.openJobs')}
                       </div>
                     </div>
                   </CardContent>
@@ -224,7 +222,7 @@ const Companies = () => {
           ) : (
             <div className="text-center py-12">
               <Building2 className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No companies found</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('companies.noCompanies')}</h3>
               <p className="text-muted-foreground">Try adjusting your search criteria</p>
             </div>
           )}
