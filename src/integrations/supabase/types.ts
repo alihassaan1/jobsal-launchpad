@@ -47,6 +47,63 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_agent_logs: {
+        Row: {
+          agent_type: string
+          completion_tokens: number | null
+          content_type: string
+          content_url: string | null
+          cost: number | null
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          prompt_tokens: number | null
+          request_preview: string | null
+          response_preview: string | null
+          status: string
+          total_tokens: number | null
+          user_id: string | null
+        }
+        Insert: {
+          agent_type: string
+          completion_tokens?: number | null
+          content_type: string
+          content_url?: string | null
+          cost?: number | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          prompt_tokens?: number | null
+          request_preview?: string | null
+          response_preview?: string | null
+          status?: string
+          total_tokens?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          agent_type?: string
+          completion_tokens?: number | null
+          content_type?: string
+          content_url?: string | null
+          cost?: number | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          prompt_tokens?: number | null
+          request_preview?: string | null
+          response_preview?: string | null
+          status?: string
+          total_tokens?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       analytics: {
         Row: {
           company_id: string | null
@@ -1255,6 +1312,19 @@ export type Database = {
         Returns: number
       }
       can_post_job: { Args: { user_id: string }; Returns: boolean }
+      get_ai_agent_analytics: {
+        Args: never
+        Returns: {
+          avg_cost_per_call: number
+          avg_duration_ms: number
+          cost_per_1k_tokens: number
+          failed_calls: number
+          successful_calls: number
+          total_calls: number
+          total_cost: number
+          total_tokens: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

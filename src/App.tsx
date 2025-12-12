@@ -29,6 +29,8 @@ import AdminTemplates from "./pages/AdminTemplates";
 import AdminMarketingAgent from "./pages/AdminMarketingAgent";
 import AdminContentGenerator from "./pages/AdminContentGenerator";
 import AdminAIAgent from "./pages/AdminAIAgent";
+import AdminAIAgentLogs from "./pages/AdminAIAgentLogs";
+import AdminAIAgentAnalytics from "./pages/AdminAIAgentAnalytics";
 import EmployerAnalytics from "./pages/EmployerAnalytics";
 import EmployerSubscription from "./pages/EmployerSubscription";
 import RecommendedJobs from "./pages/RecommendedJobs";
@@ -81,6 +83,8 @@ const App = () => (
               <Route path="marketing-agent" element={<AdminMarketingAgent />} />
               <Route path="content-generator" element={<AdminContentGenerator />} />
               <Route path="ai-agent" element={<AdminAIAgent />} />
+              <Route path="ai-agent/logs" element={<AdminAIAgentLogs />} />
+              <Route path="ai-agent/analytics" element={<AdminAIAgentAnalytics />} />
               <Route path="blog" element={<AdminBlog />} />
               <Route path="emails" element={<AdminEmails />} />
               <Route path="templates" element={<AdminTemplates />} />
