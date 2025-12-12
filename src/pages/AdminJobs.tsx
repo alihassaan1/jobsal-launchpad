@@ -57,8 +57,7 @@ export default function AdminJobs() {
         .from('jobs')
         .select(`
           *,
-          companies(name, logo_url),
-          profiles!jobs_posted_by_fkey(full_name, email)
+          companies(name, logo_url)
         `)
         .order('created_at', { ascending: false });
 
