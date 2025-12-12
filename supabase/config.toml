@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.deepseek-agent]
 verify_jwt = false
+
+[functions.scheduled-ai-content]
+verify_jwt = false

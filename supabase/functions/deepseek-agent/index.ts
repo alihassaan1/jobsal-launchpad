@@ -6,8 +6,9 @@ const corsHeaders = {
 };
 
 interface ContentRequest {
-  type: 'job_description' | 'company_profile' | 'marketing_content' | 'social_post' | 'email_template';
+  type: 'job_description' | 'company_profile' | 'marketing_content' | 'social_post' | 'email_template' | 'generate_image';
   context: Record<string, any>;
+  includeImage?: boolean;
 }
 
 const SYSTEM_PROMPTS: Record<string, string> = {
@@ -36,27 +37,97 @@ Include compelling subject lines, clear value propositions, and strong CTAs.
 Output in HTML email format with inline styles.`
 };
 
+// Generate image using Lovable AI
+async function generateImage(prompt: string): Promise<string | null> {
+  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  if (!LOVABLE_API_KEY) {
+    console.log('LOVABLE_API_KEY not set, skipping image generation');
+    return null;
+  }
+
+  try {
+    console.log('Generating image with Lovable AI:', prompt);
+    
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-image',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        modalities: ['image', 'text']
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Image generation failed:', response.status, errorText);
+      return null;
+    }
+
+    const data = await response.json();
+    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    
+    if (imageUrl) {
+      console.log('Image generated successfully');
+      return imageUrl;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error generating image:', error);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const { type, context, includeImage }: ContentRequest = await req.json();
+
+    // Handle image-only generation
+    if (type === 'generate_image') {
+      const imagePrompt = context.prompt || 'Professional business image for Albanian job market';
+      const imageUrl = await generateImage(imagePrompt);
+      
+      if (!imageUrl) {
+        throw new Error('Failed to generate image');
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          type: 'generate_image',
+          imageUrl,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const DEEPSEEK_API_KEY = Deno.env.get('DEEPSEEK_API_KEY');
     if (!DEEPSEEK_API_KEY) {
       throw new Error('DEEPSEEK_API_KEY is not configured');
     }
-
-    const { type, context }: ContentRequest = await req.json();
     
     if (!type || !SYSTEM_PROMPTS[type]) {
-      throw new Error(`Invalid content type. Valid types: ${Object.keys(SYSTEM_PROMPTS).join(', ')}`);
+      throw new Error(`Invalid content type. Valid types: ${Object.keys(SYSTEM_PROMPTS).join(', ')}, generate_image`);
     }
 
     const systemPrompt = SYSTEM_PROMPTS[type];
     
     // Build user prompt based on content type and context
     let userPrompt = '';
+    let imagePrompt = '';
     
     switch (type) {
       case 'job_description':
@@ -68,6 +139,7 @@ serve(async (req) => {
 - Experience Level: ${context.experienceLevel || 'Mid-level'}
 - Key Skills: ${context.skills?.join(', ') || 'Not specified'}
 - Additional Info: ${context.additionalInfo || 'None'}`;
+        imagePrompt = `Professional workplace image for ${context.title || 'job'} position at ${context.company || 'company'}. Modern office, Albanian professionals, corporate setting. High quality, photorealistic.`;
         break;
         
       case 'company_profile':
@@ -78,6 +150,7 @@ serve(async (req) => {
 - Location: ${context.location || 'Albania'}
 - Key Values: ${context.values?.join(', ') || 'Innovation, Quality'}
 - Additional Info: ${context.additionalInfo || 'None'}`;
+        imagePrompt = `Professional company banner for ${context.companyName || 'company'} in ${context.industry || 'business'} industry. Modern office building, corporate identity, professional team. High quality, wide format.`;
         break;
         
       case 'marketing_content':
@@ -87,6 +160,7 @@ serve(async (req) => {
 - Key Message: ${context.message || 'Find your dream job in Albania'}
 - Tone: ${context.tone || 'Professional and friendly'}
 - Call to Action: ${context.cta || 'Sign up today'}`;
+        imagePrompt = `Marketing banner for Jobs.al job portal. ${context.purpose || 'Professional careers'}. Modern design, Albanian professionals, success theme. Vibrant colors, high quality.`;
         break;
         
       case 'social_post':
@@ -95,6 +169,7 @@ serve(async (req) => {
 - Topic: ${context.topic || 'Job market trends'}
 - Key Message: ${context.message || 'Jobs.al updates'}
 - Include Statistics: ${context.includeStats ? 'Yes' : 'No'}`;
+        imagePrompt = `Social media graphic for ${context.topic || 'job market'}. Modern, vibrant design. Albanian professional theme. Square format, clean typography, blue and white colors.`;
         break;
         
       case 'email_template':
@@ -103,6 +178,7 @@ serve(async (req) => {
 - Target: ${context.target || 'All subscribers'}
 - Key Message: ${context.message || 'Latest job opportunities'}
 - CTA: ${context.cta || 'View Jobs'}`;
+        imagePrompt = `Email header banner for Jobs.al newsletter. ${context.purpose || 'Job updates'}. Professional, clean design, Albanian job market theme. Wide format, minimal.`;
         break;
     }
 
@@ -140,11 +216,18 @@ serve(async (req) => {
 
     console.log(`Successfully generated ${type} content`);
 
+    // Generate image if requested
+    let imageUrl = null;
+    if (includeImage && imagePrompt) {
+      imageUrl = await generateImage(imagePrompt);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
         type,
         content: generatedContent,
+        imageUrl,
         usage: data.usage,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
