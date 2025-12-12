@@ -57,19 +57,114 @@ serve(async (req) => {
     console.log(`Seeding ${jobsPerCategory} jobs per category using DeepSeek API...`);
     
     // First, check if we have a company to post jobs under
-    const { data: companies } = await supabase
+    let { data: companies } = await supabase
       .from('companies')
       .select('id, owner_id, name')
       .limit(1);
     
+    // If no companies exist, create sample companies
+    if (!companies || companies.length === 0) {
+      console.log('No companies found. Creating sample companies...');
+      
+      const sampleCompanies = [
+        {
+          name: 'TechCorp Albania',
+          slug: 'techcorp-albania',
+          description: 'Leading technology company in Albania providing innovative software solutions and digital transformation services.',
+          industry: 'Technology',
+          location: 'Tirana',
+          company_size: '51-200 employees',
+          website: 'https://techcorp.al',
+          is_verified: true,
+          logo_url: 'https://ui-avatars.com/api/?name=TechCorp&background=0066cc&color=fff&size=200'
+        },
+        {
+          name: 'Raiffeisen Bank Albania',
+          slug: 'raiffeisen-bank-albania',
+          description: 'One of the largest banking institutions in Albania offering comprehensive financial services.',
+          industry: 'Finance & Banking',
+          location: 'Tirana',
+          company_size: '501-1000 employees',
+          website: 'https://raiffeisen.al',
+          is_verified: true,
+          logo_url: 'https://ui-avatars.com/api/?name=Raiffeisen&background=FFD700&color=000&size=200'
+        },
+        {
+          name: 'Albania Tourism Group',
+          slug: 'albania-tourism-group',
+          description: 'Premier hospitality and tourism company showcasing the beauty of Albania to the world.',
+          industry: 'Tourism & Hospitality',
+          location: 'Vlorë',
+          company_size: '201-500 employees',
+          website: 'https://albaniatourism.al',
+          is_verified: true,
+          logo_url: 'https://ui-avatars.com/api/?name=ATG&background=00AA55&color=fff&size=200'
+        },
+        {
+          name: 'MediCare Albania',
+          slug: 'medicare-albania',
+          description: 'Leading healthcare provider with modern facilities and world-class medical professionals.',
+          industry: 'Healthcare',
+          location: 'Tirana',
+          company_size: '201-500 employees',
+          website: 'https://medicare.al',
+          is_verified: true,
+          logo_url: 'https://ui-avatars.com/api/?name=MediCare&background=DC3545&color=fff&size=200'
+        },
+        {
+          name: 'EduTech Albania',
+          slug: 'edutech-albania',
+          description: 'Innovative education technology company transforming learning experiences in Albania.',
+          industry: 'Education',
+          location: 'Durrës',
+          company_size: '11-50 employees',
+          website: 'https://edutech.al',
+          is_verified: true,
+          logo_url: 'https://ui-avatars.com/api/?name=EduTech&background=6F42C1&color=fff&size=200'
+        }
+      ];
+
+      // Get or create a system user for ownership
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id')
+        .limit(1);
+
+      if (!profiles || profiles.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "No users found. Please create a user account first." }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const ownerId = profiles[0].id;
+
+      for (const companyData of sampleCompanies) {
+        const { data: newCompany, error: companyError } = await supabase
+          .from('companies')
+          .insert({ ...companyData, owner_id: ownerId })
+          .select()
+          .single();
+
+        if (companyError) {
+          console.error('Error creating company:', companyError);
+        } else {
+          console.log(`Created company: ${newCompany.name}`);
+          if (!companies) companies = [];
+          companies.push(newCompany);
+        }
+      }
+    }
+
     if (!companies || companies.length === 0) {
       return new Response(
-        JSON.stringify({ error: "No companies found. Please create a company first." }),
+        JSON.stringify({ error: "Could not create companies." }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const company = companies[0];
+    // Use random company for each job
+    const getRandomCompany = () => companies[Math.floor(Math.random() * companies.length)];
     const createdJobs: any[] = [];
     let totalTokens = 0;
     let totalCost = 0;
@@ -78,6 +173,7 @@ serve(async (req) => {
       console.log(`Generating jobs for category: ${category}`);
       
       for (let i = 0; i < jobsPerCategory; i++) {
+        const randomCompany = getRandomCompany();
         const location = LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)];
         const jobType = JOB_TYPES[Math.floor(Math.random() * JOB_TYPES.length)];
         const experienceLevel = EXPERIENCE_LEVELS[Math.floor(Math.random() * EXPERIENCE_LEVELS.length)];
@@ -187,10 +283,10 @@ Respond ONLY with valid JSON (no markdown, no code blocks):
               is_salary_visible: true,
               is_active: true,
               is_featured: Math.random() > 0.7, // 30% featured
-              company_id: company.id,
-              posted_by: company.owner_id,
+              company_id: randomCompany.id,
+              posted_by: randomCompany.owner_id,
               seo_title: `${jobData.title} in ${location} | Jobs.al`,
-              seo_description: `Apply for ${jobData.title} position at ${company.name} in ${location}. ${experienceLevel} level ${jobType.replace('_', ' ')} opportunity.`
+              seo_description: `Apply for ${jobData.title} position at ${randomCompany.name} in ${location}. ${experienceLevel} level ${jobType.replace('_', ' ')} opportunity.`
             })
             .select()
             .single();
