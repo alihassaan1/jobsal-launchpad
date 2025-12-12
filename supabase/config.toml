@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.generate-job-images]
 verify_jwt = false
+
+[functions.generate-blog-images]
+verify_jwt = false
