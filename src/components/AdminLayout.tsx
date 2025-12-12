@@ -102,6 +102,15 @@ const adminMenuItems: MenuGroup[] = [
           { title: "Promo Codes", url: "/admin/promo-codes", icon: Ticket },
         ]
       },
+      { 
+        title: "Invoices", 
+        url: "/admin/invoices", 
+        icon: FileText,
+        subItems: [
+          { title: "All Invoices", url: "/admin/invoices", icon: FileText },
+          { title: "Billing Settings", url: "/admin/billing-settings", icon: Settings },
+        ]
+      },
     ]
   },
   {
