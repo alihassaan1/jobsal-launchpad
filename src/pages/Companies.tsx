@@ -2,12 +2,45 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Helmet } from "react-helmet";
+import Navigation from "@/components/Navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Users, Briefcase, Search, CheckCircle, Star } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Building2, Users, Briefcase, Search, CheckCircle, Star, MapPin, Filter } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+
+const INDUSTRIES = [
+  "All Industries",
+  "Technology",
+  "Finance & Banking",
+  "Healthcare",
+  "Education",
+  "Retail & E-commerce",
+  "Manufacturing",
+  "Construction",
+  "Tourism & Hospitality",
+  "Telecommunications",
+  "Real Estate",
+  "Marketing & Advertising",
+  "Legal",
+  "Consulting",
+  "Energy",
+  "Transportation & Logistics"
+];
+
+const LOCATIONS = [
+  "All Locations",
+  "Tirana",
+  "Durrës",
+  "Vlorë",
+  "Shkodër",
+  "Elbasan",
+  "Fier",
+  "Korçë",
+  "Berat"
+];
 
 const Companies = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -45,6 +78,15 @@ const Companies = () => {
     return badges[plan as keyof typeof badges] || null;
   };
 
+  const [industryFilter, setIndustryFilter] = useState("All Industries");
+  const [locationFilter, setLocationFilter] = useState("All Locations");
+
+  const filteredCompanies = companies?.filter(company => {
+    const matchesIndustry = industryFilter === "All Industries" || company.industry === industryFilter;
+    const matchesLocation = locationFilter === "All Locations" || company.location?.includes(locationFilter);
+    return matchesIndustry && matchesLocation;
+  });
+
   return (
     <>
       <Helmet>
@@ -56,26 +98,52 @@ const Companies = () => {
         <meta property="og:description" content="Discover Albania's best employers and their open positions" />
       </Helmet>
 
+      <Navigation />
+
       <div className="min-h-screen bg-background">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-16">
+        <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-12 md:py-16">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Explore Companies</h1>
-            <p className="text-xl text-primary-foreground/90 mb-8">
+            <h1 className="text-3xl md:text-5xl font-bold mb-4">Explore Companies</h1>
+            <p className="text-lg md:text-xl text-primary-foreground/90 mb-8">
               Discover Albania's top employers and find your next career opportunity
             </p>
 
-            {/* Search */}
-            <div className="max-w-2xl">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                <Input
-                  type="text"
-                  placeholder="Search companies by name, industry, or location..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-background text-foreground"
-                />
+            {/* Search & Filters */}
+            <div className="bg-background/10 backdrop-blur-sm rounded-lg p-4 md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-2 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                  <Input
+                    type="text"
+                    placeholder="Search companies by name..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-background text-foreground h-11"
+                  />
+                </div>
+                <Select value={industryFilter} onValueChange={setIndustryFilter}>
+                  <SelectTrigger className="bg-background text-foreground h-11">
+                    <Briefcase className="w-4 h-4 mr-2 text-muted-foreground" />
+                    <SelectValue placeholder="Industry" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {INDUSTRIES.map((industry) => (
+                      <SelectItem key={industry} value={industry}>{industry}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={locationFilter} onValueChange={setLocationFilter}>
+                  <SelectTrigger className="bg-background text-foreground h-11">
+                    <MapPin className="w-4 h-4 mr-2 text-muted-foreground" />
+                    <SelectValue placeholder="Location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LOCATIONS.map((location) => (
+                      <SelectItem key={location} value={location}>{location}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
@@ -94,9 +162,9 @@ const Companies = () => {
                 </Card>
               ))}
             </div>
-          ) : companies && companies.length > 0 ? (
+          ) : filteredCompanies && filteredCompanies.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {companies.map((company) => (
+              {filteredCompanies.map((company) => (
                 <Card
                   key={company.id}
                   className="hover:shadow-lg transition-all cursor-pointer group"
@@ -128,7 +196,7 @@ const Companies = () => {
                     <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                       {company.location && (
                         <div className="flex items-center gap-1">
-                          <Building2 className="w-4 h-4" />
+                          <MapPin className="w-4 h-4" />
                           {company.location}
                         </div>
                       )}

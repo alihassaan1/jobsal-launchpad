@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Outlet, NavLink, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   DollarSign,
@@ -11,12 +11,15 @@ import {
   BarChart3,
   CreditCard,
   LogOut,
-  Menu,
   Briefcase,
-  Sparkles,
   ChevronDown,
   Mail,
-  Bot
+  Bot,
+  Megaphone,
+  Activity,
+  PenTool,
+  FileCode,
+  Palette
 } from "lucide-react";
 import {
   Sidebar,
@@ -36,20 +39,20 @@ import {
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-import { 
-  FileText as FileTextIcon,
-  Activity
-} from "lucide-react";
+interface SubMenuItem {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
 
 interface MenuItem {
   title: string;
   url: string;
   icon: React.ComponentType<{ className?: string }>;
-  subItems?: { title: string; url: string; icon: React.ComponentType<{ className?: string }> }[];
+  subItems?: SubMenuItem[];
 }
 
 interface MenuGroup {
@@ -74,36 +77,50 @@ const adminMenuItems: MenuGroup[] = [
     ]
   },
   {
-    group: "Finance",
+    group: "Revenue",
     items: [
-      { title: "Revenue", url: "/admin/revenue", icon: DollarSign },
+      { title: "Transactions", url: "/admin/revenue", icon: DollarSign },
       { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
     ]
   },
   {
-    group: "Content",
+    group: "Content & AI",
     items: [
-      { title: "Blog", url: "/admin/blog", icon: FileText },
-      { title: "Content Generator", url: "/admin/content-generator", icon: Sparkles },
+      { 
+        title: "Blog", 
+        url: "/admin/blog", 
+        icon: FileText,
+        subItems: [
+          { title: "All Posts", url: "/admin/blog", icon: FileText },
+          { title: "Content Generator", url: "/admin/content-generator", icon: PenTool },
+        ]
+      },
       { 
         title: "AI Agent", 
         url: "/admin/ai-agent", 
         icon: Bot,
         subItems: [
           { title: "Dashboard", url: "/admin/ai-agent", icon: LayoutDashboard },
-          { title: "API Logs", url: "/admin/ai-agent/logs", icon: FileTextIcon },
+          { title: "API Logs", url: "/admin/ai-agent/logs", icon: FileCode },
           { title: "Analytics", url: "/admin/ai-agent/analytics", icon: Activity },
         ]
       },
-      { title: "Templates", url: "/admin/templates", icon: FileText },
-      { title: "Marketing Agent", url: "/admin/marketing-agent", icon: Sparkles },
-      { title: "Email Marketing", url: "/admin/emails", icon: Mail },
+      { 
+        title: "Marketing", 
+        url: "/admin/marketing-agent", 
+        icon: Megaphone,
+        subItems: [
+          { title: "Outreach Agent", url: "/admin/marketing-agent", icon: Bot },
+          { title: "Email Campaigns", url: "/admin/emails", icon: Mail },
+        ]
+      },
     ]
   },
   {
-    group: "System",
+    group: "Settings",
     items: [
-      { title: "Settings", url: "/admin/settings", icon: Settings },
+      { title: "Templates", url: "/admin/templates", icon: Palette },
+      { title: "System Settings", url: "/admin/settings", icon: Settings },
     ]
   }
 ];
@@ -114,7 +131,19 @@ function AdminSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const collapsed = state === 'collapsed';
-  const [openSections, setOpenSections] = useState<string[]>(['Overview', 'Management', 'Finance', 'Content', 'System']);
+  const [openSections, setOpenSections] = useState<string[]>(['Overview', 'Management', 'Revenue', 'Content & AI', 'Settings']);
+  const [openSubMenus, setOpenSubMenus] = useState<string[]>([]);
+
+  // Auto-open submenu if current route matches
+  useEffect(() => {
+    adminMenuItems.forEach(section => {
+      section.items.forEach(item => {
+        if (item.subItems?.some(sub => location.pathname === sub.url || location.pathname.startsWith(sub.url + '/'))) {
+          setOpenSubMenus(prev => prev.includes(item.title) ? prev : [...prev, item.title]);
+        }
+      });
+    });
+  }, [location.pathname]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -129,6 +158,20 @@ function AdminSidebar() {
     );
   };
 
+  const toggleSubMenu = (title: string) => {
+    setOpenSubMenus(prev =>
+      prev.includes(title)
+        ? prev.filter(t => t !== title)
+        : [...prev, title]
+    );
+  };
+
+  const isActiveRoute = (url: string, subItems?: SubMenuItem[]) => {
+    if (subItems) {
+      return subItems.some(sub => location.pathname === sub.url || location.pathname.startsWith(sub.url + '/'));
+    }
+    return location.pathname === url;
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r">
@@ -143,7 +186,7 @@ function AdminSidebar() {
             <SidebarGroup>
               <SidebarGroupLabel asChild>
                 <CollapsibleTrigger className="flex w-full items-center justify-between hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2 py-1.5">
-                  <span className="text-xs font-semibold">{section.group}</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{section.group}</span>
                   {!collapsed && (
                     <ChevronDown className="h-3 w-3 transition-transform group-data-[state=open]/collapsible:rotate-180" />
                   )}
@@ -156,19 +199,20 @@ function AdminSidebar() {
                       <SidebarMenuItem key={item.title}>
                         {item.subItems ? (
                           <Collapsible 
-                            defaultOpen={item.subItems.some(sub => location.pathname === sub.url)}
+                            open={openSubMenus.includes(item.title)}
+                            onOpenChange={() => toggleSubMenu(item.title)}
                             className="w-full"
                           >
                             <CollapsibleTrigger asChild>
                               <SidebarMenuButton 
                                 className="w-full justify-between"
-                                isActive={location.pathname.startsWith(item.url)}
+                                isActive={isActiveRoute(item.url, item.subItems)}
                               >
                                 <span className="flex items-center gap-2">
                                   <item.icon className="h-4 w-4" />
                                   <span>{item.title}</span>
                                 </span>
-                                <ChevronDown className="h-3 w-3 transition-transform group-data-[state=open]:rotate-180" />
+                                <ChevronDown className={`h-3 w-3 transition-transform ${openSubMenus.includes(item.title) ? 'rotate-180' : ''}`} />
                               </SidebarMenuButton>
                             </CollapsibleTrigger>
                             <CollapsibleContent>
