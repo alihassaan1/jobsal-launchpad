@@ -47,6 +47,10 @@ import CompanyProfile from "./pages/CompanyProfile";
 import EmployerCompanyProfile from "./pages/EmployerCompanyProfile";
 import SetupCompany from "./pages/SetupCompany";
 import NotFound from "./pages/NotFound";
+import AdminAds from "./pages/AdminAds";
+import AdminPromoCodes from "./pages/AdminPromoCodes";
+import EmployerAds from "./pages/EmployerAds";
+import EmployerAdCheckout from "./pages/EmployerAdCheckout";
 
 const queryClient = new QueryClient();
 
@@ -89,10 +93,14 @@ const App = () => (
               <Route path="blog" element={<AdminBlog />} />
               <Route path="emails" element={<AdminEmails />} />
               <Route path="templates" element={<AdminTemplates />} />
+              <Route path="ads" element={<AdminAds />} />
+              <Route path="promo-codes" element={<AdminPromoCodes />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             <Route path="/employer/analytics" element={<EmployerAnalytics />} />
             <Route path="/employer/subscription" element={<EmployerSubscription />} />
+            <Route path="/employer/ads" element={<EmployerAds />} />
+            <Route path="/employer/ads/checkout" element={<EmployerAdCheckout />} />
             <Route path="/recommended-jobs" element={<RecommendedJobs />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/ai-resume-builder" element={<ResumeBuilderLanding />} />
