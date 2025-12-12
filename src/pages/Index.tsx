@@ -12,6 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -22,6 +29,7 @@ import FeaturedCompanies from "./FeaturedCompanies";
 import { TopEmployers } from "@/components/TopEmployers";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet";
+import { ALBANIAN_CITIES } from "@/lib/i18n";
 
 // Blog section component
 const BlogSection = () => {
@@ -107,6 +115,15 @@ const Index = () => {
   const navigate = useNavigate();
   const [featuredJobs, setFeaturedJobs] = useState<any[]>([]);
   const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+  const [heroSearchTerm, setHeroSearchTerm] = useState("");
+  const [heroLocation, setHeroLocation] = useState("");
+
+  const handleHeroSearch = () => {
+    const params = new URLSearchParams();
+    if (heroSearchTerm) params.set('q', heroSearchTerm);
+    if (heroLocation) params.set('location', heroLocation);
+    navigate(`/jobs${params.toString() ? '?' + params.toString() : ''}`);
+  };
 
   useEffect(() => {
     fetchFeaturedJobs();
@@ -309,14 +326,36 @@ const Index = () => {
           <div className="max-w-4xl mx-auto bg-white/95 backdrop-blur p-6 rounded-2xl shadow-2xl border border-white/20 animate-scale-in">
             <div className="grid md:grid-cols-3 gap-4">
               <div className="relative group">
-                <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                <Input placeholder="Job title or keyword" className="pl-10 border-0 bg-white/80 focus:bg-white transition-colors" />
+                <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors z-10" />
+                <Input 
+                  placeholder="Job title or keyword" 
+                  className="pl-10 border-0 bg-white/80 focus:bg-white transition-colors" 
+                  value={heroSearchTerm}
+                  onChange={(e) => setHeroSearchTerm(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleHeroSearch()}
+                />
               </div>
               <div className="relative group">
-                <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                <Input placeholder="Location" className="pl-10 border-0 bg-white/80 focus:bg-white transition-colors" />
+                <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground z-10 pointer-events-none" />
+                <Select value={heroLocation} onValueChange={setHeroLocation}>
+                  <SelectTrigger className="pl-10 border-0 bg-white/80 focus:bg-white transition-colors h-11">
+                    <SelectValue placeholder="All Locations" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50 max-h-60">
+                    <SelectItem value="all">All Locations</SelectItem>
+                    {ALBANIAN_CITIES.map((city) => (
+                      <SelectItem key={city.key} value={city.en}>
+                        {city.en}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <Button size="lg" className="w-full shadow-lg hover:shadow-xl transition-all duration-300 group">
+              <Button 
+                size="lg" 
+                className="w-full shadow-lg hover:shadow-xl transition-all duration-300 group"
+                onClick={handleHeroSearch}
+              >
                 <Sparkles className="mr-2 h-4 w-4 group-hover:rotate-12 transition-transform" />
                 Search Jobs
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -430,7 +469,12 @@ const Index = () => {
           )}
 
           <div className="text-center mt-12">
-            <Button variant="outline" size="lg" className="shadow-sm hover:bg-accent">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="shadow-sm hover:bg-accent"
+              onClick={() => navigate('/jobs')}
+            >
               View All Jobs
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -460,7 +504,12 @@ const Index = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {jobCategories.map((category, index) => (
-              <Card key={category.name} className="text-center hover:shadow-2xl transition-all duration-500 cursor-pointer group border-0 shadow-lg bg-card/95 backdrop-blur hover:-translate-y-2 animate-fade-up" style={{animationDelay: `${index * 0.1}s`}}>
+              <Card 
+                key={category.name} 
+                className="text-center hover:shadow-2xl transition-all duration-500 cursor-pointer group border-0 shadow-lg bg-card/95 backdrop-blur hover:-translate-y-2 animate-fade-up" 
+                style={{animationDelay: `${index * 0.1}s`}}
+                onClick={() => navigate(`/jobs?category=${encodeURIComponent(category.name)}`)}
+              >
                 <CardContent className="p-6 relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-500">

@@ -19,7 +19,8 @@ import {
   Activity,
   PenTool,
   FileCode,
-  Palette
+  Palette,
+  Shield
 } from "lucide-react";
 import {
   Sidebar,
@@ -37,10 +38,14 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
   SidebarMenuSubButton,
+  SidebarFooter,
+  SidebarHeader,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 interface SubMenuItem {
   title: string;
@@ -58,11 +63,13 @@ interface MenuItem {
 interface MenuGroup {
   group: string;
   items: MenuItem[];
+  color: string;
 }
 
 const adminMenuItems: MenuGroup[] = [
   { 
     group: "Overview",
+    color: "text-blue-500",
     items: [
       { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
       { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
@@ -70,6 +77,7 @@ const adminMenuItems: MenuGroup[] = [
   },
   {
     group: "Management",
+    color: "text-emerald-500",
     items: [
       { title: "Users", url: "/admin/users", icon: Users },
       { title: "Companies", url: "/admin/companies", icon: Building2 },
@@ -78,6 +86,7 @@ const adminMenuItems: MenuGroup[] = [
   },
   {
     group: "Revenue",
+    color: "text-amber-500",
     items: [
       { title: "Transactions", url: "/admin/revenue", icon: DollarSign },
       { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
@@ -85,6 +94,7 @@ const adminMenuItems: MenuGroup[] = [
   },
   {
     group: "Content & AI",
+    color: "text-purple-500",
     items: [
       { 
         title: "Blog", 
@@ -118,6 +128,7 @@ const adminMenuItems: MenuGroup[] = [
   },
   {
     group: "Settings",
+    color: "text-slate-500",
     items: [
       { title: "Templates", url: "/admin/templates", icon: Palette },
       { title: "System Settings", url: "/admin/settings", icon: Settings },
@@ -127,7 +138,7 @@ const adminMenuItems: MenuGroup[] = [
 
 function AdminSidebar() {
   const { state } = useSidebar();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const collapsed = state === 'collapsed';
@@ -174,8 +185,25 @@ function AdminSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r">
-      <SidebarContent>
+    <Sidebar collapsible="icon" className="border-r bg-sidebar">
+      {/* Header */}
+      <SidebarHeader className="border-b border-sidebar-border">
+        <div className="flex items-center gap-3 px-4 py-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80 shadow-lg">
+            <Shield className="h-5 w-5 text-primary-foreground" />
+          </div>
+          {!collapsed && (
+            <div className="flex flex-col">
+              <span className="text-lg font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                Jobs.al
+              </span>
+              <span className="text-xs text-muted-foreground">Admin Panel</span>
+            </div>
+          )}
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent className="px-2">
         {adminMenuItems.map((section) => (
           <Collapsible
             key={section.group}
@@ -183,17 +211,22 @@ function AdminSidebar() {
             onOpenChange={() => toggleSection(section.group)}
             className="group/collapsible"
           >
-            <SidebarGroup>
+            <SidebarGroup className="py-2">
               <SidebarGroupLabel asChild>
-                <CollapsibleTrigger className="flex w-full items-center justify-between hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2 py-1.5">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{section.group}</span>
+                <CollapsibleTrigger className="flex w-full items-center justify-between hover:bg-sidebar-accent rounded-lg px-3 py-2 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <div className={`h-2 w-2 rounded-full ${section.color.replace('text-', 'bg-')}`} />
+                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {section.group}
+                    </span>
+                  </div>
                   {!collapsed && (
-                    <ChevronDown className="h-3 w-3 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
                   )}
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
               <CollapsibleContent>
-                <SidebarGroupContent>
+                <SidebarGroupContent className="mt-1">
                   <SidebarMenu>
                     {section.items.map((item) => (
                       <SidebarMenuItem key={item.title}>
@@ -205,26 +238,35 @@ function AdminSidebar() {
                           >
                             <CollapsibleTrigger asChild>
                               <SidebarMenuButton 
-                                className="w-full justify-between"
+                                className={`w-full justify-between rounded-lg transition-all duration-200 ${
+                                  isActiveRoute(item.url, item.subItems)
+                                    ? 'bg-primary/10 text-primary border-l-2 border-primary font-medium'
+                                    : 'hover:bg-sidebar-accent hover:translate-x-0.5'
+                                }`}
                                 isActive={isActiveRoute(item.url, item.subItems)}
                               >
-                                <span className="flex items-center gap-2">
-                                  <item.icon className="h-4 w-4" />
+                                <span className="flex items-center gap-2.5">
+                                  <item.icon className={`h-4 w-4 ${isActiveRoute(item.url, item.subItems) ? section.color : ''}`} />
                                   <span>{item.title}</span>
                                 </span>
-                                <ChevronDown className={`h-3 w-3 transition-transform ${openSubMenus.includes(item.title) ? 'rotate-180' : ''}`} />
+                                <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${openSubMenus.includes(item.title) ? 'rotate-180' : ''}`} />
                               </SidebarMenuButton>
                             </CollapsibleTrigger>
                             <CollapsibleContent>
-                              <SidebarMenuSub>
+                              <SidebarMenuSub className="ml-4 mt-1 border-l border-sidebar-border pl-3">
                                 {item.subItems.map((subItem) => (
                                   <SidebarMenuSubItem key={subItem.title}>
                                     <SidebarMenuSubButton 
                                       asChild 
                                       isActive={location.pathname === subItem.url}
+                                      className={`rounded-md transition-all duration-200 ${
+                                        location.pathname === subItem.url
+                                          ? 'bg-primary/10 text-primary font-medium'
+                                          : 'hover:bg-sidebar-accent'
+                                      }`}
                                     >
-                                      <NavLink to={subItem.url}>
-                                        <subItem.icon className="h-3 w-3" />
+                                      <NavLink to={subItem.url} className="flex items-center gap-2">
+                                        <subItem.icon className="h-3.5 w-3.5" />
                                         <span>{subItem.title}</span>
                                       </NavLink>
                                     </SidebarMenuSubButton>
@@ -234,9 +276,17 @@ function AdminSidebar() {
                             </CollapsibleContent>
                           </Collapsible>
                         ) : (
-                          <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                            <NavLink to={item.url}>
-                              <item.icon className="h-4 w-4" />
+                          <SidebarMenuButton 
+                            asChild 
+                            isActive={location.pathname === item.url}
+                            className={`rounded-lg transition-all duration-200 ${
+                              location.pathname === item.url
+                                ? 'bg-primary/10 text-primary border-l-2 border-primary font-medium'
+                                : 'hover:bg-sidebar-accent hover:translate-x-0.5'
+                            }`}
+                          >
+                            <NavLink to={item.url} className="flex items-center gap-2.5">
+                              <item.icon className={`h-4 w-4 ${location.pathname === item.url ? section.color : ''}`} />
                               <span>{item.title}</span>
                             </NavLink>
                           </SidebarMenuButton>
@@ -249,18 +299,32 @@ function AdminSidebar() {
             </SidebarGroup>
           </Collapsible>
         ))}
-
-        <div className="mt-auto p-4">
-          <Button
-            variant="outline"
-            className="w-full justify-start"
-            onClick={handleSignOut}
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            {!collapsed && <span>Sign Out</span>}
-          </Button>
-        </div>
       </SidebarContent>
+
+      {/* Footer */}
+      <SidebarFooter className="border-t border-sidebar-border p-3">
+        {!collapsed && (
+          <div className="flex items-center gap-3 px-2 py-2 mb-2 rounded-lg bg-sidebar-accent/50">
+            <Avatar className="h-9 w-9 border-2 border-primary/20">
+              <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+                {user?.email?.charAt(0).toUpperCase() || 'A'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{user?.email?.split('@')[0] || 'Admin'}</p>
+              <p className="text-xs text-muted-foreground">Administrator</p>
+            </div>
+          </div>
+        )}
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+          onClick={handleSignOut}
+        >
+          <LogOut className="h-4 w-4" />
+          {!collapsed && <span>Sign Out</span>}
+        </Button>
+      </SidebarFooter>
     </Sidebar>
   );
 }
@@ -285,14 +349,15 @@ export default function AdminLayout() {
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
-        <SidebarInset>
-          <header className="h-14 border-b flex items-center px-4 bg-card gap-4">
-            <SidebarTrigger />
+        <SidebarInset className="flex-1">
+          <header className="h-14 border-b flex items-center px-4 bg-card/50 backdrop-blur-sm gap-4 sticky top-0 z-10">
+            <SidebarTrigger className="hover:bg-accent rounded-lg transition-colors" />
+            <Separator orientation="vertical" className="h-6" />
             <div className="flex-1">
               <h1 className="text-lg font-semibold">Jobs.al Admin</h1>
             </div>
           </header>
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto bg-muted/30">
             <Outlet />
           </main>
         </SidebarInset>
