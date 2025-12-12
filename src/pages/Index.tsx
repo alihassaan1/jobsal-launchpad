@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, MapPin, Building2, Users, TrendingUp, Star, ArrowRight, Briefcase, Clock, DollarSign, Sparkles, LogOut, User, Calendar } from "lucide-react";
+import { Search, MapPin, Building2, Users, TrendingUp, Star, ArrowRight, Briefcase, Clock, DollarSign, Sparkles, LogOut, User, Calendar, Check, ChevronsUpDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +13,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -30,6 +36,7 @@ import { TopEmployers } from "@/components/TopEmployers";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet";
 import { ALBANIAN_CITIES } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 // Blog section component
 const BlogSection = () => {
@@ -117,12 +124,19 @@ const Index = () => {
   const [isLoadingJobs, setIsLoadingJobs] = useState(true);
   const [heroSearchTerm, setHeroSearchTerm] = useState("");
   const [heroLocation, setHeroLocation] = useState("");
+  const [locationOpen, setLocationOpen] = useState(false);
 
   const handleHeroSearch = () => {
     const params = new URLSearchParams();
     if (heroSearchTerm) params.set('q', heroSearchTerm);
     if (heroLocation) params.set('location', heroLocation);
     navigate(`/jobs${params.toString() ? '?' + params.toString() : ''}`);
+  };
+
+  const getLocationLabel = () => {
+    if (!heroLocation) return "All Locations";
+    const city = ALBANIAN_CITIES.find(c => c.en === heroLocation);
+    return city ? city.en : heroLocation;
   };
 
   useEffect(() => {
@@ -335,22 +349,55 @@ const Index = () => {
                   onKeyDown={(e) => e.key === 'Enter' && handleHeroSearch()}
                 />
               </div>
-              <div className="relative group">
-                <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground z-10 pointer-events-none" />
-                <Select value={heroLocation} onValueChange={setHeroLocation}>
-                  <SelectTrigger className="pl-10 border-0 bg-white/80 focus:bg-white transition-colors h-11">
-                    <SelectValue placeholder="All Locations" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white z-50 max-h-60">
-                    <SelectItem value="all">All Locations</SelectItem>
-                    {ALBANIAN_CITIES.map((city) => (
-                      <SelectItem key={city.key} value={city.en}>
-                        {city.en}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={locationOpen}
+                    className="w-full justify-between pl-10 border-0 bg-white/80 hover:bg-white h-11 font-normal text-left"
+                  >
+                    <MapPin className="absolute left-3 h-5 w-5 text-muted-foreground" />
+                    <span className={cn(!heroLocation && "text-muted-foreground")}>
+                      {getLocationLabel()}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[280px] p-0 bg-white z-50" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search city..." className="h-10" />
+                    <CommandList>
+                      <CommandEmpty>No city found.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value=""
+                          onSelect={() => {
+                            setHeroLocation("");
+                            setLocationOpen(false);
+                          }}
+                        >
+                          <Check className={cn("mr-2 h-4 w-4", !heroLocation ? "opacity-100" : "opacity-0")} />
+                          All Locations
+                        </CommandItem>
+                        {ALBANIAN_CITIES.map((city) => (
+                          <CommandItem
+                            key={city.key}
+                            value={city.en}
+                            onSelect={() => {
+                              setHeroLocation(city.en);
+                              setLocationOpen(false);
+                            }}
+                          >
+                            <Check className={cn("mr-2 h-4 w-4", heroLocation === city.en ? "opacity-100" : "opacity-0")} />
+                            {city.en}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               <Button 
                 size="lg" 
                 className="w-full shadow-lg hover:shadow-xl transition-all duration-300 group"
