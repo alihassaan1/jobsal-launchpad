@@ -20,7 +20,9 @@ import {
   PenTool,
   FileCode,
   Palette,
-  Shield
+  Shield,
+  Package,
+  Ticket
 } from "lucide-react";
 import {
   Sidebar,
@@ -90,6 +92,15 @@ const adminMenuItems: MenuGroup[] = [
     items: [
       { title: "Transactions", url: "/admin/revenue", icon: DollarSign },
       { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
+      { 
+        title: "Ads", 
+        url: "/admin/ads", 
+        icon: Megaphone,
+        subItems: [
+          { title: "Ad Products", url: "/admin/ads", icon: Package },
+          { title: "Promo Codes", url: "/admin/promo-codes", icon: Ticket },
+        ]
+      },
     ]
   },
   {
