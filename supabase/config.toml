@@ -32,3 +32,12 @@ verify_jwt = false
 
 [functions.scheduled-content-generator]
 verify_jwt = false
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.scheduled-email-reminders]
+verify_jwt = false
+
+[functions.send-welcome-email]
+verify_jwt = false

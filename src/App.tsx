@@ -37,6 +37,7 @@ import ResumeBuilderLandingAL from "./pages/ResumeBuilderLandingAL";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/AdminBlog";
+import AdminEmails from "./pages/AdminEmails";
 import Sitemap from "./pages/Sitemap";
 import Companies from "./pages/Companies";
 import CompanyProfile from "./pages/CompanyProfile";
@@ -79,9 +80,9 @@ const App = () => (
               <Route path="marketing-agent" element={<AdminMarketingAgent />} />
               <Route path="content-generator" element={<AdminContentGenerator />} />
               <Route path="blog" element={<AdminBlog />} />
+              <Route path="emails" element={<AdminEmails />} />
               <Route path="templates" element={<AdminTemplates />} />
               <Route path="settings" element={<AdminSettings />} />
-            </Route>
             
             <Route path="/employer/analytics" element={<EmployerAnalytics />} />
             <Route path="/employer/subscription" element={<EmployerSubscription />} />
