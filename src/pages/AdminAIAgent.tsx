@@ -12,11 +12,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Wand2, Briefcase, Building2, Megaphone, Share2, Mail, Copy, Check } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, Wand2, Briefcase, Building2, Megaphone, Share2, Mail, Copy, Check, Image, Clock, Play, Calendar, Zap } from "lucide-react";
 
 interface GeneratedContent {
   type: string;
   content: string;
+  imageUrl?: string | null;
   usage?: {
     prompt_tokens: number;
     completion_tokens: number;
@@ -27,6 +30,7 @@ interface GeneratedContent {
 const AdminAIAgent = () => {
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
   const [copied, setCopied] = useState(false);
+  const [includeImage, setIncludeImage] = useState(false);
 
   // Job Description State
   const [jobTitle, setJobTitle] = useState("");
@@ -59,10 +63,13 @@ const AdminAIAgent = () => {
   const [emailMessage, setEmailMessage] = useState("");
   const [emailCta, setEmailCta] = useState("");
 
+  // Image Generation State
+  const [imagePrompt, setImagePrompt] = useState("");
+
   const generateMutation = useMutation({
-    mutationFn: async ({ type, context }: { type: string; context: Record<string, any> }) => {
+    mutationFn: async ({ type, context, includeImage: withImage }: { type: string; context: Record<string, any>; includeImage?: boolean }) => {
       const { data, error } = await supabase.functions.invoke('deepseek-agent', {
-        body: { type, context }
+        body: { type, context, includeImage: withImage }
       });
       if (error) throw error;
       if (!data.success) throw new Error(data.error);
@@ -74,6 +81,22 @@ const AdminAIAgent = () => {
     },
     onError: (error) => {
       toast.error(`Generation failed: ${error.message}`);
+    }
+  });
+
+  const scheduledMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('scheduled-ai-content', {
+        body: { trigger: 'manual' }
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(`Generated ${data.generated} pieces of content!`);
+    },
+    onError: (error) => {
+      toast.error(`Scheduled generation failed: ${error.message}`);
     }
   });
 
@@ -96,7 +119,8 @@ const AdminAIAgent = () => {
         jobType,
         experienceLevel: jobExperience,
         skills: jobSkills.split(',').map(s => s.trim()).filter(Boolean),
-      }
+      },
+      includeImage
     });
   };
 
@@ -108,7 +132,8 @@ const AdminAIAgent = () => {
         industry: companyIndustry,
         size: companySize,
         values: companyValues.split(',').map(s => s.trim()).filter(Boolean),
-      }
+      },
+      includeImage
     });
   };
 
@@ -120,7 +145,8 @@ const AdminAIAgent = () => {
         audience: marketingAudience,
         message: marketingMessage,
         cta: marketingCta,
-      }
+      },
+      includeImage
     });
   };
 
@@ -131,7 +157,8 @@ const AdminAIAgent = () => {
         platform: socialPlatform,
         topic: socialTopic,
         message: socialMessage,
-      }
+      },
+      includeImage
     });
   };
 
@@ -143,19 +170,100 @@ const AdminAIAgent = () => {
         target: emailTarget,
         message: emailMessage,
         cta: emailCta,
+      },
+      includeImage
+    });
+  };
+
+  const generateImage = () => {
+    generateMutation.mutate({
+      type: 'generate_image',
+      context: {
+        prompt: imagePrompt,
       }
     });
   };
 
   return (
     <AdminGuard>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">AI Content Agent</h1>
-          <p className="text-muted-foreground mt-1">
-            Generate professional content using DeepSeek AI
-          </p>
+      <div className="space-y-6 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">AI Content Agent</h1>
+            <p className="text-muted-foreground mt-1">
+              Generate professional content using DeepSeek AI + Lovable AI Images
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Switch
+                id="include-image"
+                checked={includeImage}
+                onCheckedChange={setIncludeImage}
+              />
+              <Label htmlFor="include-image" className="flex items-center gap-1">
+                <Image className="h-4 w-4" />
+                Include AI Image
+              </Label>
+            </div>
+          </div>
         </div>
+
+        {/* Scheduled Content Section */}
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Automated Content Generation
+            </CardTitle>
+            <CardDescription>
+              Daily automated content runs at 8 AM Albania time
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-background">
+                <Calendar className="h-5 w-5 text-blue-500" />
+                <div>
+                  <p className="text-sm font-medium">Daily</p>
+                  <p className="text-xs text-muted-foreground">Blog Posts + Social</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-background">
+                <Calendar className="h-5 w-5 text-green-500" />
+                <div>
+                  <p className="text-sm font-medium">Mon & Thu</p>
+                  <p className="text-xs text-muted-foreground">City Guides</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-background">
+                <Calendar className="h-5 w-5 text-purple-500" />
+                <div>
+                  <p className="text-sm font-medium">Tue & Fri</p>
+                  <p className="text-xs text-muted-foreground">Career Guides</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-background">
+                <Calendar className="h-5 w-5 text-orange-500" />
+                <div>
+                  <p className="text-sm font-medium">Wednesday</p>
+                  <p className="text-xs text-muted-foreground">Email Newsletter</p>
+                </div>
+              </div>
+            </div>
+            <Button 
+              onClick={() => scheduledMutation.mutate()}
+              disabled={scheduledMutation.isPending}
+              className="w-full"
+            >
+              {scheduledMutation.isPending ? (
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Running Scheduled Generation...</>
+              ) : (
+                <><Play className="h-4 w-4 mr-2" /> Run Scheduled Content Now</>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Input Section */}
@@ -171,26 +279,24 @@ const AdminAIAgent = () => {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="job_description" className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
+                <TabsList className="grid w-full grid-cols-6">
                   <TabsTrigger value="job_description" className="text-xs">
-                    <Briefcase className="h-4 w-4 mr-1" />
-                    Jobs
+                    <Briefcase className="h-4 w-4" />
                   </TabsTrigger>
                   <TabsTrigger value="company_profile" className="text-xs">
-                    <Building2 className="h-4 w-4 mr-1" />
-                    Company
+                    <Building2 className="h-4 w-4" />
                   </TabsTrigger>
                   <TabsTrigger value="marketing" className="text-xs">
-                    <Megaphone className="h-4 w-4 mr-1" />
-                    Marketing
+                    <Megaphone className="h-4 w-4" />
                   </TabsTrigger>
                   <TabsTrigger value="social" className="text-xs">
-                    <Share2 className="h-4 w-4 mr-1" />
-                    Social
+                    <Share2 className="h-4 w-4" />
                   </TabsTrigger>
                   <TabsTrigger value="email" className="text-xs">
-                    <Mail className="h-4 w-4 mr-1" />
-                    Email
+                    <Mail className="h-4 w-4" />
+                  </TabsTrigger>
+                  <TabsTrigger value="image" className="text-xs">
+                    <Image className="h-4 w-4" />
                   </TabsTrigger>
                 </TabsList>
 
@@ -469,6 +575,35 @@ const AdminAIAgent = () => {
                     )}
                   </Button>
                 </TabsContent>
+
+                <TabsContent value="image" className="space-y-4 mt-4">
+                  <Alert>
+                    <Zap className="h-4 w-4" />
+                    <AlertDescription>
+                      Uses Lovable AI (Gemini) to generate high-quality images for your content.
+                    </AlertDescription>
+                  </Alert>
+                  <div className="space-y-2">
+                    <Label>Image Description</Label>
+                    <Textarea 
+                      placeholder="Describe the image you want to generate... e.g., Professional business team in modern Tirana office, diverse Albanian professionals collaborating, bright and modern atmosphere"
+                      value={imagePrompt}
+                      onChange={(e) => setImagePrompt(e.target.value)}
+                      rows={4}
+                    />
+                  </div>
+                  <Button 
+                    onClick={generateImage} 
+                    disabled={generateMutation.isPending || !imagePrompt.trim()}
+                    className="w-full"
+                  >
+                    {generateMutation.isPending ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating Image...</>
+                    ) : (
+                      <><Image className="h-4 w-4 mr-2" /> Generate Image</>
+                    )}
+                  </Button>
+                </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
@@ -485,16 +620,20 @@ const AdminAIAgent = () => {
                 </div>
                 {generatedContent && (
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">
-                      {generatedContent.usage?.total_tokens || 0} tokens
-                    </Badge>
-                    <Button variant="outline" size="sm" onClick={handleCopy}>
-                      {copied ? (
-                        <><Check className="h-4 w-4 mr-1" /> Copied</>
-                      ) : (
-                        <><Copy className="h-4 w-4 mr-1" /> Copy</>
-                      )}
-                    </Button>
+                    {generatedContent.usage && (
+                      <Badge variant="secondary">
+                        {generatedContent.usage.total_tokens} tokens
+                      </Badge>
+                    )}
+                    {generatedContent.content && (
+                      <Button variant="outline" size="sm" onClick={handleCopy}>
+                        {copied ? (
+                          <><Check className="h-4 w-4 mr-1" /> Copied</>
+                        ) : (
+                          <><Copy className="h-4 w-4 mr-1" /> Copy</>
+                        )}
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
@@ -504,15 +643,26 @@ const AdminAIAgent = () => {
                 <div className="flex items-center justify-center h-64">
                   <div className="text-center space-y-4">
                     <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-                    <p className="text-muted-foreground">Generating content with DeepSeek AI...</p>
+                    <p className="text-muted-foreground">Generating content with AI...</p>
                   </div>
                 </div>
               ) : generatedContent ? (
                 <ScrollArea className="h-[500px] rounded-md border p-4">
-                  <div 
-                    className="prose prose-sm max-w-none dark:prose-invert"
-                    dangerouslySetInnerHTML={{ __html: generatedContent.content }}
-                  />
+                  {generatedContent.imageUrl && (
+                    <div className="mb-4">
+                      <img 
+                        src={generatedContent.imageUrl} 
+                        alt="Generated" 
+                        className="w-full rounded-lg border"
+                      />
+                    </div>
+                  )}
+                  {generatedContent.content && (
+                    <div 
+                      className="prose prose-sm max-w-none dark:prose-invert"
+                      dangerouslySetInnerHTML={{ __html: generatedContent.content }}
+                    />
+                  )}
                 </ScrollArea>
               ) : (
                 <div className="flex items-center justify-center h-64 border-2 border-dashed rounded-lg">
