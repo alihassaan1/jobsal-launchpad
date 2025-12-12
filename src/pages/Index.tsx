@@ -20,6 +20,7 @@ import heroBg from "@/assets/hero-bg.jpg";
 import patternBg from "@/assets/pattern-bg.jpg";
 import FeaturedCompanies from "./FeaturedCompanies";
 import { TopEmployers } from "@/components/TopEmployers";
+import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet";
 
 // Blog section component
@@ -591,52 +592,7 @@ const Index = () => {
       <BlogSection />
 
       {/* Footer */}
-      <footer className="bg-secondary py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent mb-4">
-                jobs.al
-              </div>
-              <p className="text-muted-foreground mb-4">
-                Albania's leading job portal connecting talents with opportunities.
-              </p>
-              <div className="text-sm text-muted-foreground">
-                © 2024 jobs.al. All rights reserved.
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">For Job Seekers</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/jobs" className="hover:text-primary">Browse Jobs</a></li>
-                <li><a href="#" className="hover:text-primary">Career Advice</a></li>
-                <li><a href="/resume-templates" className="hover:text-primary">Resume Templates</a></li>
-                <li><a href="/resume-builder" className="hover:text-primary">Resume Builder</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">For Employers</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary">Post a Job</a></li>
-                <li><a href="#" className="hover:text-primary">Browse Resumes</a></li>
-                <li><a href="/pricing" className="hover:text-primary">Pricing Plans</a></li>
-                <li><a href="#" className="hover:text-primary">ATS Integration</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary">About Us</a></li>
-                <li><a href="/companies" className="hover:text-primary">Companies</a></li>
-                <li><a href="/blog" className="hover:text-primary">Blog</a></li>
-                <li><a href="#" className="hover:text-primary">Contact</a></li>
-                <li><a href="#" className="hover:text-primary">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-primary">Terms of Service</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
     </>
   );
