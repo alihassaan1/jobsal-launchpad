@@ -48,6 +48,7 @@ import EmployerCompanyProfile from "./pages/EmployerCompanyProfile";
 import SetupCompany from "./pages/SetupCompany";
 import NotFound from "./pages/NotFound";
 import AdminAds from "./pages/AdminAds";
+import AdminAdAnalytics from "./pages/AdminAdAnalytics";
 import AdminPromoCodes from "./pages/AdminPromoCodes";
 import EmployerAds from "./pages/EmployerAds";
 import EmployerAdCheckout from "./pages/EmployerAdCheckout";
@@ -94,6 +95,7 @@ const App = () => (
               <Route path="emails" element={<AdminEmails />} />
               <Route path="templates" element={<AdminTemplates />} />
               <Route path="ads" element={<AdminAds />} />
+              <Route path="ad-analytics" element={<AdminAdAnalytics />} />
               <Route path="promo-codes" element={<AdminPromoCodes />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
