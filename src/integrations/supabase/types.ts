@@ -445,6 +445,42 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_authors: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          location: string | null
+          name: string
+          specialization: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          name: string
+          specialization?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          name?: string
+          specialization?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           banner_url: string | null
@@ -1407,6 +1443,7 @@ export type Database = {
       posts: {
         Row: {
           author_id: string
+          blog_author_id: string | null
           category: string
           company_id: string | null
           content: string
@@ -1429,6 +1466,7 @@ export type Database = {
         }
         Insert: {
           author_id: string
+          blog_author_id?: string | null
           category: string
           company_id?: string | null
           content: string
@@ -1451,6 +1489,7 @@ export type Database = {
         }
         Update: {
           author_id?: string
+          blog_author_id?: string | null
           category?: string
           company_id?: string | null
           content?: string
@@ -1477,6 +1516,13 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_blog_author_id_fkey"
+            columns: ["blog_author_id"]
+            isOneToOne: false
+            referencedRelation: "blog_authors"
             referencedColumns: ["id"]
           },
           {
