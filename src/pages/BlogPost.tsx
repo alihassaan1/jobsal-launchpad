@@ -28,7 +28,7 @@ const BlogPost = () => {
   const fetchPost = async () => {
     const { data, error } = await supabase
       .from('posts')
-      .select('*, profiles!posts_author_id_fkey(full_name, avatar_url)')
+      .select('*, profiles!posts_author_id_fkey(full_name, avatar_url), blog_authors(name, bio, location)')
       .eq('slug', slug)
       .eq('is_published', true)
       .single();
@@ -47,8 +47,16 @@ const BlogPost = () => {
         .replace(/```\s*/gi, '');
       
       setPost({ ...data, content: cleanedContent });
-      // Use Albanian author name as fallback
-      setAuthor(data.profiles || { full_name: 'Andi Krasniqi', avatar_url: null });
+      
+      // Use blog_author if present, otherwise fall back to profile or default
+      if (data.blog_authors) {
+        setAuthor({ full_name: data.blog_authors.name, avatar_url: null, bio: data.blog_authors.bio });
+      } else if (data.profiles) {
+        setAuthor(data.profiles);
+      } else {
+        setAuthor({ full_name: 'Andi Krasniqi', avatar_url: null });
+      }
+      
       fetchRelatedPosts(data.category, data.id);
     }
     setLoading(false);

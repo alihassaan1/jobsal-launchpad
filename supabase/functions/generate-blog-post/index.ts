@@ -34,7 +34,19 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Generate blog content using DeepSeek
+    // Get a random blog author for this post
+    const { data: blogAuthors } = await supabase
+      .from('blog_authors')
+      .select('id')
+      .eq('is_active', true);
+    
+    let blogAuthorId = null;
+    if (blogAuthors && blogAuthors.length > 0) {
+      const randomIndex = Math.floor(Math.random() * blogAuthors.length);
+      blogAuthorId = blogAuthors[randomIndex].id;
+      console.log('Selected blog author:', blogAuthorId);
+    }
+
     console.log("Calling DeepSeek API for content generation...");
     const contentResponse = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
@@ -232,6 +244,7 @@ The image should make viewers want to read the article about ${topic}.`
         meta_title: generatedContent.metaTitle,
         meta_description: generatedContent.metaDescription,
         author_id: userId,
+        blog_author_id: blogAuthorId,
         is_published: false,
         language: 'en'
       })

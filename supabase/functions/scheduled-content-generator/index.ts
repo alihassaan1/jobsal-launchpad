@@ -100,6 +100,20 @@ serve(async (req) => {
 
     const authorId = adminUser.user_id;
 
+    // Get all active blog authors for random selection
+    const { data: blogAuthors } = await supabase
+      .from('blog_authors')
+      .select('id')
+      .eq('is_active', true);
+    
+    const getRandomBlogAuthorId = () => {
+      if (blogAuthors && blogAuthors.length > 0) {
+        const randomIndex = Math.floor(Math.random() * blogAuthors.length);
+        return blogAuthors[randomIndex].id;
+      }
+      return null;
+    };
+
     // Get existing posts to avoid duplicates
     const { data: existingPosts } = await supabase
       .from('posts')
@@ -126,13 +140,13 @@ serve(async (req) => {
     let result;
     switch (contentToGenerate.type) {
       case 'blog':
-        result = await generateCTROptimizedBlog(LOVABLE_API_KEY, supabase, authorId, contentToGenerate.data);
+        result = await generateCTROptimizedBlog(LOVABLE_API_KEY, supabase, authorId, getRandomBlogAuthorId(), contentToGenerate.data);
         break;
       case 'cityGuide':
-        result = await generateCityGuide(LOVABLE_API_KEY, supabase, authorId, contentToGenerate.data);
+        result = await generateCityGuide(LOVABLE_API_KEY, supabase, authorId, getRandomBlogAuthorId(), contentToGenerate.data);
         break;
       case 'careerGuide':
-        result = await generateCareerGuide(LOVABLE_API_KEY, supabase, authorId, contentToGenerate.data);
+        result = await generateCareerGuide(LOVABLE_API_KEY, supabase, authorId, getRandomBlogAuthorId(), contentToGenerate.data);
         break;
     }
 
@@ -187,7 +201,7 @@ function selectNextContent(existingSlugs: Set<string>, existingTitles: Set<strin
   return null;
 }
 
-async function generateCTROptimizedBlog(apiKey: string, supabase: any, authorId: string, blogData: any) {
+async function generateCTROptimizedBlog(apiKey: string, supabase: any, authorId: string, blogAuthorId: string | null, blogData: any) {
   const year = new Date().getFullYear();
   
   const systemPrompt = `You are an expert SEO content writer specializing in the Albanian job market. 
@@ -275,7 +289,8 @@ Content requirements:
       language: 'en',
       is_published: true,
       published_at: new Date().toISOString(),
-      author_id: authorId
+      author_id: authorId,
+      blog_author_id: blogAuthorId
     })
     .select()
     .single();
@@ -286,7 +301,7 @@ Content requirements:
   return { slug: post.slug, title: post.title };
 }
 
-async function generateCityGuide(apiKey: string, supabase: any, authorId: string, cityData: any) {
+async function generateCityGuide(apiKey: string, supabase: any, authorId: string, blogAuthorId: string | null, cityData: any) {
   const year = new Date().getFullYear();
   
   const systemPrompt = `You are an expert content writer creating city-specific employment guides for Albania.
@@ -367,7 +382,8 @@ Content must include:
       language: 'en',
       is_published: true,
       published_at: new Date().toISOString(),
-      author_id: authorId
+      author_id: authorId,
+      blog_author_id: blogAuthorId
     })
     .select()
     .single();
@@ -378,7 +394,7 @@ Content must include:
   return { slug: post.slug, title: post.title };
 }
 
-async function generateCareerGuide(apiKey: string, supabase: any, authorId: string, careerData: any) {
+async function generateCareerGuide(apiKey: string, supabase: any, authorId: string, blogAuthorId: string | null, careerData: any) {
   const year = new Date().getFullYear();
   
   const systemPrompt = `You are an expert career content writer specializing in the Albanian job market.
@@ -461,7 +477,8 @@ Content must include:
       language: 'en',
       is_published: true,
       published_at: new Date().toISOString(),
-      author_id: authorId
+      author_id: authorId,
+      blog_author_id: blogAuthorId
     })
     .select()
     .single();
