@@ -41,9 +41,14 @@ const BlogPost = () => {
     }
 
     if (data) {
-      setPost(data);
-      // Handle case where author profile might not exist
-      setAuthor(data.profiles || { full_name: 'Anonymous', avatar_url: null });
+      // Clean content from markdown code block artifacts
+      const cleanedContent = data.content
+        .replace(/```html\s*/gi, '')
+        .replace(/```\s*/gi, '');
+      
+      setPost({ ...data, content: cleanedContent });
+      // Use Albanian author name as fallback
+      setAuthor(data.profiles || { full_name: 'Andi Krasniqi', avatar_url: null });
       fetchRelatedPosts(data.category, data.id);
     }
     setLoading(false);
@@ -145,7 +150,7 @@ const BlogPost = () => {
             "dateModified": post.updated_at,
             "author": {
               "@type": "Person",
-              "name": author?.full_name || "Jobs.al Team"
+              "name": author?.full_name || "Andi Krasniqi"
             },
             "publisher": {
               "@type": "Organization",
@@ -191,7 +196,7 @@ const BlogPost = () => {
                       </AvatarFallback>
                     </Avatar>
                      <div>
-                      <p className="font-medium">{author?.full_name || 'Ethan'}</p>
+                      <p className="font-medium">{author?.full_name || 'Andi Krasniqi'}</p>
                       <div className="flex items-center gap-3 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
