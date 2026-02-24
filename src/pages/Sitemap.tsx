@@ -2,18 +2,18 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 // Helper to fetch all rows beyond the 1000-row default limit
-async function fetchAll<T>(
-  table: string,
+async function fetchAllRows(
+  table: "posts" | "jobs" | "companies",
   select: string,
   filter?: { column: string; value: any }
-): Promise<T[]> {
+): Promise<any[]> {
   const pageSize = 1000;
   let offset = 0;
-  let allData: T[] = [];
+  let allData: any[] = [];
   let hasMore = true;
 
   while (hasMore) {
-    let query = supabase.from(table).select(select).range(offset, offset + pageSize - 1);
+    let query = (supabase.from(table) as any).select(select).range(offset, offset + pageSize - 1);
     if (filter) {
       query = query.eq(filter.column, filter.value);
     }
@@ -21,7 +21,7 @@ async function fetchAll<T>(
     if (error || !data || data.length === 0) {
       hasMore = false;
     } else {
-      allData = allData.concat(data as T[]);
+      allData = allData.concat(data);
       offset += pageSize;
       if (data.length < pageSize) hasMore = false;
     }
