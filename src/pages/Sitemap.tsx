@@ -41,9 +41,9 @@ const Sitemap = () => {
 
     // Fetch ALL published posts, active jobs, and companies (no 1000-row cap)
     const [posts, jobs, companies] = await Promise.all([
-      fetchAll<{ slug: string; updated_at: string }>("posts", "slug, updated_at", { column: "is_published", value: true }),
-      fetchAll<{ slug: string; updated_at: string; category: string; location: string }>("jobs", "slug, updated_at, category, location", { column: "is_active", value: true }),
-      fetchAll<{ slug: string; updated_at: string }>("companies", "slug, updated_at"),
+      fetchAllRows("posts", "slug, updated_at", { column: "is_published", value: true }),
+      fetchAllRows("jobs", "slug, updated_at, category, location", { column: "is_active", value: true }),
+      fetchAllRows("companies", "slug, updated_at"),
     ]);
 
     // Collect unique categories and locations from jobs for index pages
