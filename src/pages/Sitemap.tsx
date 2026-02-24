@@ -47,8 +47,8 @@ const Sitemap = () => {
     ]);
 
     // Collect unique categories and locations from jobs for index pages
-    const categories = [...new Set(jobs.map(j => j.category).filter(Boolean))];
-    const locations = [...new Set(jobs.map(j => j.location).filter(Boolean))];
+    const categories = [...new Set(jobs.map((j: any) => j.category).filter(Boolean))] as string[];
+    const locations = [...new Set(jobs.map((j: any) => j.location).filter(Boolean))] as string[];
 
     // Static routes
     const staticRoutes = [
