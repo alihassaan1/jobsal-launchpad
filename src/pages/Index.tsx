@@ -337,7 +337,7 @@ const Index = () => {
           </div>
           
           {/* Enhanced Search Bar */}
-          <div className="max-w-4xl mx-auto bg-white/95 backdrop-blur p-6 rounded-2xl shadow-2xl border border-white/20 animate-scale-in">
+          <div className="max-w-4xl mx-auto bg-white/95 backdrop-blur p-6 rounded-2xl shadow-2xl border border-white/20">
             <div className="grid md:grid-cols-3 gap-4">
               <div className="relative group">
                 <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors z-10" />
