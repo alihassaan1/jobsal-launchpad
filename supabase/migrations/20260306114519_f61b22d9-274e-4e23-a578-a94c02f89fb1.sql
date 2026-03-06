@@ -1,0 +1,10 @@
+UPDATE companies SET logo_url = '/logos/albtelecom.png' WHERE slug = 'albtelecom';
+UPDATE companies SET logo_url = '/logos/one-telecom.png' WHERE slug = 'one-telecommunications';
+UPDATE companies SET logo_url = '/logos/bankers-petroleum.png' WHERE slug = 'bankers-petroleum';
+UPDATE companies SET logo_url = '/logos/kastrati-group.png' WHERE slug = 'kastrati-group';
+UPDATE companies SET logo_url = '/logos/credins-bank.png' WHERE slug = 'credins-bank';
+UPDATE companies SET logo_url = '/logos/albpetrol.png' WHERE slug = 'albpetrol';
+UPDATE companies SET logo_url = '/logos/digitalb.png' WHERE slug = 'digitalb';
+UPDATE companies SET logo_url = '/logos/antea-cement.png' WHERE slug = 'antea-cement';
+UPDATE companies SET logo_url = '/logos/tirana-airport.png' WHERE slug = 'tirana-airport';
+UPDATE companies SET logo_url = '/logos/neptun.png' WHERE slug = 'neptun-albania';
