@@ -89,6 +89,10 @@ export default function AdminSettings() {
             <Palette className="mr-2 h-4 w-4" />
             Theme
           </TabsTrigger>
+          <TabsTrigger value="analytics">
+            <Globe className="mr-2 h-4 w-4" />
+            Analytics
+          </TabsTrigger>
           <TabsTrigger value="seo">
             <Globe className="mr-2 h-4 w-4" />
             SEO
@@ -213,6 +217,42 @@ export default function AdminSettings() {
               </div>
               <Button onClick={() => handleSaveSection('Theme', ['primary_color', 'site_logo'])}>
                 Save Theme Settings
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Analytics Settings */}
+        <TabsContent value="analytics">
+          <Card>
+            <CardHeader>
+              <CardTitle>Google Analytics</CardTitle>
+              <CardDescription>Configure Google Analytics tracking</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="ga_measurement_id">Measurement ID</Label>
+                <Input
+                  id="ga_measurement_id"
+                  value={settings.ga_measurement_id || ''}
+                  onChange={(e) => handleInputChange('ga_measurement_id', e.target.value)}
+                  placeholder="G-XXXXXXXXXX"
+                />
+                <p className="text-xs text-muted-foreground">Current: G-Z5KWC604KL (configured in index.html)</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="ga_enabled">Tracking Status</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="ga_enabled"
+                    value={settings.ga_enabled || 'true'}
+                    onChange={(e) => handleInputChange('ga_enabled', e.target.value)}
+                    placeholder="true or false"
+                  />
+                </div>
+              </div>
+              <Button onClick={() => handleSaveSection('Analytics', ['ga_measurement_id', 'ga_enabled'])}>
+                Save Analytics Settings
               </Button>
             </CardContent>
           </Card>
