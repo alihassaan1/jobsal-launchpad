@@ -648,7 +648,7 @@ const Index = () => {
                     <Building2 className="mr-2 h-4 w-4" />
                     Post a Job
                   </Button>
-                  <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary" onClick={() => navigate('/jobs')}>
+                  <Button size="lg" variant="outline" className="bg-white text-primary border-white hover:bg-white/90" onClick={() => navigate('/jobs')}>
                     <Users className="mr-2 h-4 w-4" />
                     Browse Jobs
                   </Button>
