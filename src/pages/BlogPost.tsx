@@ -142,27 +142,18 @@ const BlogPost = () => {
         <meta property="og:description" content={post.meta_description || post.excerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={shareUrl} />
-        {post.featured_image && (
-          <>
-            <meta property="og:image" content={post.featured_image.startsWith('http') ? post.featured_image : `${siteOrigin}${post.featured_image}`} />
-            <meta property="og:image:width" content="1200" />
-            <meta property="og:image:height" content="630" />
-            <meta property="og:image:type" content="image/jpeg" />
-          </>
-        )}
+        <meta property="og:image" content={post.featured_image ? (post.featured_image.startsWith('http') ? post.featured_image : `${siteOrigin}${post.featured_image}`) : `${siteOrigin}/favicon.png`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:type" content="image/jpeg" />
         <meta property="og:site_name" content="Jobs.al" />
         <meta property="og:locale" content={post.language === 'en' ? 'en_US' : 'sq_AL'} />
         <meta property="article:published_time" content={post.published_at} />
         <meta property="article:author" content={author?.full_name} />
-        {post.tags?.map((tag: string) => (
-          <meta key={tag} property="article:tag" content={tag} />
-        ))}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.meta_title || post.title} />
         <meta name="twitter:description" content={post.meta_description || post.excerpt} />
-        {post.featured_image && (
-          <meta name="twitter:image" content={post.featured_image.startsWith('http') ? post.featured_image : `${siteOrigin}${post.featured_image}`} />
-        )}
+        <meta name="twitter:image" content={post.featured_image ? (post.featured_image.startsWith('http') ? post.featured_image : `${siteOrigin}${post.featured_image}`) : `${siteOrigin}/favicon.png`} />
         <link rel="canonical" href={shareUrl} />
         
         {/* Schema.org Article Markup */}
