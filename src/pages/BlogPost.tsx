@@ -86,7 +86,8 @@ const BlogPost = () => {
     });
   };
 
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const siteOrigin = 'https://jobsal-launchpad.lovable.app';
+  const shareUrl = `${siteOrigin}/blog/${slug}`;
   const shareTitle = post?.title || '';
 
   const handleShare = (platform: string) => {
@@ -137,13 +138,31 @@ const BlogPost = () => {
         <title>{post.meta_title || post.title} | Jobs.al Blog</title>
         <meta name="description" content={post.meta_description || post.excerpt} />
         <meta name="keywords" content={post.tags?.join(', ')} />
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:title" content={post.meta_title || post.title} />
+        <meta property="og:description" content={post.meta_description || post.excerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={shareUrl} />
-        {post.featured_image && <meta property="og:image" content={post.featured_image} />}
+        {post.featured_image && (
+          <>
+            <meta property="og:image" content={post.featured_image.startsWith('http') ? post.featured_image : `${siteOrigin}${post.featured_image}`} />
+            <meta property="og:image:width" content="1200" />
+            <meta property="og:image:height" content="630" />
+            <meta property="og:image:type" content="image/jpeg" />
+          </>
+        )}
+        <meta property="og:site_name" content="Jobs.al" />
+        <meta property="og:locale" content={post.language === 'en' ? 'en_US' : 'sq_AL'} />
         <meta property="article:published_time" content={post.published_at} />
         <meta property="article:author" content={author?.full_name} />
+        {post.tags?.map((tag: string) => (
+          <meta key={tag} property="article:tag" content={tag} />
+        ))}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.meta_title || post.title} />
+        <meta name="twitter:description" content={post.meta_description || post.excerpt} />
+        {post.featured_image && (
+          <meta name="twitter:image" content={post.featured_image.startsWith('http') ? post.featured_image : `${siteOrigin}${post.featured_image}`} />
+        )}
         <link rel="canonical" href={shareUrl} />
         
         {/* Schema.org Article Markup */}
@@ -153,7 +172,7 @@ const BlogPost = () => {
             "@type": "Article",
             "headline": post.title,
             "description": post.excerpt,
-            "image": post.featured_image,
+            "image": post.featured_image?.startsWith('http') ? post.featured_image : `${siteOrigin}${post.featured_image}`,
             "datePublished": post.published_at,
             "dateModified": post.updated_at,
             "author": {
@@ -165,8 +184,12 @@ const BlogPost = () => {
               "name": "Jobs.al",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://jobs.al/logo.png"
+                "url": `${siteOrigin}/favicon.png`
               }
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": shareUrl
             }
           })}
         </script>
