@@ -88,7 +88,7 @@ const BlogSection = () => {
                 </div>
               )}
               <CardHeader>
-                <Badge variant="secondary" className="w-fit mb-2">{post.category}</Badge>
+                <Badge variant="secondary" className="w-fit mb-2">{post.category.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</Badge>
                 <CardTitle className="text-lg line-clamp-2">{post.title}</CardTitle>
                 <CardDescription className="line-clamp-2">{post.excerpt}</CardDescription>
               </CardHeader>

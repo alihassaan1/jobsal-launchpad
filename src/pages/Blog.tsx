@@ -234,7 +234,7 @@ const Blog = () => {
                         )}
                         <CardHeader>
                           <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="secondary">{post.category}</Badge>
+                            <Badge variant="secondary">{post.category.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</Badge>
                             <span className="text-sm">
                               {post.language === 'en' ? '🇬🇧' : '🇦🇱'}
                             </span>
