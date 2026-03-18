@@ -86,7 +86,8 @@ const BlogPost = () => {
     });
   };
 
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const siteOrigin = 'https://jobsal-launchpad.lovable.app';
+  const shareUrl = `${siteOrigin}/blog/${slug}`;
   const shareTitle = post?.title || '';
 
   const handleShare = (platform: string) => {
