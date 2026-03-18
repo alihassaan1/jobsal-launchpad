@@ -172,7 +172,7 @@ const BlogPost = () => {
             "@type": "Article",
             "headline": post.title,
             "description": post.excerpt,
-            "image": post.featured_image,
+            "image": post.featured_image?.startsWith('http') ? post.featured_image : `${siteOrigin}${post.featured_image}`,
             "datePublished": post.published_at,
             "dateModified": post.updated_at,
             "author": {
@@ -184,8 +184,12 @@ const BlogPost = () => {
               "name": "Jobs.al",
               "logo": {
                 "@type": "ImageObject",
-                "url": "https://jobs.al/logo.png"
+                "url": `${siteOrigin}/favicon.png`
               }
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": shareUrl
             }
           })}
         </script>
