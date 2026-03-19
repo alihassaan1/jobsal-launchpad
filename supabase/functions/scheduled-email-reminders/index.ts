@@ -18,24 +18,13 @@ serve(async (req) => {
 
     console.log("Starting scheduled email reminders...");
 
-    // Get all users who:
-    // 1. Have no resumes
-    // 2. Haven't received a resume reminder in the last 3 days
-    // 3. Haven't unsubscribed from resume reminders
     const now = new Date();
-    const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    // Get profiles with their resume count and email preferences
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select(`
-        id,
-        email,
-        full_name,
-        created_at
-      `)
+      .select("id, email, full_name, created_at, phone, location, bio, updated_at")
       .order("created_at", { ascending: true })
       .limit(100);
 
@@ -54,86 +43,27 @@ serve(async (req) => {
 
     for (const profile of profiles || []) {
       try {
-        // Check if user has any resumes
-        const { count: resumeCount } = await supabase
-          .from("resumes")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", profile.id);
-
-        if (resumeCount && resumeCount > 0) {
-          results.skipped++;
-          continue; // User has resumes, skip
-        }
-
         // Check email preferences
         const { data: prefs } = await supabase
           .from("user_email_preferences")
-          .select("resume_reminders, unsubscribed_at")
+          .select("resume_reminders, unsubscribed_at, job_alerts")
           .eq("user_id", profile.id)
           .maybeSingle();
 
-        if (prefs?.unsubscribed_at || prefs?.resume_reminders === false) {
-          results.skipped++;
-          continue; // User unsubscribed
-        }
-
-        // Get last resume reminder sent to this user
-        const { data: lastEmail } = await supabase
-          .from("email_logs")
-          .select("template_slug, sent_at")
-          .eq("user_id", profile.id)
-          .like("template_slug", "resume-reminder%")
-          .order("sent_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        // Determine which reminder to send based on signup date
-        const signupDate = new Date(profile.created_at);
-        const daysSinceSignup = Math.floor((now.getTime() - signupDate.getTime()) / (24 * 60 * 60 * 1000));
-
-        let templateToSend: string | null = null;
-
-        if (daysSinceSignup >= 14 && (!lastEmail || lastEmail.template_slug !== "resume-reminder-final")) {
-          // Check if we've sent final reminder
-          const { count: finalCount } = await supabase
-            .from("email_logs")
-            .select("*", { count: "exact", head: true })
-            .eq("user_id", profile.id)
-            .eq("template_slug", "resume-reminder-final");
-
-          if (!finalCount || finalCount === 0) {
-            templateToSend = "resume-reminder-final";
-          }
-        } else if (daysSinceSignup >= 7 && daysSinceSignup < 14) {
-          // Check if we've sent reminder 2
-          const { count: reminder2Count } = await supabase
-            .from("email_logs")
-            .select("*", { count: "exact", head: true })
-            .eq("user_id", profile.id)
-            .eq("template_slug", "resume-reminder-2");
-
-          if (!reminder2Count || reminder2Count === 0) {
-            templateToSend = "resume-reminder-2";
-          }
-        } else if (daysSinceSignup >= 3 && daysSinceSignup < 7) {
-          // Check if we've sent reminder 1
-          const { count: reminder1Count } = await supabase
-            .from("email_logs")
-            .select("*", { count: "exact", head: true })
-            .eq("user_id", profile.id)
-            .eq("template_slug", "resume-reminder-1");
-
-          if (!reminder1Count || reminder1Count === 0) {
-            templateToSend = "resume-reminder-1";
-          }
-        }
-
-        if (!templateToSend) {
+        if (prefs?.unsubscribed_at) {
           results.skipped++;
           continue;
         }
 
         // Don't send if we sent any email in the last 24 hours
+        const { data: lastEmail } = await supabase
+          .from("email_logs")
+          .select("template_slug, sent_at")
+          .eq("user_id", profile.id)
+          .order("sent_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
         if (lastEmail) {
           const lastSentDate = new Date(lastEmail.sent_at);
           const hoursSinceLastEmail = (now.getTime() - lastSentDate.getTime()) / (60 * 60 * 1000);
@@ -143,12 +73,112 @@ serve(async (req) => {
           }
         }
 
-        // Get new jobs count for personalization
-        const { count: newJobsCount } = await supabase
-          .from("jobs")
-          .select("*", { count: "exact", head: true })
-          .eq("is_active", true)
-          .gte("created_at", sevenDaysAgo.toISOString());
+        const signupDate = new Date(profile.created_at);
+        const daysSinceSignup = Math.floor((now.getTime() - signupDate.getTime()) / (24 * 60 * 60 * 1000));
+
+        let templateToSend: string | null = null;
+        let extraData: Record<string, string> = {};
+
+        // --- REACTIVATION CHECK (30+ days inactive) ---
+        if (daysSinceSignup >= 30) {
+          const lastActivity = new Date(profile.updated_at);
+          const daysSinceActivity = Math.floor((now.getTime() - lastActivity.getTime()) / (24 * 60 * 60 * 1000));
+
+          if (daysSinceActivity >= 30) {
+            const { count: reactivationSent } = await supabase
+              .from("email_logs")
+              .select("*", { count: "exact", head: true })
+              .eq("user_id", profile.id)
+              .eq("template_slug", "reactivation")
+              .gte("sent_at", thirtyDaysAgo.toISOString());
+
+            if (!reactivationSent || reactivationSent === 0) {
+              const { count: newJobsCount } = await supabase
+                .from("jobs")
+                .select("*", { count: "exact", head: true })
+                .eq("is_active", true)
+                .gte("created_at", thirtyDaysAgo.toISOString());
+
+              templateToSend = "reactivation";
+              extraData = { newJobsCount: String(newJobsCount || 50) };
+            }
+          }
+        }
+
+        // --- PROFILE INCOMPLETE CHECK (Day 5+) ---
+        if (!templateToSend && daysSinceSignup >= 5) {
+          const isIncomplete = !profile.phone || !profile.location || !profile.bio;
+
+          if (isIncomplete) {
+            const { count: profileEmailSent } = await supabase
+              .from("email_logs")
+              .select("*", { count: "exact", head: true })
+              .eq("user_id", profile.id)
+              .eq("template_slug", "profile-incomplete");
+
+            if (!profileEmailSent || profileEmailSent === 0) {
+              const missingFields: string[] = [];
+              if (!profile.phone) missingFields.push("Numri i telefonit");
+              if (!profile.location) missingFields.push("Vendndodhja");
+              if (!profile.bio) missingFields.push("Biografia / Përshkrimi");
+
+              const filledCount = 3 - missingFields.length;
+              const completionPercent = Math.round(((filledCount + 2) / 5) * 100); // +2 for email & name
+
+              templateToSend = "profile-incomplete";
+              extraData = {
+                missingFields: missingFields.join(", "),
+                completionPercent: String(completionPercent),
+              };
+            }
+          }
+        }
+
+        // --- RESUME REMINDER SEQUENCE ---
+        if (!templateToSend && prefs?.resume_reminders !== false) {
+          const { count: resumeCount } = await supabase
+            .from("resumes")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", profile.id);
+
+          if (!resumeCount || resumeCount === 0) {
+            if (daysSinceSignup >= 14) {
+              const { count: finalCount } = await supabase
+                .from("email_logs")
+                .select("*", { count: "exact", head: true })
+                .eq("user_id", profile.id)
+                .eq("template_slug", "resume-reminder-final");
+              if (!finalCount || finalCount === 0) {
+                const { count: newJobsCount } = await supabase
+                  .from("jobs")
+                  .select("*", { count: "exact", head: true })
+                  .eq("is_active", true)
+                  .gte("created_at", sevenDaysAgo.toISOString());
+                templateToSend = "resume-reminder-final";
+                extraData = { newJobsCount: String(newJobsCount || 50) };
+              }
+            } else if (daysSinceSignup >= 7) {
+              const { count: r2Count } = await supabase
+                .from("email_logs")
+                .select("*", { count: "exact", head: true })
+                .eq("user_id", profile.id)
+                .eq("template_slug", "resume-reminder-2");
+              if (!r2Count || r2Count === 0) templateToSend = "resume-reminder-2";
+            } else if (daysSinceSignup >= 3) {
+              const { count: r1Count } = await supabase
+                .from("email_logs")
+                .select("*", { count: "exact", head: true })
+                .eq("user_id", profile.id)
+                .eq("template_slug", "resume-reminder-1");
+              if (!r1Count || r1Count === 0) templateToSend = "resume-reminder-1";
+            }
+          }
+        }
+
+        if (!templateToSend) {
+          results.skipped++;
+          continue;
+        }
 
         // Send the email
         const sendEmailResponse = await fetch(
@@ -164,7 +194,7 @@ serve(async (req) => {
               templateSlug: templateToSend,
               data: {
                 name: profile.full_name || "",
-                newJobsCount: String(newJobsCount || 50),
+                ...extraData,
               },
               userId: profile.id,
             }),
@@ -188,10 +218,7 @@ serve(async (req) => {
     console.log("Scheduled email reminders completed:", results);
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        results,
-      }),
+      JSON.stringify({ success: true, results }),
       {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
