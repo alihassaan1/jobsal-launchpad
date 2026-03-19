@@ -75,6 +75,30 @@ function getEmailTemplate(templateSlug: string, data: Record<string, string>): {
     "resume-upload-reminder": {
       subject: `${data.name || 'Përdoruesi'}, ngarkoni CV-në tuaj për të aplikuar më shpejt! 📎`,
       html: generateResumeUploadReminderEmail(data)
+    },
+    "subscription-renewal": {
+      subject: `Abonimi juaj "${data.planName || 'Pro'}" po rinovohet për ${data.daysLeft || '7'} ditë 🔄`,
+      html: generateSubscriptionRenewalEmail(data)
+    },
+    "subscription-expired": {
+      subject: `Abonimi juaj në Jobs.al ka skaduar ⚠️`,
+      html: generateSubscriptionExpiredEmail(data)
+    },
+    "payment-receipt": {
+      subject: `Fatura #${data.invoiceNumber || ''} — Pagesa u konfirmua ✅`,
+      html: generatePaymentReceiptEmail(data)
+    },
+    "payment-failed": {
+      subject: `Pagesa për "${data.planName || 'abonim'}" nuk u krye — Veproni tani ❌`,
+      html: generatePaymentFailedEmail(data)
+    },
+    "ad-performance-weekly": {
+      subject: `Raporti javor i reklamës: ${data.impressions || '0'} shfaqje, ${data.clicks || '0'} klikime 📊`,
+      html: generateAdPerformanceWeeklyEmail(data)
+    },
+    "invoice-overdue": {
+      subject: `Fatura #${data.invoiceNumber || ''} ka kaluar afatin e pagesës 🔴`,
+      html: generateInvoiceOverdueEmail(data)
     }
   };
 
