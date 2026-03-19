@@ -138,6 +138,29 @@ export default function AdminUsers() {
       return;
     }
 
+    // Send role upgrade email if changed to employer
+    if (newRole === 'employer') {
+      try {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseKey}`,
+          },
+          body: JSON.stringify({
+            to: selectedUser.email,
+            templateSlug: 'role-upgrade-employer',
+            data: { name: selectedUser.full_name || '' },
+            userId: selectedUser.id,
+          }),
+        });
+      } catch (emailErr) {
+        console.error('Failed to send role upgrade email:', emailErr);
+      }
+    }
+
     toast.success("User role updated successfully");
     setSelectedUser(null);
     fetchUsers();

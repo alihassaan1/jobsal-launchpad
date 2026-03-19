@@ -134,6 +134,26 @@ serve(async (req) => {
           }
         }
 
+        // --- RESUME UPLOAD REMINDER (Day 3) ---
+        if (!templateToSend && prefs?.resume_reminders !== false && daysSinceSignup >= 3 && daysSinceSignup < 7) {
+          const { count: resumeCount } = await supabase
+            .from("resumes")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", profile.id);
+
+          if (!resumeCount || resumeCount === 0) {
+            const { count: uploadReminderSent } = await supabase
+              .from("email_logs")
+              .select("*", { count: "exact", head: true })
+              .eq("user_id", profile.id)
+              .eq("template_slug", "resume-upload-reminder");
+
+            if (!uploadReminderSent || uploadReminderSent === 0) {
+              templateToSend = "resume-upload-reminder";
+            }
+          }
+        }
+
         // --- RESUME REMINDER SEQUENCE ---
         if (!templateToSend && prefs?.resume_reminders !== false) {
           const { count: resumeCount } = await supabase
@@ -164,13 +184,6 @@ serve(async (req) => {
                 .eq("user_id", profile.id)
                 .eq("template_slug", "resume-reminder-2");
               if (!r2Count || r2Count === 0) templateToSend = "resume-reminder-2";
-            } else if (daysSinceSignup >= 3) {
-              const { count: r1Count } = await supabase
-                .from("email_logs")
-                .select("*", { count: "exact", head: true })
-                .eq("user_id", profile.id)
-                .eq("template_slug", "resume-reminder-1");
-              if (!r1Count || r1Count === 0) templateToSend = "resume-reminder-1";
             }
           }
         }
