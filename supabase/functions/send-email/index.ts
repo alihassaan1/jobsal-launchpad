@@ -35,6 +35,38 @@ function getEmailTemplate(templateSlug: string, data: Record<string, string>): {
     "application-confirmation": {
       subject: `Aplikimi juaj u dërgua me sukses! ✅`,
       html: generateApplicationConfirmation(data)
+    },
+    "job-match": {
+      subject: `${data.matchCount || '3'} punë të reja përputhen me CV-në tuaj! 🎯`,
+      html: generateJobMatchEmail(data)
+    },
+    "application-status": {
+      subject: `Përditësim për aplikimin tuaj tek ${data.company || 'Kompania'} 📋`,
+      html: generateApplicationStatusEmail(data)
+    },
+    "profile-incomplete": {
+      subject: `${data.name || 'Përdoruesi'}, plotësoni profilin tuaj për rezultate më të mira! ✏️`,
+      html: generateProfileIncompleteEmail(data)
+    },
+    "reactivation": {
+      subject: `Na keni munguar! ${data.newJobsCount || '50'}+ punë të reja ju presin 🚀`,
+      html: generateReactivationEmail(data)
+    },
+    "employer-welcome": {
+      subject: `Mirë se vini në Jobs.al si Punëdhënës! 🏢`,
+      html: generateEmployerWelcomeEmail(data)
+    },
+    "job-expiring": {
+      subject: `Puna "${data.jobTitle || 'Punë'}" po skadon për ${data.daysLeft || '3'} ditë! ⏰`,
+      html: generateJobExpiringEmail(data)
+    },
+    "new-applicant": {
+      subject: `Aplikant i ri për "${data.jobTitle || 'Punë'}" 📨`,
+      html: generateNewApplicantEmail(data)
+    },
+    "interview-scheduled": {
+      subject: `Intervista juaj është konfirmuar për ${data.interviewDate || 'së shpejti'}! 🗓️`,
+      html: generateInterviewScheduledEmail(data)
     }
   };
 
@@ -61,6 +93,7 @@ function wrapEmail(content: string, unsubscribeUrl: string = "https://jobs.al/se
     .content p { color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 16px 0; }
     .cta-button { display: inline-block; background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); color: #ffffff !important; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; margin: 24px 0; }
     .cta-button:hover { opacity: 0.9; }
+    .cta-secondary { display: inline-block; background: #ffffff; color: #4F46E5 !important; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin: 12px 0; border: 2px solid #4F46E5; }
     .feature-box { background-color: #f9fafb; border-radius: 12px; padding: 24px; margin: 24px 0; }
     .feature-item { display: flex; align-items: flex-start; margin: 16px 0; }
     .feature-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; }
@@ -74,12 +107,20 @@ function wrapEmail(content: string, unsubscribeUrl: string = "https://jobs.al/se
     .job-card h4 { color: #1f2937; font-size: 18px; margin: 0 0 8px 0; }
     .job-card .company { color: #4F46E5; font-size: 14px; margin: 0 0 8px 0; }
     .job-card .details { color: #6b7280; font-size: 14px; margin: 0; }
+    .status-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+    .status-reviewed { background: #DBEAFE; color: #1D4ED8; }
+    .status-shortlisted { background: #D1FAE5; color: #065F46; }
+    .status-rejected { background: #FEE2E2; color: #991B1B; }
+    .status-interview { background: #FEF3C7; color: #92400E; }
     .footer { background-color: #1f2937; padding: 32px; text-align: center; }
     .footer p { color: #9ca3af; font-size: 14px; margin: 0 0 16px 0; }
     .footer a { color: #a5b4fc; text-decoration: none; }
     .social-links { margin: 24px 0; }
     .social-links a { display: inline-block; margin: 0 8px; color: #9ca3af; text-decoration: none; }
     .unsubscribe { color: #6b7280 !important; font-size: 12px; }
+    .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+    .info-label { color: #6b7280; font-size: 14px; }
+    .info-value { color: #1f2937; font-size: 14px; font-weight: 600; }
     @media only screen and (max-width: 600px) {
       .container { width: 100% !important; }
       .content { padding: 24px 16px !important; }
@@ -109,6 +150,8 @@ function wrapEmail(content: string, unsubscribeUrl: string = "https://jobs.al/se
 </body>
 </html>`;
 }
+
+// ==================== EXISTING TEMPLATES ====================
 
 function generateWelcomeEmail(data: Record<string, string>): string {
   const content = `
@@ -346,6 +389,425 @@ function generateApplicationConfirmation(data: Record<string, string>): string {
     </div>`;
   return wrapEmail(content);
 }
+
+// ==================== NEW TEMPLATES ====================
+
+function generateJobMatchEmail(data: Record<string, string>): string {
+  const jobs = data.jobs ? JSON.parse(data.jobs) : [];
+  const jobCards = jobs.map((job: any) => `
+    <div class="job-card">
+      <h4>${job.title}</h4>
+      <p class="company">${job.company}</p>
+      <p class="details">📍 ${job.location} • 💼 ${job.type}${job.matchScore ? ` • 🎯 ${job.matchScore}% përputhje` : ''}</p>
+      <a href="https://jobs.al/jobs/${job.slug}" style="color: #4F46E5; font-size: 14px;">Apliko Tani →</a>
+    </div>
+  `).join('');
+
+  const content = `
+    <div class="header">
+      <h1>🎯 Punë të Reja për Ju!</h1>
+    </div>
+    <div class="content">
+      <h2>Përshëndetje${data.name ? `, ${data.name}` : ''}!</h2>
+      <p>Kemi gjetur <strong>${data.matchCount || jobs.length} punë të reja</strong> që përputhen me aftësitë dhe përvojën tuaj. Shikoni mundësitë më poshtë:</p>
+      
+      ${jobCards || `
+        <div class="job-card">
+          <p>Vizitoni platformën për rekomandime të personalizuara!</p>
+        </div>
+      `}
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/recommended-jobs" class="cta-button">Shiko Të Gjitha Rekomandimet</a>
+      </p>
+
+      <div class="feature-box">
+        <p style="margin: 0; color: #4b5563; font-size: 14px;">
+          💡 <strong>Këshillë:</strong> Mbani CV-në tuaj të përditësuar për rekomandime më të sakta. <a href="https://jobs.al/my-resumes" style="color: #4F46E5;">Përditëso CV-në →</a>
+        </p>
+      </div>
+    </div>`;
+  return wrapEmail(content);
+}
+
+function generateApplicationStatusEmail(data: Record<string, string>): string {
+  const statusMap: Record<string, { label: string; class: string; emoji: string; message: string }> = {
+    "reviewed": {
+      label: "Shqyrtuar",
+      class: "status-reviewed",
+      emoji: "👀",
+      message: "Aplikimi juaj është shqyrtuar nga punëdhënësi. Kjo do të thotë që CV-ja juaj ka tërhequr vëmendjen e tyre!"
+    },
+    "shortlisted": {
+      label: "Listë e Shkurtër",
+      class: "status-shortlisted",
+      emoji: "⭐",
+      message: "Urime! Jeni përzgjedhur në listën e shkurtër! Punëdhënësi mund t'ju kontaktojë së shpejti për hapin e ardhshëm."
+    },
+    "rejected": {
+      label: "Refuzuar",
+      class: "status-rejected",
+      emoji: "📝",
+      message: "Na vjen keq, por punëdhënësi ka vendosur të ecë përpara me kandidatë të tjerë. Mos u dekurajoni — ka shumë mundësi të tjera!"
+    },
+    "interview": {
+      label: "Intervistë",
+      class: "status-interview",
+      emoji: "🗓️",
+      message: "Punëdhënësi dëshiron t'ju takojë! Prisni kontakt për caktimin e intervistës."
+    }
+  };
+
+  const status = statusMap[data.status || "reviewed"] || statusMap["reviewed"];
+
+  const content = `
+    <div class="header">
+      <h1>${status.emoji} Përditësim Aplikimi</h1>
+    </div>
+    <div class="content">
+      <h2>Përshëndetje${data.name ? `, ${data.name}` : ''}!</h2>
+      
+      <div class="job-card" style="border-left: 4px solid #4F46E5;">
+        <h4>${data.jobTitle || 'Pozicioni'}</h4>
+        <p class="company">${data.company || 'Kompania'}</p>
+        <p class="details">📍 ${data.location || 'Tiranë'}</p>
+        <div style="margin-top: 12px;">
+          <span class="status-badge ${status.class}">${status.label}</span>
+        </div>
+      </div>
+
+      <p>${status.message}</p>
+
+      ${data.status === 'rejected' ? `
+        <div class="stats-box">
+          <h3>${data.newJobsCount || '50'}+</h3>
+          <p>Punë aktive që përputhen me profilin tuaj</p>
+        </div>
+        <p style="text-align: center;">
+          <a href="https://jobs.al/jobs" class="cta-button">Zbulo Punë të Reja</a>
+        </p>
+      ` : `
+        <p style="text-align: center;">
+          <a href="https://jobs.al/candidate-dashboard" class="cta-button">Shiko Aplikimet e Mia</a>
+        </p>
+      `}
+
+      ${data.notes ? `
+        <div class="feature-box">
+          <p style="margin: 0; color: #4b5563; font-size: 14px;">
+            📝 <strong>Shënim nga punëdhënësi:</strong> ${data.notes}
+          </p>
+        </div>
+      ` : ''}
+    </div>`;
+  return wrapEmail(content);
+}
+
+function generateProfileIncompleteEmail(data: Record<string, string>): string {
+  const missingFields = (data.missingFields || 'telefon, vendndodhje, bio').split(',').map(f => f.trim());
+  
+  const content = `
+    <div class="header">
+      <h1>✏️ Plotësoni Profilin Tuaj</h1>
+    </div>
+    <div class="content">
+      <h2>Përshëndetje${data.name ? `, ${data.name}` : ''}!</h2>
+      <p>Kemi vënë re që profili juaj në Jobs.al nuk është plotësuar ende. Një profil i plotë ju ndihmon të dalloheni ndaj kandidatëve të tjerë!</p>
+      
+      <div class="feature-box" style="background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border: 1px solid #F59E0B;">
+        <p style="margin: 0; color: #92400E; font-size: 16px;">
+          ⚡ <strong>Profili juaj është ${data.completionPercent || '40'}% i plotë.</strong> Plotësoni fushat e mbetura për përfitim maksimal!
+        </p>
+      </div>
+
+      <p><strong>Fushat që mungojnë:</strong></p>
+      <ul style="color: #4b5563; line-height: 2;">
+        ${missingFields.map(f => `<li>❌ ${f}</li>`).join('')}
+      </ul>
+
+      <div class="feature-box">
+        <div class="feature-item">
+          <div class="feature-icon"><span>👁️</span></div>
+          <div class="feature-text">
+            <h4>Dukshmëri më e Lartë</h4>
+            <p>Punëdhënësit preferojnë profile të plotësuara kur kërkojnë kandidatë</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><span>🎯</span></div>
+          <div class="feature-text">
+            <h4>Rekomandime më të Sakta</h4>
+            <p>Ne mund t'ju sugjerojmë punë më të përshtatshme me informacion më të plotë</p>
+          </div>
+        </div>
+      </div>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/candidate-dashboard" class="cta-button">Plotëso Profilin Tani</a>
+      </p>
+
+      <p style="color: #6b7280; font-size: 14px;">Zgjat vetëm 2 minuta!</p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+function generateReactivationEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="header">
+      <h1>🚀 Na Keni Munguar!</h1>
+    </div>
+    <div class="content">
+      <h2>Përshëndetje${data.name ? `, ${data.name}` : ''}!</h2>
+      <p>Ka kaluar pak kohë që kur vizituat Jobs.al për herë të fundit. Shumë gjëra kanë ndryshuar dhe kemi mundësi të reja emocionuese për ju!</p>
+      
+      <div class="stats-box">
+        <h3>${data.newJobsCount || '50'}+</h3>
+        <p>Punë të reja u shtuan që nga vizita juaj e fundit</p>
+      </div>
+
+      <div class="feature-box">
+        <p style="margin: 0; color: #1f2937; font-size: 16px; font-weight: 600;">🆕 Çfarë ka të re:</p>
+        <ul style="color: #4b5563; line-height: 2; margin-top: 12px;">
+          <li>📊 Kompani të reja kanë filluar të punësojnë</li>
+          <li>🤖 Ndërtues i përmirësuar i CV-së me AI</li>
+          <li>🎯 Rekomandime pune më të sakta</li>
+          <li>💼 Kategori të reja punësh</li>
+        </ul>
+      </div>
+
+      ${data.topCategories ? `
+        <p><strong>Kategoritë më të kërkuara tani:</strong></p>
+        <p style="color: #4b5563;">${data.topCategories}</p>
+      ` : ''}
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/jobs" class="cta-button">Zbulo Punë të Reja</a>
+      </p>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/resume-builder" class="cta-secondary">Përditëso CV-në Tënde</a>
+      </p>
+
+      <p>Na kanë munguar! Shpresojmë t'ju shohim përsëri së shpejti.</p>
+      <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+function generateEmployerWelcomeEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="header">
+      <h1>🏢 Mirë se Vini, Punëdhënës!</h1>
+    </div>
+    <div class="content">
+      <h2>Përshëndetje${data.name ? `, ${data.name}` : ''}!</h2>
+      <p>Ju falënderojmë që zgjodhët Jobs.al për rekrutimin tuaj! Platforma jonë ju lidh me mijëra punëkërkues të kualifikuar në Shqipëri.</p>
+      
+      <div class="stats-box">
+        <h3>5,000+</h3>
+        <p>Punëkërkues aktivë në platformë</p>
+      </div>
+
+      <p><strong>Hapat e ardhshëm për të filluar:</strong></p>
+
+      <div class="feature-box">
+        <div class="feature-item">
+          <div class="feature-icon"><span>1️⃣</span></div>
+          <div class="feature-text">
+            <h4>Krijoni Profilin e Kompanisë</h4>
+            <p>Shtoni logon, përshkrimin, dhe informacionin e kompanisë suaj</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><span>2️⃣</span></div>
+          <div class="feature-text">
+            <h4>Postoni Punën e Parë</h4>
+            <p>Krijoni një shpallje pune dhe arrini mijëra kandidatë</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><span>3️⃣</span></div>
+          <div class="feature-text">
+            <h4>Menaxhoni Aplikanët</h4>
+            <p>Përdorni panelin tonë ATS për të shqyrtuar dhe menaxhuar aplikimet</p>
+          </div>
+        </div>
+      </div>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/setup-company" class="cta-button">Krijo Profilin e Kompanisë</a>
+      </p>
+
+      <div class="feature-box" style="background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%); border: 1px solid #3B82F6;">
+        <p style="margin: 0; color: #1E40AF; font-size: 14px;">
+          💎 <strong>Këshillë Pro:</strong> Kompanitë me profil të plotë marrin 4x më shumë aplikime. Mos harroni të shtoni logon dhe përshkrimin!
+        </p>
+      </div>
+
+      <p>Keni pyetje? Na kontaktoni në <a href="mailto:employers@jobs.al">employers@jobs.al</a></p>
+      
+      <p>Suksese me rekrutimin!<br><strong>Ekipi i Jobs.al</strong></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+function generateJobExpiringEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="header">
+      <h1>⏰ Puna Po Skadon!</h1>
+    </div>
+    <div class="content">
+      <h2>Përshëndetje${data.name ? `, ${data.name}` : ''}!</h2>
+      <p>Një punë që keni parë/ruajtur po skadon së shpejti. Mos e humbni mundësinë!</p>
+      
+      <div class="job-card" style="border-left: 4px solid #F59E0B; background: #FFFBEB;">
+        <h4>${data.jobTitle || 'Pozicioni'}</h4>
+        <p class="company">${data.company || 'Kompania'}</p>
+        <p class="details">📍 ${data.location || 'Tiranë'} • 💼 ${data.jobType || 'Kohë e Plotë'}</p>
+        ${data.salary ? `<p class="details">💰 ${data.salary}</p>` : ''}
+        <div style="margin-top: 12px;">
+          <span class="status-badge" style="background: #FEF3C7; color: #92400E;">⏰ Skadon për ${data.daysLeft || '3'} ditë</span>
+        </div>
+      </div>
+
+      <div class="feature-box" style="background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%); border: 1px solid #EF4444;">
+        <p style="margin: 0; color: #991B1B; font-size: 16px;">
+          ⚠️ <strong>Afati i aplikimit:</strong> ${data.deadline || 'Së shpejti'}. Aplikoni para se të jetë vonë!
+        </p>
+      </div>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/jobs/${data.jobSlug || ''}" class="cta-button">Apliko Tani</a>
+      </p>
+
+      <p style="color: #6b7280; font-size: 14px;">Nuk jeni i interesuar? <a href="https://jobs.al/jobs" style="color: #4F46E5;">Shikoni punë të tjera →</a></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+function generateNewApplicantEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="header">
+      <h1>📨 Aplikant i Ri!</h1>
+    </div>
+    <div class="content">
+      <h2>Përshëndetje${data.employerName ? `, ${data.employerName}` : ''}!</h2>
+      <p>Keni marrë një aplikim të ri për pozicionin tuaj në Jobs.al!</p>
+      
+      <div class="job-card" style="border-left: 4px solid #10B981;">
+        <p style="color: #6b7280; font-size: 13px; margin: 0 0 8px 0;">POZICIONI</p>
+        <h4>${data.jobTitle || 'Pozicioni'}</h4>
+        <p class="details">📍 ${data.location || 'Tiranë'}</p>
+      </div>
+
+      <div class="feature-box">
+        <p style="margin: 0 0 12px 0; color: #1f2937; font-weight: 600;">👤 Detajet e Aplikantit:</p>
+        <div class="info-row">
+          <span class="info-label">Emri</span>
+          <span class="info-value">${data.applicantName || 'Kandidati'}</span>
+        </div>
+        ${data.applicantEmail ? `
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value">${data.applicantEmail}</span>
+        </div>
+        ` : ''}
+        ${data.matchScore ? `
+        <div class="info-row">
+          <span class="info-label">Përputhje AI</span>
+          <span class="info-value">🎯 ${data.matchScore}%</span>
+        </div>
+        ` : ''}
+        <div class="info-row" style="border-bottom: none;">
+          <span class="info-label">Data e Aplikimit</span>
+          <span class="info-value">${data.appliedDate || new Date().toLocaleDateString('sq-AL')}</span>
+        </div>
+      </div>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/employer-dashboard" class="cta-button">Shqyrto Aplikimin</a>
+      </p>
+
+      <div class="stats-box">
+        <h3>${data.totalApplications || '1'}</h3>
+        <p>Aplikime gjithsej për këtë pozicion</p>
+      </div>
+    </div>`;
+  return wrapEmail(content);
+}
+
+function generateInterviewScheduledEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="header">
+      <h1>🗓️ Intervistë e Konfirmuar!</h1>
+    </div>
+    <div class="content">
+      <h2>Urime${data.name ? `, ${data.name}` : ''}!</h2>
+      <p>Intervista juaj është caktuar! Ja detajet:</p>
+      
+      <div class="feature-box" style="background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%); border: 2px solid #3B82F6;">
+        <div class="info-row">
+          <span class="info-label">Kompania</span>
+          <span class="info-value">${data.company || 'Kompania'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Pozicioni</span>
+          <span class="info-value">${data.jobTitle || 'Pozicioni'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">📅 Data</span>
+          <span class="info-value">${data.interviewDate || 'Do të konfirmohet'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">🕐 Ora</span>
+          <span class="info-value">${data.interviewTime || 'Do të konfirmohet'}</span>
+        </div>
+        ${data.interviewLocation ? `
+        <div class="info-row">
+          <span class="info-label">📍 Vendndodhja</span>
+          <span class="info-value">${data.interviewLocation}</span>
+        </div>
+        ` : ''}
+        ${data.interviewType ? `
+        <div class="info-row" style="border-bottom: none;">
+          <span class="info-label">Tipi</span>
+          <span class="info-value">${data.interviewType === 'online' ? '💻 Online' : '🏢 Në Person'}</span>
+        </div>
+        ` : ''}
+        ${data.meetingLink ? `
+        <div style="margin-top: 16px; text-align: center;">
+          <a href="${data.meetingLink}" class="cta-button" style="margin: 0;">Hyr në Meeting</a>
+        </div>
+        ` : ''}
+      </div>
+
+      ${data.interviewNotes ? `
+        <div class="feature-box">
+          <p style="margin: 0; color: #4b5563; font-size: 14px;">
+            📝 <strong>Shënime nga punëdhënësi:</strong> ${data.interviewNotes}
+          </p>
+        </div>
+      ` : ''}
+
+      <p><strong>Këshilla për përgatitje:</strong></p>
+      <ul style="color: #4b5563; line-height: 2;">
+        <li>🔍 Hulumtoni kompaninë ${data.company || ''} para intervistës</li>
+        <li>📄 Rishikoni CV-në tuaj dhe përvojën tuaj</li>
+        <li>👔 Vishuni profesionalisht</li>
+        <li>⏰ Shkoni 10 minuta para kohës</li>
+      </ul>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/candidate-dashboard" class="cta-button">Shiko Aplikimet e Mia</a>
+      </p>
+
+      <p>Suksese me intervistën!</p>
+      <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+// ==================== MAIN HANDLER ====================
 
 interface SendEmailRequest {
   to: string;

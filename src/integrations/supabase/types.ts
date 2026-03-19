@@ -1976,8 +1976,10 @@ export type Database = {
         Row: {
           application_updates: boolean | null
           created_at: string | null
+          employer_notifications: boolean | null
           id: string
           job_alerts: boolean | null
+          job_expiring_alerts: boolean | null
           marketing_emails: boolean | null
           resume_reminders: boolean | null
           unsubscribed_at: string | null
@@ -1988,8 +1990,10 @@ export type Database = {
         Insert: {
           application_updates?: boolean | null
           created_at?: string | null
+          employer_notifications?: boolean | null
           id?: string
           job_alerts?: boolean | null
+          job_expiring_alerts?: boolean | null
           marketing_emails?: boolean | null
           resume_reminders?: boolean | null
           unsubscribed_at?: string | null
@@ -2000,8 +2004,10 @@ export type Database = {
         Update: {
           application_updates?: boolean | null
           created_at?: string | null
+          employer_notifications?: boolean | null
           id?: string
           job_alerts?: boolean | null
+          job_expiring_alerts?: boolean | null
           marketing_emails?: boolean | null
           resume_reminders?: boolean | null
           unsubscribed_at?: string | null

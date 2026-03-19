@@ -30,6 +30,58 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
+  const sendNewApplicantNotification = async () => {
+    try {
+      // Get employer info from job's company
+      const { data: company } = await supabase
+        .from("companies")
+        .select("owner_id, name")
+        .eq("id", job.company_id)
+        .single();
+
+      if (!company) return;
+
+      const { data: employerProfile } = await supabase
+        .from("profiles")
+        .select("email, full_name")
+        .eq("id", company.owner_id)
+        .single();
+
+      if (!employerProfile?.email) return;
+
+      const { data: userProfile } = await supabase
+        .from("profiles")
+        .select("full_name, email")
+        .eq("id", user!.id)
+        .single();
+
+      // Get application count for this job
+      const { count: totalApplications } = await supabase
+        .from("applications")
+        .select("*", { count: "exact", head: true })
+        .eq("job_id", job.id);
+
+      await supabase.functions.invoke("send-email", {
+        body: {
+          to: employerProfile.email,
+          templateSlug: "new-applicant",
+          data: {
+            employerName: employerProfile.full_name || "",
+            jobTitle: job.title,
+            location: job.location,
+            applicantName: userProfile?.full_name || "Kandidat",
+            applicantEmail: userProfile?.email || "",
+            appliedDate: new Date().toLocaleDateString("sq-AL"),
+            totalApplications: String(totalApplications || 1),
+          },
+          userId: company.owner_id,
+        },
+      });
+    } catch (err) {
+      console.error("Failed to send new-applicant notification:", err);
+    }
+  };
+
   const applyMutation = useMutation({
     mutationFn: async ({ coverLetter, resumeUrl }: { coverLetter: string; resumeUrl?: string }) => {
       // Check if already applied
@@ -57,6 +109,10 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
     onSuccess: () => {
       toast({ title: "Application submitted successfully!" });
       queryClient.invalidateQueries({ queryKey: ["myApplications"] });
+      
+      // Trigger new-applicant notification to employer
+      sendNewApplicantNotification();
+      
       onClose();
       setCoverLetter("");
       setResumeFile(null);
