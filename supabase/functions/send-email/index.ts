@@ -81,80 +81,115 @@ function getEmailTemplate(templateSlug: string, data: Record<string, string>): {
   return templates[templateSlug] || templates["welcome"];
 }
 
-// Base email wrapper
+// Base email wrapper — Albanian Red theme matching jobs.al website
 function wrapEmail(content: string, unsubscribeUrl: string = "https://jobs.al/settings"): string {
   return `
 <!DOCTYPE html>
-<html lang="sq">
+<html lang="sq" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
   <title>Jobs.al</title>
   <style>
-    body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f5; }
-    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
-    .header { background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); padding: 32px; text-align: center; }
-    .header img { height: 40px; }
-    .header h1 { color: #ffffff; font-size: 28px; margin: 16px 0 0 0; font-weight: 700; }
+    :root { color-scheme: light; supported-color-schemes: light; }
+    body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #fafafa; color: #262626; }
+    table { border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    td { padding: 0; }
+    img { border: 0; display: block; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+    a { color: #E8272C; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+    .header { background: linear-gradient(135deg, #E8272C 0%, #F04E53 50%, #F47275 100%); padding: 36px 32px; text-align: center; }
+    .header-logo { font-size: 32px; font-weight: 800; color: #ffffff !important; letter-spacing: -0.5px; margin: 0; }
+    .header-logo span { font-weight: 400; opacity: 0.9; }
+    .header h1 { color: #ffffff; font-size: 22px; margin: 12px 0 0 0; font-weight: 600; letter-spacing: -0.2px; }
     .content { padding: 40px 32px; }
-    .content h2 { color: #1f2937; font-size: 24px; margin: 0 0 16px 0; }
-    .content p { color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 16px 0; }
-    .cta-button { display: inline-block; background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); color: #ffffff !important; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; margin: 24px 0; }
-    .cta-button:hover { opacity: 0.9; }
-    .cta-secondary { display: inline-block; background: #ffffff; color: #4F46E5 !important; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; margin: 12px 0; border: 2px solid #4F46E5; }
-    .feature-box { background-color: #f9fafb; border-radius: 12px; padding: 24px; margin: 24px 0; }
+    .content h2 { color: #1a1a1a; font-size: 22px; margin: 0 0 16px 0; font-weight: 700; letter-spacing: -0.3px; }
+    .content p { color: #525252; font-size: 15px; line-height: 1.7; margin: 0 0 16px 0; }
+    .cta-button { display: inline-block; background: #E8272C; color: #ffffff !important; text-decoration: none !important; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px; margin: 20px 0; mso-padding-alt: 0; text-align: center; }
+    /*[if mso]><style>.cta-button { background: #E8272C !important; padding: 14px 32px !important; }</style><![endif]*/
+    .cta-secondary { display: inline-block; background: #ffffff; color: #E8272C !important; text-decoration: none !important; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; margin: 10px 0; border: 2px solid #E8272C; }
+    .feature-box { background-color: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px; padding: 24px; margin: 24px 0; }
     .feature-item { display: flex; align-items: flex-start; margin: 16px 0; }
-    .feature-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; }
-    .feature-icon span { color: #ffffff; font-size: 24px; }
-    .feature-text h4 { color: #1f2937; font-size: 16px; margin: 0 0 4px 0; font-weight: 600; }
-    .feature-text p { color: #6b7280; font-size: 14px; margin: 0; }
-    .stats-box { background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center; }
-    .stats-box h3 { color: #ffffff; font-size: 32px; margin: 0; font-weight: 700; }
-    .stats-box p { color: rgba(255,255,255,0.9); font-size: 14px; margin: 8px 0 0 0; }
-    .job-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; }
-    .job-card h4 { color: #1f2937; font-size: 18px; margin: 0 0 8px 0; }
-    .job-card .company { color: #4F46E5; font-size: 14px; margin: 0 0 8px 0; }
-    .job-card .details { color: #6b7280; font-size: 14px; margin: 0; }
-    .status-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+    .feature-icon { width: 44px; height: 44px; background: #E8272C; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 14px; flex-shrink: 0; }
+    .feature-icon span { color: #ffffff; font-size: 22px; }
+    .feature-text h4 { color: #1a1a1a; font-size: 15px; margin: 0 0 4px 0; font-weight: 600; }
+    .feature-text p { color: #737373; font-size: 13px; margin: 0; }
+    .stats-box { background: linear-gradient(135deg, #E8272C 0%, #F04E53 100%); border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center; }
+    .stats-box h3 { color: #ffffff; font-size: 36px; margin: 0; font-weight: 800; letter-spacing: -0.5px; }
+    .stats-box p { color: rgba(255,255,255,0.85); font-size: 13px; margin: 6px 0 0 0; font-weight: 500; }
+    .job-card { border: 1px solid #e5e5e5; border-radius: 10px; padding: 20px; margin: 14px 0; transition: border-color 0.2s; }
+    .job-card h4 { color: #1a1a1a; font-size: 17px; margin: 0 0 6px 0; font-weight: 600; }
+    .job-card .company { color: #E8272C; font-size: 14px; margin: 0 0 6px 0; font-weight: 500; }
+    .job-card .details { color: #737373; font-size: 13px; margin: 0; }
+    .status-badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
     .status-reviewed { background: #DBEAFE; color: #1D4ED8; }
     .status-shortlisted { background: #D1FAE5; color: #065F46; }
     .status-rejected { background: #FEE2E2; color: #991B1B; }
     .status-interview { background: #FEF3C7; color: #92400E; }
-    .footer { background-color: #1f2937; padding: 32px; text-align: center; }
-    .footer p { color: #9ca3af; font-size: 14px; margin: 0 0 16px 0; }
-    .footer a { color: #a5b4fc; text-decoration: none; }
-    .social-links { margin: 24px 0; }
-    .social-links a { display: inline-block; margin: 0 8px; color: #9ca3af; text-decoration: none; }
-    .unsubscribe { color: #6b7280 !important; font-size: 12px; }
-    .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
-    .info-label { color: #6b7280; font-size: 14px; }
-    .info-value { color: #1f2937; font-size: 14px; font-weight: 600; }
+    .divider { height: 1px; background: #f0f0f0; margin: 28px 0; border: none; }
+    .footer { background-color: #1a1a1a; padding: 32px; text-align: center; }
+    .footer p { color: #a3a3a3; font-size: 13px; margin: 0 0 14px 0; line-height: 1.5; }
+    .footer a { color: #F47275; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .social-links { margin: 20px 0; }
+    .social-links a { display: inline-block; margin: 0 10px; color: #a3a3a3 !important; text-decoration: none; font-size: 13px; }
+    .unsubscribe { color: #737373 !important; font-size: 11px; }
+    .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+    .info-label { color: #737373; font-size: 13px; }
+    .info-value { color: #1a1a1a; font-size: 13px; font-weight: 600; }
+    .preheader { display: none !important; visibility: hidden; mso-hide: all; font-size: 1px; line-height: 1px; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; }
     @media only screen and (max-width: 600px) {
-      .container { width: 100% !important; }
-      .content { padding: 24px 16px !important; }
-      .header { padding: 24px 16px !important; }
+      .container { width: 100% !important; border-radius: 0 !important; }
+      .content { padding: 28px 20px !important; }
+      .header { padding: 28px 20px !important; }
+      .footer { padding: 28px 20px !important; }
+      .cta-button { display: block !important; text-align: center !important; }
+      .cta-secondary { display: block !important; text-align: center !important; }
     }
   </style>
 </head>
-<body>
-  <div class="container">
+<body style="margin: 0; padding: 0; background-color: #fafafa;">
+  <!--[if mso]>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0">
+  <tr><td>
+  <![endif]-->
+  <div class="container" style="max-width: 600px; margin: 0 auto;">
     ${content}
     <div class="footer">
-      <p><strong style="color: #ffffff;">Jobs.al</strong> - Platforma #1 e punësimit në Shqipëri</p>
+      <p style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 4px;">jobs.al</p>
+      <p style="margin-bottom: 20px;">Platforma #1 e punësimit në Shqipëri</p>
       <div class="social-links">
-        <a href="https://facebook.com/jobs.al">Facebook</a> •
-        <a href="https://instagram.com/jobs.al">Instagram</a> •
+        <a href="https://facebook.com/jobs.al">Facebook</a> ·
+        <a href="https://instagram.com/jobs.al">Instagram</a> ·
         <a href="https://linkedin.com/company/jobs-al">LinkedIn</a>
       </div>
-      <p style="font-size: 12px; color: #6b7280;">
-        © 2024 Jobs.al. Të gjitha të drejtat e rezervuara.<br>
-        Tiranë, Shqipëri
+      <p style="font-size: 11px; color: #737373; margin-top: 20px;">
+        © ${new Date().getFullYear()} Jobs.al — Tiranë, Shqipëri<br>
+        Të gjitha të drejtat e rezervuara.
       </p>
-      <p>
+      <p style="margin-top: 12px;">
         <a href="${unsubscribeUrl}" class="unsubscribe">Çregjistrohu nga emailet</a>
       </p>
     </div>
   </div>
+  <!--[if mso]>
+  </td></tr></table>
+  </td></tr></table>
+  <![endif]-->
 </body>
 </html>`;
 }
