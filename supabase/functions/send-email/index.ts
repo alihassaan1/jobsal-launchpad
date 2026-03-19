@@ -75,6 +75,30 @@ function getEmailTemplate(templateSlug: string, data: Record<string, string>): {
     "resume-upload-reminder": {
       subject: `${data.name || 'Përdoruesi'}, ngarkoni CV-në tuaj për të aplikuar më shpejt! 📎`,
       html: generateResumeUploadReminderEmail(data)
+    },
+    "subscription-renewal": {
+      subject: `Abonimi juaj "${data.planName || 'Pro'}" po rinovohet për ${data.daysLeft || '7'} ditë 🔄`,
+      html: generateSubscriptionRenewalEmail(data)
+    },
+    "subscription-expired": {
+      subject: `Abonimi juaj në Jobs.al ka skaduar ⚠️`,
+      html: generateSubscriptionExpiredEmail(data)
+    },
+    "payment-receipt": {
+      subject: `Fatura #${data.invoiceNumber || ''} — Pagesa u konfirmua ✅`,
+      html: generatePaymentReceiptEmail(data)
+    },
+    "payment-failed": {
+      subject: `Pagesa për "${data.planName || 'abonim'}" nuk u krye — Veproni tani ❌`,
+      html: generatePaymentFailedEmail(data)
+    },
+    "ad-performance-weekly": {
+      subject: `Raporti javor i reklamës: ${data.impressions || '0'} shfaqje, ${data.clicks || '0'} klikime 📊`,
+      html: generateAdPerformanceWeeklyEmail(data)
+    },
+    "invoice-overdue": {
+      subject: `Fatura #${data.invoiceNumber || ''} ka kaluar afatin e pagesës 🔴`,
+      html: generateInvoiceOverdueEmail(data)
     }
   };
 
@@ -923,6 +947,298 @@ function generateResumeUploadReminderEmail(data: Record<string, string>): string
       </p>
 
       <p style="color: #6b7280; font-size: 14px;">💡 <strong>Këshillë:</strong> Mund të ngarkoni CV në format PDF ose Word, ose të përdorni Resume Builder-in tonë me AI për të krijuar një CV profesionale.</p>
+      <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+// ==================== SUBSCRIPTION RENEWAL TEMPLATE ====================
+
+function generateSubscriptionRenewalEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
+      <h1>🔄 Abonimi juaj po rinovohet</h1>
+    </div>
+    <div class="content">
+      <h2>Përshëndetje, ${data.name || 'Punëdhënës'}!</h2>
+      <p>Dëshirojmë t'ju njoftojmë që abonimi juaj <strong>"${data.planName || 'Pro'}"</strong> do të rinovohet automatikisht për <strong>${data.daysLeft || '7'} ditë</strong>.</p>
+
+      <div class="feature-box">
+        <div class="info-row">
+          <span class="info-label">Plani</span>
+          <span class="info-value">${data.planName || 'Pro'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Data e rinovimit</span>
+          <span class="info-value">${data.renewalDate || 'Së shpejti'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Shuma</span>
+          <span class="info-value">${data.amount || '€0'} / ${data.period || 'muaj'}</span>
+        </div>
+        <div class="info-row" style="border-bottom: none;">
+          <span class="info-label">Metoda e pagesës</span>
+          <span class="info-value">${data.paymentMethod || 'Kartë krediti'}</span>
+        </div>
+      </div>
+
+      <p>Nëse dëshironi të ndryshoni ose anuloni abonimin, mund ta bëni para datës së rinovimit.</p>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/employer-subscription" class="cta-button">Menaxho Abonimin</a>
+      </p>
+
+      <p style="color: #737373; font-size: 13px;">💡 Keni pyetje rreth faturimit? Na kontaktoni në <a href="mailto:billing@jobs.al" style="color: #E8272C;">billing@jobs.al</a></p>
+      <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+// ==================== SUBSCRIPTION EXPIRED TEMPLATE ====================
+
+function generateSubscriptionExpiredEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
+      <h1>⚠️ Abonimi juaj ka skaduar</h1>
+    </div>
+    <div class="content">
+      <h2>${data.name || 'Punëdhënës'}, abonimi juaj përfundoi</h2>
+      <p>Plani juaj <strong>"${data.planName || 'Pro'}"</strong> ka skaduar më <strong>${data.expiredDate || 'ditën e fundit'}</strong>. Pa abonim aktiv, nuk do të keni akses në këto veçori:</p>
+
+      <div class="feature-box">
+        <ul style="color: #525252; line-height: 2.2; padding-left: 20px; margin: 0;">
+          <li>❌ Postimi i njoftimeve të reja të punës</li>
+          <li>❌ Aksesi në ATS (Sistemi i Ndjekjes së Aplikimeve)</li>
+          <li>❌ Shikimi i CV-ve të kandidatëve</li>
+          <li>❌ Analitika e avancuar e njoftimeve</li>
+        </ul>
+      </div>
+
+      <div class="stats-box">
+        <h3>${data.activeJobsCount || '0'}</h3>
+        <p>Njoftimet tuaja aktive do të çaktivizohen</p>
+      </div>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/employer-subscription" class="cta-button">Rinovo Abonimin Tani</a>
+      </p>
+      <p style="text-align: center;">
+        <a href="https://jobs.al/pricing" class="cta-secondary">Shiko Planet e Disponueshme</a>
+      </p>
+
+      <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+// ==================== PAYMENT RECEIPT TEMPLATE ====================
+
+function generatePaymentReceiptEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
+      <h1>✅ Pagesa u konfirmua</h1>
+    </div>
+    <div class="content">
+      <h2>Faleminderit, ${data.name || 'Punëdhënës'}!</h2>
+      <p>Pagesa juaj u procesua me sukses. Më poshtë gjeni detajet e faturës.</p>
+
+      <div class="feature-box" style="background: #F0FDF4; border-color: #BBF7D0;">
+        <div class="info-row">
+          <span class="info-label">Nr. Faturës</span>
+          <span class="info-value">#${data.invoiceNumber || '—'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Data</span>
+          <span class="info-value">${data.paymentDate || new Date().toLocaleDateString('sq-AL')}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Përshkrimi</span>
+          <span class="info-value">${data.description || 'Abonim Jobs.al'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Metoda</span>
+          <span class="info-value">${data.paymentMethod || 'Kartë'}</span>
+        </div>
+        <div class="info-row" style="border-bottom: none;">
+          <span class="info-label" style="font-size: 16px; font-weight: 700; color: #1a1a1a;">Totali</span>
+          <span class="info-value" style="font-size: 18px; color: #059669;">${data.amount || '€0'}</span>
+        </div>
+      </div>
+
+      ${data.pdfUrl ? `
+      <p style="text-align: center;">
+        <a href="${data.pdfUrl}" class="cta-button">📄 Shkarko Faturën PDF</a>
+      </p>
+      ` : ''}
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/employer-billing" class="cta-secondary">Shiko Historinë e Pagesave</a>
+      </p>
+
+      <p style="color: #737373; font-size: 13px;">Kjo faturë u gjenerua automatikisht. Për pyetje: <a href="mailto:billing@jobs.al" style="color: #E8272C;">billing@jobs.al</a></p>
+      <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+// ==================== PAYMENT FAILED TEMPLATE ====================
+
+function generatePaymentFailedEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
+      <h1>❌ Pagesa nuk u krye</h1>
+    </div>
+    <div class="content">
+      <h2>${data.name || 'Punëdhënës'}, pagesa juaj dështoi</h2>
+      <p>Kemi provuar të procesojmë pagesën për <strong>"${data.planName || 'abonimin tuaj'}"</strong>, por transaksioni nuk u pranua.</p>
+
+      <div class="feature-box" style="background: #FEF2F2; border-color: #FECACA;">
+        <div class="info-row">
+          <span class="info-label">Shuma</span>
+          <span class="info-value">${data.amount || '€0'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Arsyeja</span>
+          <span class="info-value" style="color: #DC2626;">${data.failureReason || 'Karta u refuzua'}</span>
+        </div>
+        <div class="info-row" style="border-bottom: none;">
+          <span class="info-label">Provat</span>
+          <span class="info-value">${data.attemptCount || '1'} / 3</span>
+        </div>
+      </div>
+
+      <p>⏳ Do të provojmë pagesën automatikisht edhe <strong>${data.retriesLeft || '2'} herë</strong> në ditët e ardhshme. Për të shmangur ndërprerjen e shërbimit, ju lutemi përditësoni metodën e pagesës.</p>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/employer-billing" class="cta-button">Përditëso Metodën e Pagesës</a>
+      </p>
+
+      <p style="color: #737373; font-size: 13px;">Nëse keni pyetje, na kontaktoni: <a href="mailto:billing@jobs.al" style="color: #E8272C;">billing@jobs.al</a></p>
+      <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+// ==================== AD PERFORMANCE WEEKLY TEMPLATE ====================
+
+function generateAdPerformanceWeeklyEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
+      <h1>📊 Raporti Javor i Reklamës</h1>
+    </div>
+    <div class="content">
+      <h2>Përshëndetje, ${data.name || 'Punëdhënës'}!</h2>
+      <p>Ja si performoi reklama juaj <strong>"${data.adTitle || 'Njoftimi'}"</strong> këtë javë (${data.weekRange || 'javën e kaluar'}):</p>
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
+        <tr>
+          <td style="width: 33%; padding: 8px;">
+            <div style="background: linear-gradient(135deg, #E8272C 0%, #F04E53 100%); border-radius: 12px; padding: 20px; text-align: center;">
+              <p style="color: #fff; font-size: 28px; font-weight: 800; margin: 0;">${data.impressions || '0'}</p>
+              <p style="color: rgba(255,255,255,0.85); font-size: 12px; margin: 4px 0 0 0;">Shfaqje</p>
+            </div>
+          </td>
+          <td style="width: 33%; padding: 8px;">
+            <div style="background: linear-gradient(135deg, #E8272C 0%, #F04E53 100%); border-radius: 12px; padding: 20px; text-align: center;">
+              <p style="color: #fff; font-size: 28px; font-weight: 800; margin: 0;">${data.clicks || '0'}</p>
+              <p style="color: rgba(255,255,255,0.85); font-size: 12px; margin: 4px 0 0 0;">Klikime</p>
+            </div>
+          </td>
+          <td style="width: 33%; padding: 8px;">
+            <div style="background: linear-gradient(135deg, #E8272C 0%, #F04E53 100%); border-radius: 12px; padding: 20px; text-align: center;">
+              <p style="color: #fff; font-size: 28px; font-weight: 800; margin: 0;">${data.applications || '0'}</p>
+              <p style="color: rgba(255,255,255,0.85); font-size: 12px; margin: 4px 0 0 0;">Aplikime</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <div class="feature-box">
+        <div class="info-row">
+          <span class="info-label">CTR (Click-Through Rate)</span>
+          <span class="info-value">${data.ctr || '0%'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Kosto për Aplikim</span>
+          <span class="info-value">${data.costPerApplication || '€0'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Ditë të mbetura</span>
+          <span class="info-value">${data.daysRemaining || '0'} ditë</span>
+        </div>
+        <div class="info-row" style="border-bottom: none;">
+          <span class="info-label">Buxheti i shpenzuar</span>
+          <span class="info-value">${data.budgetSpent || '€0'} / ${data.budgetTotal || '€0'}</span>
+        </div>
+      </div>
+
+      ${data.recommendation ? `
+      <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; padding: 16px; margin: 20px 0;">
+        <p style="margin: 0; color: #92400E; font-size: 14px;">💡 <strong>Rekomandim:</strong> ${data.recommendation}</p>
+      </div>
+      ` : ''}
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/employer-analytics" class="cta-button">Shiko Analitikën e Plotë</a>
+      </p>
+      <p style="text-align: center;">
+        <a href="https://jobs.al/employer-ads" class="cta-secondary">Menaxho Reklamat</a>
+      </p>
+
+      <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+// ==================== INVOICE OVERDUE TEMPLATE ====================
+
+function generateInvoiceOverdueEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
+      <h1>🔴 Fatura ka kaluar afatin</h1>
+    </div>
+    <div class="content">
+      <h2>${data.name || 'Punëdhënës'}, keni një faturë të papaguar</h2>
+      <p>Fatura <strong>#${data.invoiceNumber || '—'}</strong> ka kaluar afatin e pagesës prej <strong>${data.daysOverdue || '0'} ditësh</strong>. Ju lutemi kryeni pagesën sa më shpejt për të shmangur ndërprerjen e shërbimeve.</p>
+
+      <div class="feature-box" style="background: #FEF2F2; border-color: #FECACA;">
+        <div class="info-row">
+          <span class="info-label">Nr. Faturës</span>
+          <span class="info-value">#${data.invoiceNumber || '—'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Data e lëshimit</span>
+          <span class="info-value">${data.issueDate || '—'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Afati i pagesës</span>
+          <span class="info-value" style="color: #DC2626;">${data.dueDate || '—'} (${data.daysOverdue || '0'} ditë me vonesë)</span>
+        </div>
+        <div class="info-row" style="border-bottom: none;">
+          <span class="info-label" style="font-size: 16px; font-weight: 700; color: #1a1a1a;">Shuma e papaguar</span>
+          <span class="info-value" style="font-size: 18px; color: #DC2626;">${data.amount || '€0'}</span>
+        </div>
+      </div>
+
+      <p>⚠️ Nëse pagesa nuk kryhet brenda <strong>${data.gracePeriodDays || '7'} ditëve</strong>, njoftimet tuaja aktive dhe aksesi në panelin e punëdhënësit do të pezullohen.</p>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/employer-billing" class="cta-button">Paguaj Faturën Tani</a>
+      </p>
+
+      ${data.pdfUrl ? `
+      <p style="text-align: center;">
+        <a href="${data.pdfUrl}" class="cta-secondary">📄 Shkarko Faturën PDF</a>
+      </p>
+      ` : ''}
+
+      <p style="color: #737373; font-size: 13px;">Nëse keni kryer pagesën tashmë, ju lutemi injorojeni këtë email. Për çdo pyetje: <a href="mailto:billing@jobs.al" style="color: #E8272C;">billing@jobs.al</a></p>
       <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
     </div>`;
   return wrapEmail(content);
