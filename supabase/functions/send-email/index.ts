@@ -67,6 +67,14 @@ function getEmailTemplate(templateSlug: string, data: Record<string, string>): {
     "interview-scheduled": {
       subject: `Intervista juaj është konfirmuar për ${data.interviewDate || 'së shpejti'}! 🗓️`,
       html: generateInterviewScheduledEmail(data)
+    },
+    "role-upgrade-employer": {
+      subject: `Llogaria juaj u përditësua – Tani jeni Punëdhënës në Jobs.al! 🏢`,
+      html: generateRoleUpgradeEmployerEmail(data)
+    },
+    "resume-upload-reminder": {
+      subject: `${data.name || 'Përdoruesi'}, ngarkoni CV-në tuaj për të aplikuar më shpejt! 📎`,
+      html: generateResumeUploadReminderEmail(data)
     }
   };
 
