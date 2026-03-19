@@ -199,6 +199,7 @@ function wrapEmail(content: string, unsubscribeUrl: string = "https://jobs.al/se
 function generateWelcomeEmail(data: Record<string, string>): string {
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>🎉 Mirë se vini në Jobs.al!</h1>
     </div>
     <div class="content">
@@ -248,6 +249,7 @@ function generateWelcomeEmail(data: Record<string, string>): string {
 function generateResumeReminder1(data: Record<string, string>): string {
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>📄 CV-ja Juaj Po Pret!</h1>
     </div>
     <div class="content">
@@ -297,6 +299,7 @@ function generateResumeReminder1(data: Record<string, string>): string {
 function generateResumeReminder2(data: Record<string, string>): string {
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>🤔 A Jeni Ende Duke Kërkuar?</h1>
     </div>
     <div class="content">
@@ -330,6 +333,7 @@ function generateResumeReminder2(data: Record<string, string>): string {
 function generateFinalReminder(data: Record<string, string>): string {
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>🔍 Mundësi e Fundit!</h1>
     </div>
     <div class="content">
@@ -382,6 +386,7 @@ function generateWeeklyDigest(data: Record<string, string>): string {
 
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>💼 Përmbledhja Javore</h1>
     </div>
     <div class="content">
@@ -405,6 +410,7 @@ function generateWeeklyDigest(data: Record<string, string>): string {
 function generateApplicationConfirmation(data: Record<string, string>): string {
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>✅ Aplikimi u Dërgua!</h1>
     </div>
     <div class="content">
@@ -448,6 +454,7 @@ function generateJobMatchEmail(data: Record<string, string>): string {
 
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>🎯 Punë të Reja për Ju!</h1>
     </div>
     <div class="content">
@@ -505,6 +512,7 @@ function generateApplicationStatusEmail(data: Record<string, string>): string {
 
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>${status.emoji} Përditësim Aplikimi</h1>
     </div>
     <div class="content">
@@ -551,6 +559,7 @@ function generateProfileIncompleteEmail(data: Record<string, string>): string {
   
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>✏️ Plotësoni Profilin Tuaj</h1>
     </div>
     <div class="content">
@@ -597,6 +606,7 @@ function generateProfileIncompleteEmail(data: Record<string, string>): string {
 function generateReactivationEmail(data: Record<string, string>): string {
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>🚀 Na Keni Munguar!</h1>
     </div>
     <div class="content">
@@ -640,6 +650,7 @@ function generateReactivationEmail(data: Record<string, string>): string {
 function generateEmployerWelcomeEmail(data: Record<string, string>): string {
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>🏢 Mirë se Vini, Punëdhënës!</h1>
     </div>
     <div class="content">
@@ -697,6 +708,7 @@ function generateEmployerWelcomeEmail(data: Record<string, string>): string {
 function generateJobExpiringEmail(data: Record<string, string>): string {
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>⏰ Puna Po Skadon!</h1>
     </div>
     <div class="content">
@@ -731,6 +743,7 @@ function generateJobExpiringEmail(data: Record<string, string>): string {
 function generateNewApplicantEmail(data: Record<string, string>): string {
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>📨 Aplikant i Ri!</h1>
     </div>
     <div class="content">
@@ -782,6 +795,7 @@ function generateNewApplicantEmail(data: Record<string, string>): string {
 function generateInterviewScheduledEmail(data: Record<string, string>): string {
   const content = `
     <div class="header">
+      <p class="header-logo">jobs<span>.al</span></p>
       <h1>🗓️ Intervistë e Konfirmuar!</h1>
     </div>
     <div class="content">
