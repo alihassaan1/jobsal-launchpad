@@ -67,6 +67,14 @@ function getEmailTemplate(templateSlug: string, data: Record<string, string>): {
     "interview-scheduled": {
       subject: `Intervista juaj është konfirmuar për ${data.interviewDate || 'së shpejti'}! 🗓️`,
       html: generateInterviewScheduledEmail(data)
+    },
+    "role-upgrade-employer": {
+      subject: `Llogaria juaj u përditësua – Tani jeni Punëdhënës në Jobs.al! 🏢`,
+      html: generateRoleUpgradeEmployerEmail(data)
+    },
+    "resume-upload-reminder": {
+      subject: `${data.name || 'Përdoruesi'}, ngarkoni CV-në tuaj për të aplikuar më shpejt! 📎`,
+      html: generateResumeUploadReminderEmail(data)
     }
   };
 
@@ -802,6 +810,70 @@ function generateInterviewScheduledEmail(data: Record<string, string>): string {
       </p>
 
       <p>Suksese me intervistën!</p>
+      <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+// ==================== ROLE UPGRADE EMPLOYER TEMPLATE ====================
+
+function generateRoleUpgradeEmployerEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="content">
+      <h2>Urime, ${data.name || 'Përdoruesi'}! 🎉</h2>
+      <p>Llogaria juaj në Jobs.al u përditësua me sukses. Tani jeni regjistruar si <strong>Punëdhënës</strong>!</p>
+      
+      <div class="feature-box">
+        <p style="margin: 0 0 16px 0; font-weight: 600; color: #1f2937; font-size: 18px;">🏢 Çfarë mund të bëni tani:</p>
+        <ul style="color: #4b5563; line-height: 2.2; padding-left: 20px; margin: 0;">
+          <li>📝 <strong>Postoni punë</strong> – Krijoni njoftim pune dhe gjeni kandidatët idealë</li>
+          <li>🏗️ <strong>Krijoni profilin e kompanisë</strong> – Ndërtoni faqen tuaj të kompanisë</li>
+          <li>📊 <strong>Shikoni analitikë</strong> – Ndiqni performancën e njoftimeve tuaja</li>
+          <li>🤖 <strong>AI Matching</strong> – Sistemi ynë do t'ju rekomandojë kandidatët më të mirë</li>
+        </ul>
+      </div>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/setup-company" class="cta-button">Konfiguro Kompaninë</a>
+      </p>
+
+      <p style="text-align: center; margin-top: 8px;">
+        <a href="https://jobs.al/employer-dashboard" class="cta-secondary">Hyr në Panelin e Punëdhënësit</a>
+      </p>
+
+      <p>Nëse keni pyetje ose keni nevojë për ndihmë, na shkruani në <a href="mailto:support@jobs.al" style="color: #4F46E5;">support@jobs.al</a>.</p>
+      <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
+    </div>`;
+  return wrapEmail(content);
+}
+
+// ==================== RESUME UPLOAD REMINDER TEMPLATE ====================
+
+function generateResumeUploadReminderEmail(data: Record<string, string>): string {
+  const content = `
+    <div class="content">
+      <h2>Përshëndetje, ${data.name || 'Përdoruesi'}! 👋</h2>
+      <p>Kemi vëne re që nuk keni ngarkuar ende një CV në llogarinë tuaj në Jobs.al. Ngarkimi i CV-së bën procesin e aplikimit shumë më të shpejtë!</p>
+      
+      <div class="feature-box">
+        <p style="margin: 0 0 16px 0; font-weight: 600; color: #1f2937; font-size: 18px;">📎 Pse duhet të ngarkoni CV-në?</p>
+        <ul style="color: #4b5563; line-height: 2.2; padding-left: 20px; margin: 0;">
+          <li>⚡ <strong>Aplikoni me 1 klik</strong> – Nuk ju duhet të plotësoni formularë çdo herë</li>
+          <li>🎯 <strong>AI Matching</strong> – Sistemi ynë analizon CV-në dhe ju rekomandon punë</li>
+          <li>👀 <strong>Punëdhënësit ju shohin</strong> – CV juaj bëhet e dukshme për punëdhënësit</li>
+          <li>📊 <strong>Match Score</strong> – Merrni vlerësim automatik për çdo punë</li>
+        </ul>
+      </div>
+
+      <p style="text-align: center;">
+        <a href="https://jobs.al/my-resumes" class="cta-button">Ngarko CV-në Tani</a>
+      </p>
+
+      <p style="text-align: center; margin-top: 8px;">
+        <a href="https://jobs.al/resume-builder" class="cta-secondary">Ose Krijo CV me AI 🤖</a>
+      </p>
+
+      <p style="color: #6b7280; font-size: 14px;">💡 <strong>Këshillë:</strong> Mund të ngarkoni CV në format PDF ose Word, ose të përdorni Resume Builder-in tonë me AI për të krijuar një CV profesionale.</p>
       <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
     </div>`;
   return wrapEmail(content);
