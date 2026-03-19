@@ -372,7 +372,7 @@ function generateWeeklyDigest(data: Record<string, string>): string {
       <h4>${job.title}</h4>
       <p class="company">${job.company}</p>
       <p class="details">📍 ${job.location} • 💼 ${job.type}</p>
-      <a href="https://jobs.al/jobs/${job.slug}" style="color: #4F46E5; font-size: 14px;">Shiko Detajet →</a>
+      <a href="https://jobs.al/jobs/${job.slug}" style="color: #E8272C; font-size: 14px;">Shiko Detajet →</a>
     </div>
   `).join('') : `
     <div class="job-card">
@@ -442,7 +442,7 @@ function generateJobMatchEmail(data: Record<string, string>): string {
       <h4>${job.title}</h4>
       <p class="company">${job.company}</p>
       <p class="details">📍 ${job.location} • 💼 ${job.type}${job.matchScore ? ` • 🎯 ${job.matchScore}% përputhje` : ''}</p>
-      <a href="https://jobs.al/jobs/${job.slug}" style="color: #4F46E5; font-size: 14px;">Apliko Tani →</a>
+      <a href="https://jobs.al/jobs/${job.slug}" style="color: #E8272C; font-size: 14px;">Apliko Tani →</a>
     </div>
   `).join('');
 
@@ -466,7 +466,7 @@ function generateJobMatchEmail(data: Record<string, string>): string {
 
       <div class="feature-box">
         <p style="margin: 0; color: #4b5563; font-size: 14px;">
-          💡 <strong>Këshillë:</strong> Mbani CV-në tuaj të përditësuar për rekomandime më të sakta. <a href="https://jobs.al/my-resumes" style="color: #4F46E5;">Përditëso CV-në →</a>
+          💡 <strong>Këshillë:</strong> Mbani CV-në tuaj të përditësuar për rekomandime më të sakta. <a href="https://jobs.al/my-resumes" style="color: #E8272C;">Përditëso CV-në →</a>
         </p>
       </div>
     </div>`;
@@ -510,7 +510,7 @@ function generateApplicationStatusEmail(data: Record<string, string>): string {
     <div class="content">
       <h2>Përshëndetje${data.name ? `, ${data.name}` : ''}!</h2>
       
-      <div class="job-card" style="border-left: 4px solid #4F46E5;">
+      <div class="job-card" style="border-left: 4px solid #E8272C;">
         <h4>${data.jobTitle || 'Pozicioni'}</h4>
         <p class="company">${data.company || 'Kompania'}</p>
         <p class="details">📍 ${data.location || 'Tiranë'}</p>
@@ -723,7 +723,7 @@ function generateJobExpiringEmail(data: Record<string, string>): string {
         <a href="https://jobs.al/jobs/${data.jobSlug || ''}" class="cta-button">Apliko Tani</a>
       </p>
 
-      <p style="color: #6b7280; font-size: 14px;">Nuk jeni i interesuar? <a href="https://jobs.al/jobs" style="color: #4F46E5;">Shikoni punë të tjera →</a></p>
+      <p style="color: #6b7280; font-size: 14px;">Nuk jeni i interesuar? <a href="https://jobs.al/jobs" style="color: #E8272C;">Shikoni punë të tjera →</a></p>
     </div>`;
   return wrapEmail(content);
 }
@@ -876,7 +876,7 @@ function generateRoleUpgradeEmployerEmail(data: Record<string, string>): string 
         <a href="https://jobs.al/employer-dashboard" class="cta-secondary">Hyr në Panelin e Punëdhënësit</a>
       </p>
 
-      <p>Nëse keni pyetje ose keni nevojë për ndihmë, na shkruani në <a href="mailto:support@jobs.al" style="color: #4F46E5;">support@jobs.al</a>.</p>
+      <p>Nëse keni pyetje ose keni nevojë për ndihmë, na shkruani në <a href="mailto:support@jobs.al" style="color: #E8272C;">support@jobs.al</a>.</p>
       <p>Me respekt,<br><strong>Ekipi i Jobs.al</strong></p>
     </div>`;
   return wrapEmail(content);
