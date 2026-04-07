@@ -1,98 +1,92 @@
 
 
-# GSC Data Analysis & SEO Keyword Optimization Plan
+# Bing Webmaster Tools Keyword Analysis & SEO Update Plan
 
-## Key Findings from Google Search Console (Last 3 Months)
+## Key Findings from Bing Data (436 keywords)
 
-### Performance Summary
-- **72 total clicks, 1,345 impressions, 5.35% avg CTR, 21.9 avg position**
-- Mobile dominates (51 clicks / 71%) but desktop has 6x more impressions (858) with terrible CTR (2.1%)
-- Almost all traffic lands on homepage (70/72 clicks). Blog, resume-builder, and jobs pages get nearly zero clicks
-- Albania is top country (31 clicks) but US has 223 impressions with only 1 click (position 31.6)
+### Bing vs Google — What's New
 
-### High-Value Keyword Opportunities
+Bing reveals keyword clusters that barely appeared in GSC, representing untapped audiences:
 
-**Tier 1 — Already ranking, need CTR improvement (positions 1-10):**
-| Keyword | Clicks | Impressions | Position | Action |
-|---------|--------|-------------|----------|--------|
-| jobsal | 2 | 66 | 1.94 | Brand — already #1, optimize title/desc for CTR |
-| jobs al | 5 | 55 | 4.04 | Optimize homepage meta for this exact query |
-| job al | 2 | 30 | 5.53 | Same cluster as above |
-| al jobs | 2 | 34 | 9.26 | Same cluster |
-| work al | 0 | 3 | 6.67 | Include in homepage keywords |
+**1. Foreigners/Expats Cluster (HIGH VALUE — 50+ combined impressions)**
+| Keyword | Impressions | Clicks | Position |
+|---------|-------------|--------|----------|
+| albania jobs for foreigners | 17 | 3 | 5.6 |
+| jobs in albania for expats | 5 | 0 | 2.0 |
+| english speaking jobs in albania | 5 | 0 | 6.4 |
+| jobs in albania for british people | 4 | 1 | 6.0 |
+| jobs albania foreigners | 4 | 0 | 2.0 |
+| jobs for americans in albania | 2 | 0 | 7.0 |
+| albania jobs for indian | 2 | 0 | 5.0 |
 
-**Tier 2 — High impressions but poor position (10-50), biggest growth potential:**
-| Keyword | Impressions | Position | Action |
-|---------|-------------|----------|--------|
-| jobs in albania | 69 | 46.6 | Create dedicated landing content |
-| jobs hiring near me full time | 43 | 8.35 | Already page 1! Optimize for CTR |
-| jobs in tirana | 39 | 31.7 | Create Tirana jobs landing page content |
-| albania jobs | 34 | 56.8 | Strengthen homepage targeting |
-| job vacancies | 25 | 31.7 | Add to page meta + H1 copy |
-| job in albania | 24 | 51.5 | Long-tail blog/page target |
-| jobs in albanien | 13 | 85.6 | German-language searchers — potential DE content |
+This is a completely new audience segment not targeted anywhere on the site.
 
-**Tier 3 — Zero clicks, moderate impressions, fixable:**
+**2. Job Synonyms Missing from Current Meta**
 | Keyword | Impressions | Position |
 |---------|-------------|----------|
-| where to find jobs | 12 | 10.1 |
-| albania job portal | 8 | 10.4 |
-| jobs hiring near me | 5 | 10.2 |
-| job search | 4 | 10.5 |
+| job openings in albania | 9 | 2.2 |
+| job opportunities in albania | 8 | 2.5 |
+| vacancies albania | 8 | 3.2 |
+| albania job apply | 12 | 4.2 |
+| hiring in albania | 3 | 2.0 |
+| job offers in albania | 2 | 1.0 |
 
-### Page Performance Issues
-- `/jobs` page: 0 clicks, 4 impressions — not indexed well
-- `/blog`: 1 click, 21 impressions — needs better meta
-- `/companies`: 0 clicks — missing from search targeting
-- Blog posts not appearing in queries at all
+**3. Industry-Specific Queries (not targeted at all)**
+- banking jobs albania (13 imp)
+- nursing jobs, hotel jobs, aviation jobs, pharmacy jobs, engineering jobs
+
+**4. City Queries Beyond Tirana**
+- jobs in durres albania (3 imp, 1 click)
+- vlore albania jobs (1 imp)
+- jobs in south albania (1 imp)
+
+**5. Competitor Brand Queries (people looking for alternatives)**
+- indeed albania (9 imp, 0 clicks, pos 3.4)
+- indeed.com albania (3 imp)
+- indeed jobs albania (2 imp)
+
+### Performance Summary
+- Top keyword: "jobs in albania" — 125 impressions, 19 clicks, position 2.6 (much better than Google's 46.6!)
+- "albania jobs" — 34 imp, 14 clicks, 41% CTR at position 1.8
+- Brand query "jobs.al" — only 2 impressions (low brand awareness on Bing)
 
 ---
 
 ## Implementation Plan
 
-### 1. Optimize Homepage Meta Tags (Index.tsx)
-Update `<Helmet>` with GSC-informed keywords:
-- Title: "Jobs.al — Jobs in Albania | Job Vacancies & Career Portal"
-- Description: Include top query terms: "jobs in Albania", "jobs in Tirana", "job vacancies", "albania job portal"
-- Keywords meta: Add all Tier 1 + 2 query terms
-- Add structured data (JobPosting aggregate, WebSite with SearchAction)
+### 1. Update Homepage Meta (Index.tsx)
+Add Bing-discovered keywords to the `keywords` meta tag:
+- Add: "job openings in albania", "job opportunities in albania", "albania jobs for foreigners", "english speaking jobs in albania", "hiring in albania", "vacancies albania", "job offers albania"
+- Update description to naturally include "job openings" and "job opportunities"
 
-### 2. Optimize Jobs Page Meta (Jobs.tsx)
-- Title: "Job Vacancies in Albania | Find Jobs in Tirana & All Cities"
-- Description: Target "job vacancies", "jobs hiring", "jobs in tirana", "full time jobs albania"
-- Add `WebSite` SearchAction schema for sitelinks search box
+### 2. Update Jobs Page Meta (Jobs.tsx)
+- Add to keywords: "job openings", "job opportunities", "vacancies", "albania job apply", "hiring in albania"
+- Update description to include "job openings" and "hiring" synonyms
 
-### 3. Optimize Blog Page Meta (Blog.tsx)
-- Title: "Career Advice & Job Market Insights Albania | Jobs.al Blog"
-- Better description targeting career-related long-tail queries
+### 3. Update Blog Page Meta (Blog.tsx)
+- Add career-related Bing terms: "career opportunities albania", "employment in albania"
 
-### 4. Update index.html Default Meta
-- Update default `<meta>` keywords and description with top-performing search terms
-- Update OG image to actual Jobs.al branded image instead of lovable.dev placeholder
+### 4. Update index.html Global Meta
+- Add new keyword terms to the default keywords meta tag
+- Update description with "job openings" and "opportunities" synonyms
 
-### 5. Add Structured Data to Homepage
-- `WebSite` schema with `SearchAction` (enables Google sitelinks search box)
-- `Organization` schema with logo, name, social profiles
-- `JobPosting` aggregate breadcrumb
+### 5. Update Companies Page (Companies.tsx)
+- Add "employment company in albania", "companies hiring in albania" to keywords
 
-### 6. Create/Optimize Landing Pages for High-Value Keywords
-- Ensure `/jobs?location=Tirana` pages have proper meta (already exist via JobsByLocation)
-- Verify JobsByCategory and JobsByLocation pages have keyword-optimized Helmet tags
+### 6. Update ResumeBuilderLanding Meta
+- Add "job apply albania", "cv for albania jobs" terms
 
-### 7. Update robots.txt
-- Verify sitemap reference is correct
-- Ensure all key pages are crawlable
+### 7. Update JobsByLocation (JobsByLocation.tsx)
+- Ensure Durres and other cities have keyword coverage for "jobs in durres albania", "jobs tirana"
 
 ---
 
 ### Files to Modify
-1. **`index.html`** — Update default meta tags, OG image, add Organization schema
-2. **`src/pages/Index.tsx`** — Rewrite Helmet with GSC-optimized keywords + WebSite schema
-3. **`src/pages/Jobs.tsx`** — Optimize title/description for job vacancy queries
-4. **`src/pages/Blog.tsx`** — Better meta targeting career advice keywords
-5. **`src/pages/Companies.tsx`** — Add meta targeting "companies in albania" queries
-6. **`src/pages/JobsByLocation.tsx`** — Verify/optimize location-specific meta
-7. **`src/pages/JobsByCategory.tsx`** — Verify/optimize category-specific meta
-8. **`src/pages/ResumeBuilderLanding.tsx`** — Target "krijo cv shqip", "resume builder" queries
-9. **`public/robots.txt`** — Verify sitemap and crawl rules
+1. **`index.html`** — Expand default keywords with Bing-discovered terms
+2. **`src/pages/Index.tsx`** — Add foreigners/expats and synonym keywords
+3. **`src/pages/Jobs.tsx`** — Add "job openings", "opportunities", "hiring" terms
+4. **`src/pages/Blog.tsx`** — Add employment-related long-tail keywords
+5. **`src/pages/Companies.tsx`** — Add "companies hiring" keywords
+6. **`src/pages/ResumeBuilderLanding.tsx`** — Add application-related terms
+7. **`src/pages/JobsByLocation.tsx`** — Verify city-specific keyword coverage
 
