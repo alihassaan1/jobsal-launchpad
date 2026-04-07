@@ -129,11 +129,13 @@ const Blog = () => {
   return (
     <>
       <Helmet>
-        <title>Blog - Career Tips, Job Market Insights & Resume Advice | Jobs.al</title>
-        <meta name="description" content="Explore expert career advice, job market trends, and resume tips on the Jobs.al blog. Stay informed about employment opportunities in Albania and beyond." />
-        <meta name="keywords" content="career blog, job market Albania, resume tips, employment advice, career guidance" />
-        <meta property="og:title" content="Blog - Career Tips & Job Market Insights | Jobs.al" />
-        <meta property="og:description" content="Expert career advice and job market insights for professionals in Albania" />
+        <title>Career Advice & Job Market Insights Albania | Jobs.al Blog</title>
+        <meta name="description" content="Expert career advice, resume tips & Albanian job market trends. Discover salary guides, interview tips & employment insights for professionals in Albania." />
+        <meta name="keywords" content="career advice albania, job market albania, resume tips, interview tips, salary guide albania, employment trends, career blog" />
+        <meta property="og:title" content="Career Advice & Job Market Insights | Jobs.al Blog" />
+        <meta property="og:description" content="Expert career advice, resume tips & Albanian job market trends for professionals." />
+        <meta property="og:url" content="https://jobs.al/blog" />
+        <meta property="og:image" content="https://jobs.al/og-image.jpg" />
         <link rel="canonical" href="https://jobs.al/blog" />
       </Helmet>
 

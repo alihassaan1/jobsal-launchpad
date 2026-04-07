@@ -84,11 +84,16 @@ const Companies = () => {
   return (
     <>
       <Helmet>
-        <title>{language === 'sq' ? 'Kompanitë Top që Punësojnë në Shqipëri | Jobs.al' : 'Top Companies Hiring in Albania | Jobs.al Company Directory'}</title>
+        <title>{language === 'sq' ? 'Kompanitë Top që Punësojnë në Shqipëri | Jobs.al' : 'Companies Hiring in Albania | Employer Directory | Jobs.al'}</title>
         <meta name="description" content={language === 'sq' 
-          ? 'Eksploro kompanitë e verifikuara që punësojnë në Shqipëri. Gjej profile punëdhënësish dhe pozicione të hapura.'
-          : 'Explore verified companies hiring in Albania. Find employer profiles, company culture, benefits, and open positions.'
+          ? 'Eksploro kompanitë e verifikuara që punësojnë në Shqipëri. Gjej profile punëdhënësish, kulturën e kompanisë dhe pozicione të hapura.'
+          : 'Discover top employers hiring in Albania. Browse company profiles, open positions, culture & benefits. Find your ideal workplace in Tirana & beyond.'
         } />
+        <meta name="keywords" content="companies in albania, employers albania, hiring companies tirana, top employers, albanian companies, company directory" />
+        <meta property="og:title" content={language === 'sq' ? 'Kompani që Punësojnë në Shqipëri | Jobs.al' : 'Companies Hiring in Albania | Jobs.al'} />
+        <meta property="og:description" content="Discover top employers hiring in Albania. Browse company profiles and open positions." />
+        <meta property="og:url" content="https://jobs.al/companies" />
+        <meta property="og:image" content="https://jobs.al/og-image.jpg" />
         <link rel="canonical" href="https://jobs.al/companies" />
       </Helmet>
 
