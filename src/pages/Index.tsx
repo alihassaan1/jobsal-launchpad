@@ -200,12 +200,12 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Jobs.al — Jobs in Albania | Job Vacancies & Career Portal</title>
-        <meta name="description" content="Albania's #1 job portal. Browse jobs in Tirana, Durres & all cities. Find full-time job vacancies, apply online & build your CV with our free AI resume builder." />
-        <meta name="keywords" content="jobs in albania, jobs in tirana, albania jobs, job vacancies, pune shqiperi, pune ne tirane, albania job portal, jobs hiring near me, job search, al jobs, jobs al, work albania, where to find jobs, job in albania" />
+        <title>Jobs.al — Jobs in Albania | Job Openings & Career Portal</title>
+        <meta name="description" content="Albania's #1 job portal. Browse job openings & opportunities in Tirana, Durres & all cities. Find full-time job vacancies, apply online & build your CV. Jobs for foreigners & English speakers welcome." />
+        <meta name="keywords" content="jobs in albania, jobs in tirana, albania jobs, job vacancies, pune shqiperi, pune ne tirane, albania job portal, jobs hiring near me, job search, al jobs, jobs al, work albania, where to find jobs, job in albania, job openings in albania, job opportunities in albania, albania jobs for foreigners, english speaking jobs in albania, hiring in albania, vacancies albania, job offers albania, jobs for expats albania, jobs in durres, jobs for americans in albania" />
         <link rel="canonical" href="https://jobs.al" />
-        <meta property="og:title" content="Jobs.al — Jobs in Albania | Job Vacancies & Career Portal" />
-        <meta property="og:description" content="Albania's #1 job portal. Browse job vacancies in Tirana, Durres & all Albanian cities. Free AI resume builder included." />
+        <meta property="og:title" content="Jobs.al — Jobs in Albania | Job Openings & Career Portal" />
+        <meta property="og:description" content="Albania's #1 job portal. Browse job openings & vacancies in Tirana, Durres & all Albanian cities. Jobs for foreigners welcome. Free AI resume builder included." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://jobs.al" />
         <meta property="og:image" content="https://jobs.al/og-image.jpg" />
