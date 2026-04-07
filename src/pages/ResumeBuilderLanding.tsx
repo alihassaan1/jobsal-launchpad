@@ -123,21 +123,23 @@ const ResumeBuilderLanding = () => {
     <>
       <Helmet>
         <html lang="en" />
-        <title>Free Online Resume Builder – Create a Professional CV with AI | Jobs.al</title>
-        <meta name="description" content="Build your perfect resume online using Jobs.al's free AI-powered resume builder. Choose professional templates, optimize for ATS, and connect directly with employers in Albania." />
-        <meta name="keywords" content="online resume builder, AI CV maker, professional resume templates, build resume Albania, job seeker tools, free CV builder" />
-        <meta property="og:title" content="Free Online Resume Builder – Create a Professional CV with AI | Jobs.al" />
-        <meta property="og:description" content="Build your perfect resume online using Jobs.al's free AI-powered resume builder. Choose professional templates, optimize for ATS, and connect directly with employers in Albania." />
+        <title>Free AI Resume Builder — Create Professional CV Online | Jobs.al</title>
+        <meta name="description" content="Build your professional resume online for free with Jobs.al's AI-powered CV builder. ATS-friendly templates, instant PDF export & direct employer visibility in Albania." />
+        <meta name="keywords" content="resume builder, AI CV maker, free resume builder, online CV builder, professional resume templates, ATS resume, build resume albania, krijo cv" />
+        <meta property="og:title" content="Free AI Resume Builder — Create Professional CV Online | Jobs.al" />
+        <meta property="og:description" content="Build your professional resume for free with AI. ATS-friendly templates & instant PDF export." />
         <meta property="og:type" content="website" />
-        <link rel="alternate" hrefLang="en" href="/ai-resume-builder" />
-        <link rel="alternate" hrefLang="sq" href="/resume-builder-al" />
+        <meta property="og:url" content="https://jobs.al/ai-resume-builder" />
+        <meta property="og:image" content="https://jobs.al/og-image.jpg" />
+        <link rel="alternate" hrefLang="en" href="https://jobs.al/ai-resume-builder" />
+        <link rel="alternate" hrefLang="sq" href="https://jobs.al/resume-builder-al" />
+        <link rel="canonical" href="https://jobs.al/ai-resume-builder" />
         
-        {/* Schema.org Structured Data */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "Jobs.al Resume Builder",
+            "name": "Jobs.al AI Resume Builder",
             "applicationCategory": "BusinessApplication",
             "offers": {
               "@type": "Offer",
@@ -145,8 +147,9 @@ const ResumeBuilderLanding = () => {
               "priceCurrency": "EUR"
             },
             "operatingSystem": "Web",
-            "description": "Free online AI-powered resume builder for creating professional resumes",
-            "inLanguage": "en",
+            "url": "https://jobs.al/ai-resume-builder",
+            "description": "Free online AI-powered resume builder for creating professional, ATS-friendly resumes",
+            "inLanguage": ["en", "sq"],
             "featureList": "AI-powered suggestions, ATS-friendly templates, PDF export, Employer visibility"
           })}
         </script>

@@ -358,8 +358,12 @@ export default function JobsByCategory() {
   return (
     <>
       <Helmet>
-        <title>{categoryInfo.title[language]} {language === 'sq' ? 'në Shqipëri' : 'in Albania'} | Jobs.al</title>
-        <meta name="description" content={`${categoryInfo.description[language]} ${language === 'sq' ? 'Shfleto' : 'Browse'} ${jobs?.length || 0}+ ${language === 'sq' ? 'pozicione aktive' : 'active positions'}.`} />
+        <title>{`${categoryInfo.title[language]} ${language === 'sq' ? 'në Shqipëri' : 'in Albania'} — ${language === 'sq' ? 'Vende Pune' : 'Job Vacancies'} | Jobs.al`}</title>
+        <meta name="description" content={`${categoryInfo.description[language]} ${language === 'sq' ? 'Shfleto' : 'Browse'} ${jobs?.length || 0}+ ${language === 'sq' ? 'pozicione aktive. Apliko online tani' : 'active positions. Apply online today'}.`} />
+        <meta name="keywords" content={`${category} jobs albania, ${category} vacancies, pune ${category}, ${category} careers albania`} />
+        <meta property="og:title" content={`${categoryInfo.title[language]} | Jobs.al`} />
+        <meta property="og:description" content={`Find ${category} job vacancies in Albania. Browse open positions and apply online.`} />
+        <meta property="og:url" content={`https://jobs.al/jobs/category/${category?.toLowerCase()}`} />
         <link rel="canonical" href={`https://jobs.al/jobs/category/${category?.toLowerCase()}`} />
       </Helmet>
 

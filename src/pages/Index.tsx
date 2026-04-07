@@ -200,14 +200,29 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Jobs.al - Find Your Dream Job in Albania | Top Albanian Job Portal</title>
-        <meta name="description" content="Discover thousands of job opportunities in Albania. Jobs.al is Albania's leading job portal connecting talented professionals with top employers across Tirana, Durres, and major Albanian cities." />
-        <meta name="keywords" content="jobs albania, pune shqiperi, job vacancies albania, career opportunities albania, employment tirana, jobs tirana, albanian job market" />
+        <title>Jobs.al — Jobs in Albania | Job Vacancies & Career Portal</title>
+        <meta name="description" content="Albania's #1 job portal. Browse jobs in Tirana, Durres & all cities. Find full-time job vacancies, apply online & build your CV with our free AI resume builder." />
+        <meta name="keywords" content="jobs in albania, jobs in tirana, albania jobs, job vacancies, pune shqiperi, pune ne tirane, albania job portal, jobs hiring near me, job search, al jobs, jobs al, work albania, where to find jobs, job in albania" />
         <link rel="canonical" href="https://jobs.al" />
-        <meta property="og:title" content="Jobs.al - Albania's Premier Job Search Platform" />
-        <meta property="og:description" content="Find your next career opportunity in Albania. Browse 1,200+ active job listings from 500+ verified companies." />
+        <meta property="og:title" content="Jobs.al — Jobs in Albania | Job Vacancies & Career Portal" />
+        <meta property="og:description" content="Albania's #1 job portal. Browse job vacancies in Tirana, Durres & all Albanian cities. Free AI resume builder included." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://jobs.al" />
+        <meta property="og:image" content="https://jobs.al/og-image.jpg" />
+        <meta property="og:site_name" content="Jobs.al" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Jobs.al",
+            "url": "https://jobs.al",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://jobs.al/jobs?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          })}
+        </script>
       </Helmet>
       <div className="min-h-screen bg-background">
       {/* Header */}

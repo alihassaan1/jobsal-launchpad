@@ -92,12 +92,17 @@ const Jobs = () => {
   return (
     <>
       <Helmet>
-        <title>{language === 'sq' ? 'Shfleto të Gjitha Punët në Shqipëri | Jobs.al' : 'Browse All Jobs in Albania | Jobs.al Job Search'}</title>
+        <title>{language === 'sq' ? 'Pune në Shqipëri — Vende Pune në Tiranë & Të Gjitha Qytetet | Jobs.al' : 'Job Vacancies in Albania | Find Jobs in Tirana & All Cities | Jobs.al'}</title>
         <meta name="description" content={language === 'sq' 
-          ? 'Kërko dhe filtro qindra mundësi punësimi në Shqipëri. Gjej pozicione me kohë të plotë, të pjesshme, në distancë dhe kontrata.'
-          : 'Search and filter through hundreds of job opportunities across Albania. Find full-time, part-time, remote, and contract positions.'
+          ? 'Kërko vende pune në Shqipëri. Gjej pozicione me kohë të plotë, të pjesshme dhe në distancë në Tiranë, Durrës dhe qytete të tjera. Apliko online tani.'
+          : 'Search job vacancies in Albania. Find full-time, part-time & remote jobs in Tirana, Durres & all cities. Apply online to hundreds of open positions.'
         } />
+        <meta name="keywords" content="job vacancies, jobs in albania, jobs in tirana, full time jobs, jobs hiring near me, albania jobs, pune shqiperi" />
         <link rel="canonical" href="https://jobs.al/jobs" />
+        <meta property="og:title" content={language === 'sq' ? 'Vende Pune në Shqipëri | Jobs.al' : 'Job Vacancies in Albania | Jobs.al'} />
+        <meta property="og:description" content="Browse and apply to hundreds of job vacancies across Albania. Full-time, part-time & remote positions." />
+        <meta property="og:url" content="https://jobs.al/jobs" />
+        <meta property="og:image" content="https://jobs.al/og-image.jpg" />
       </Helmet>
       <div className="min-h-screen bg-background">
       {/* Header */}

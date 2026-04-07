@@ -278,8 +278,12 @@ export default function JobsByLocation() {
   return (
     <>
       <Helmet>
-        <title>{cityInfo.title[language]}, {language === 'sq' ? 'Shqipëri' : 'Albania'} | Jobs.al</title>
-        <meta name="description" content={`${cityInfo.description[language]} ${language === 'sq' ? 'Shfleto' : 'Browse'} ${jobs?.length || 0}+ ${language === 'sq' ? 'pozicione aktive' : 'active positions'}.`} />
+        <title>{`${cityInfo.title[language]} — ${language === 'sq' ? 'Vende Pune' : 'Job Vacancies'} | Jobs.al`}</title>
+        <meta name="description" content={`${cityInfo.description[language]} ${language === 'sq' ? 'Shfleto' : 'Browse'} ${jobs?.length || 0}+ ${language === 'sq' ? 'pozicione aktive. Apliko online tani' : 'active positions. Apply online today'}.`} />
+        <meta name="keywords" content={`jobs in ${city}, ${city} jobs albania, job vacancies ${city}, pune ne ${city}, work in ${city}`} />
+        <meta property="og:title" content={`${cityInfo.title[language]} | Jobs.al`} />
+        <meta property="og:description" content={`Find job vacancies in ${city}, Albania. Browse open positions and apply online.`} />
+        <meta property="og:url" content={`https://jobs.al/jobs/location/${city?.toLowerCase()}`} />
         <link rel="canonical" href={`https://jobs.al/jobs/location/${city?.toLowerCase()}`} />
       </Helmet>
 
