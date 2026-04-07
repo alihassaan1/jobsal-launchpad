@@ -235,6 +235,7 @@ const BlogPost = () => {
                 <div className="flex items-center gap-2 mb-4">
                   <Badge>{post.category.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</Badge>
                   <span className="text-sm">{post.language === 'en' ? '🇬🇧 English' : '🇦🇱 Shqip'}</span>
+                  <span className="text-sm text-muted-foreground">· {readingTime} min read</span>
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
                   {post.title}
