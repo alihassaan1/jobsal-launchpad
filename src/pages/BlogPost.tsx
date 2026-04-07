@@ -86,9 +86,17 @@ const BlogPost = () => {
     });
   };
 
-  const siteOrigin = 'https://jobsal-launchpad.lovable.app';
+  const siteOrigin = 'https://jobs.al';
   const shareUrl = `${siteOrigin}/blog/${slug}`;
   const shareTitle = post?.title || '';
+  
+  // Estimate reading time
+  const getReadingTime = (content: string) => {
+    const text = content.replace(/<[^>]+>/g, '');
+    const words = text.split(/\s+/).length;
+    return Math.max(1, Math.ceil(words / 200));
+  };
+  const readingTime = post ? getReadingTime(post.content) : 0;
 
   const handleShare = (platform: string) => {
     const urls: Record<string, string> = {
@@ -137,35 +145,41 @@ const BlogPost = () => {
         <html lang={post.language} />
         <title>{post.meta_title || post.title} | Jobs.al Blog</title>
         <meta name="description" content={post.meta_description || post.excerpt} />
-        <meta name="keywords" content={post.tags?.join(', ')} />
+        <meta name="keywords" content={post.meta_keywords?.join(', ') || post.tags?.join(', ')} />
+        <meta name="author" content={author?.full_name || 'Jobs.al'} />
         <meta property="og:title" content={post.meta_title || post.title} />
         <meta property="og:description" content={post.meta_description || post.excerpt} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={shareUrl} />
-        <meta property="og:image" content={post.featured_image ? (post.featured_image.startsWith('http') ? post.featured_image : `${siteOrigin}${post.featured_image}`) : `${siteOrigin}/favicon.png`} />
+        <meta property="og:image" content={post.featured_image && post.featured_image.startsWith('http') ? post.featured_image : `${siteOrigin}/og-image.jpg`} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:type" content="image/jpeg" />
         <meta property="og:site_name" content="Jobs.al" />
         <meta property="og:locale" content={post.language === 'en' ? 'en_US' : 'sq_AL'} />
         <meta property="article:published_time" content={post.published_at} />
+        <meta property="article:modified_time" content={post.updated_at} />
         <meta property="article:author" content={author?.full_name} />
+        <meta property="article:section" content={post.category} />
+        {post.tags?.map((tag: string) => (
+          <meta key={tag} property="article:tag" content={tag} />
+        ))}
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@jobs_al" />
         <meta name="twitter:title" content={post.meta_title || post.title} />
         <meta name="twitter:description" content={post.meta_description || post.excerpt} />
-        <meta name="twitter:image" content={post.featured_image ? (post.featured_image.startsWith('http') ? post.featured_image : `${siteOrigin}${post.featured_image}`) : `${siteOrigin}/favicon.png`} />
+        <meta name="twitter:image" content={post.featured_image && post.featured_image.startsWith('http') ? post.featured_image : `${siteOrigin}/og-image.jpg`} />
         <link rel="canonical" href={shareUrl} />
         
-        {/* Schema.org Article Markup */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Article",
-            "headline": post.title,
-            "description": post.excerpt,
-            "image": post.featured_image?.startsWith('http') ? post.featured_image : `${siteOrigin}${post.featured_image}`,
+            "headline": post.meta_title || post.title,
+            "description": post.meta_description || post.excerpt,
+            "image": post.featured_image?.startsWith('http') ? post.featured_image : `${siteOrigin}/og-image.jpg`,
             "datePublished": post.published_at,
             "dateModified": post.updated_at,
+            "wordCount": post.content.replace(/<[^>]+>/g, '').split(/\s+/).length,
             "author": {
               "@type": "Person",
               "name": author?.full_name || "Andi Krasniqi"
@@ -173,6 +187,7 @@ const BlogPost = () => {
             "publisher": {
               "@type": "Organization",
               "name": "Jobs.al",
+              "url": "https://jobs.al",
               "logo": {
                 "@type": "ImageObject",
                 "url": `${siteOrigin}/favicon.png`
@@ -181,7 +196,21 @@ const BlogPost = () => {
             "mainEntityOfPage": {
               "@type": "WebPage",
               "@id": shareUrl
-            }
+            },
+            "keywords": post.meta_keywords?.join(', ') || post.tags?.join(', '),
+            "inLanguage": post.language === 'en' ? 'en-US' : 'sq-AL',
+            "articleSection": post.category?.replace(/[-_]/g, ' ')
+          })}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://jobs.al" },
+              { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://jobs.al/blog" },
+              { "@type": "ListItem", "position": 3, "name": post.title, "item": shareUrl }
+            ]
           })}
         </script>
       </Helmet>
@@ -206,6 +235,7 @@ const BlogPost = () => {
                 <div className="flex items-center gap-2 mb-4">
                   <Badge>{post.category.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</Badge>
                   <span className="text-sm">{post.language === 'en' ? '🇬🇧 English' : '🇦🇱 Shqip'}</span>
+                  <span className="text-sm text-muted-foreground">· {readingTime} min read</span>
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
                   {post.title}
