@@ -92,15 +92,15 @@ const Jobs = () => {
   return (
     <>
       <Helmet>
-        <title>{language === 'sq' ? 'Pune në Shqipëri — Vende Pune në Tiranë & Të Gjitha Qytetet | Jobs.al' : 'Job Vacancies in Albania | Find Jobs in Tirana & All Cities | Jobs.al'}</title>
+        <title>{language === 'sq' ? 'Pune në Shqipëri — Vende Pune në Tiranë & Të Gjitha Qytetet | Jobs.al' : 'Job Openings in Albania | Find Jobs in Tirana & All Cities | Jobs.al'}</title>
         <meta name="description" content={language === 'sq' 
           ? 'Kërko vende pune në Shqipëri. Gjej pozicione me kohë të plotë, të pjesshme dhe në distancë në Tiranë, Durrës dhe qytete të tjera. Apliko online tani.'
-          : 'Search job vacancies in Albania. Find full-time, part-time & remote jobs in Tirana, Durres & all cities. Apply online to hundreds of open positions.'
+          : 'Search job openings & vacancies in Albania. Find full-time, part-time & remote job opportunities in Tirana, Durres & all cities. Hiring now — apply online today.'
         } />
-        <meta name="keywords" content="job vacancies, jobs in albania, jobs in tirana, full time jobs, jobs hiring near me, albania jobs, pune shqiperi" />
+        <meta name="keywords" content="job vacancies, jobs in albania, jobs in tirana, full time jobs, jobs hiring near me, albania jobs, pune shqiperi, job openings, job opportunities, vacancies albania, albania job apply, hiring in albania, job offers albania, english speaking jobs albania" />
         <link rel="canonical" href="https://jobs.al/jobs" />
-        <meta property="og:title" content={language === 'sq' ? 'Vende Pune në Shqipëri | Jobs.al' : 'Job Vacancies in Albania | Jobs.al'} />
-        <meta property="og:description" content="Browse and apply to hundreds of job vacancies across Albania. Full-time, part-time & remote positions." />
+        <meta property="og:title" content={language === 'sq' ? 'Vende Pune në Shqipëri | Jobs.al' : 'Job Openings in Albania | Jobs.al'} />
+        <meta property="og:description" content="Browse and apply to hundreds of job openings & vacancies across Albania. Full-time, part-time & remote opportunities." />
         <meta property="og:url" content="https://jobs.al/jobs" />
         <meta property="og:image" content="https://jobs.al/og-image.jpg" />
       </Helmet>

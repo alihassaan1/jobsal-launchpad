@@ -124,8 +124,8 @@ const ResumeBuilderLanding = () => {
       <Helmet>
         <html lang="en" />
         <title>Free AI Resume Builder — Create Professional CV Online | Jobs.al</title>
-        <meta name="description" content="Build your professional resume online for free with Jobs.al's AI-powered CV builder. ATS-friendly templates, instant PDF export & direct employer visibility in Albania." />
-        <meta name="keywords" content="resume builder, AI CV maker, free resume builder, online CV builder, professional resume templates, ATS resume, build resume albania, krijo cv" />
+        <meta name="description" content="Build your professional resume online for free with Jobs.al's AI-powered CV builder. ATS-friendly templates, instant PDF export & direct employer visibility. Apply to jobs in Albania easily." />
+        <meta name="keywords" content="resume builder, AI CV maker, free resume builder, online CV builder, professional resume templates, ATS resume, build resume albania, krijo cv, job apply albania, cv for albania jobs, albania job apply, create cv online free" />
         <meta property="og:title" content="Free AI Resume Builder — Create Professional CV Online | Jobs.al" />
         <meta property="og:description" content="Build your professional resume for free with AI. ATS-friendly templates & instant PDF export." />
         <meta property="og:type" content="website" />
