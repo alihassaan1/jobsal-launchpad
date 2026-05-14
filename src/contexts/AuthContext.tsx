@@ -16,6 +16,7 @@ interface AuthContextType {
   signInWithLinkedIn: () => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
+  resendConfirmation: (email: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -86,8 +87,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
+
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -99,18 +100,79 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (error) {
+        const msg = (error.message || '').toLowerCase();
+        const alreadyRegistered =
+          msg.includes('already registered') ||
+          msg.includes('already exists') ||
+          msg.includes('user already');
+
+        if (alreadyRegistered) {
+          // Try to sign them in directly with the password they just typed.
+          const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+          if (!signInError) {
+            toast({
+              title: "Welcome back!",
+              description: "You already have an account — we've signed you in.",
+            });
+            return { error: null };
+          }
+          toast({
+            title: "Account already exists",
+            description: "This email is already registered. Please sign in instead, or use 'Forgot password' to reset it.",
+            variant: "destructive",
+          });
+          return { error };
+        }
+
         toast({
           title: "Registration failed",
           description: error.message,
           variant: "destructive",
         });
-      } else {
-        toast({
-          title: "Success!",
-          description: "Please check your email to verify your account.",
-        });
+        return { error };
       }
 
+      // If a session was returned, email confirmation is OFF — user is signed in immediately.
+      if (data?.session) {
+        toast({
+          title: "Account created!",
+          description: "You're signed in and ready to go.",
+        });
+      } else {
+        // Email confirmation is ON. Try sign-in immediately as a fallback in case
+        // confirmation is disabled or the user has confirmed via another channel.
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        if (!signInError) {
+          toast({
+            title: "Account created!",
+            description: "You're signed in and ready to go.",
+          });
+        } else {
+          toast({
+            title: "Check your email",
+            description: "We sent a confirmation link. If it doesn't work (some email scanners click links automatically), just come back and sign in — your account is ready.",
+          });
+        }
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      return { error };
+    }
+  };
+
+  const resendConfirmation = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/` },
+      });
+      if (error) {
+        toast({ title: "Couldn't resend email", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Confirmation email resent", description: "Check your inbox (and spam folder)." });
+      }
       return { error };
     } catch (error: any) {
       return { error };
@@ -239,6 +301,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signInWithLinkedIn,
     signOut,
     resetPassword,
+    resendConfirmation,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
