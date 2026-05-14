@@ -42,7 +42,7 @@ const Auth = () => {
     const { error } = await signIn(loginEmail, loginPassword);
     setLoading(false);
     if (!error) {
-      navigate('/');
+      navigate(startsAsEmployer ? '/setup-company' : '/');
     } else {
       setLoginError(error.message || 'Login failed');
     }
@@ -65,6 +65,7 @@ const Auth = () => {
       setRegisterEmail('');
       setRegisterPassword('');
       setRegisterName('');
+      setAuthTab('login');
     }
   };
 
