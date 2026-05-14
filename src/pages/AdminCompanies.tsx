@@ -38,14 +38,97 @@ import { EmptyState } from "@/components/admin/EmptyState";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function AdminCompanies() {
+  const { user } = useAuth();
   const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newCompany, setNewCompany] = useState({
+    name: "",
+    description: "",
+    industry: "",
+    location: "",
+    website: "",
+    email: "",
+    phone: "",
+    logo_url: "",
+    owner_email: "",
+  });
 
   useEffect(() => {
     fetchCompanies();
   }, []);
+
+  const generateSlug = (name: string) =>
+    name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);
+
+  const handleCreateCompany = async () => {
+    if (!newCompany.name.trim()) {
+      toast.error("Company name is required");
+      return;
+    }
+    if (!user) {
+      toast.error("You must be signed in");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      // Resolve owner: if admin entered an email, look up that user; otherwise self.
+      let ownerId = user.id;
+      const ownerEmail = newCompany.owner_email.trim().toLowerCase();
+      if (ownerEmail) {
+        const { data: ownerProfile, error: ownerErr } = await supabase
+          .from('profiles')
+          .select('id')
+          .ilike('email', ownerEmail)
+          .maybeSingle();
+        if (ownerErr) {
+          console.warn('Owner lookup error:', ownerErr);
+        }
+        if (!ownerProfile) {
+          toast.error(`No user found with email ${ownerEmail}. Leave blank to assign to yourself.`);
+          setCreating(false);
+          return;
+        }
+        ownerId = ownerProfile.id;
+      }
+
+      const { error } = await supabase.from('companies').insert({
+        name: newCompany.name.trim(),
+        slug: generateSlug(newCompany.name),
+        description: newCompany.description || null,
+        industry: newCompany.industry || null,
+        location: newCompany.location || null,
+        website: newCompany.website || null,
+        email: newCompany.email || null,
+        phone: newCompany.phone || null,
+        logo_url: newCompany.logo_url || null,
+        owner_id: ownerId,
+      });
+
+      if (error) throw error;
+
+      toast.success("Company created");
+      setCreateOpen(false);
+      setNewCompany({
+        name: "", description: "", industry: "", location: "",
+        website: "", email: "", phone: "", logo_url: "", owner_email: "",
+      });
+      fetchCompanies();
+    } catch (err: any) {
+      console.error('Create company error:', err);
+      toast.error(err.message || "Failed to create company");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const fetchCompanies = async () => {
     setLoading(true);
