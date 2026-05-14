@@ -17,6 +17,11 @@ Deno.serve(async (req) => {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    if (typeof password !== "string" || password.length < 6) {
+      return new Response(JSON.stringify({ error: "Password must be at least 6 characters" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -24,6 +29,11 @@ Deno.serve(async (req) => {
 
     // Verify caller is admin
     const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader.toLowerCase().startsWith("bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const userClient = createClient(SUPABASE_URL, ANON, {
       global: { headers: { Authorization: authHeader } },
     });
