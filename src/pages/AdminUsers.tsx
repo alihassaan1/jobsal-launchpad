@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
 import { LoadingState } from "@/components/admin/LoadingState";
 import { EmptyState } from "@/components/admin/EmptyState";
+import { ensureCompanyForUser } from "@/lib/ensureCompany";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
@@ -136,6 +137,18 @@ export default function AdminUsers() {
     if (error) {
       toast.error("Failed to update user role");
       return;
+    }
+
+    // Auto-create a draft company so the new employer shows up in Companies
+    if (newRole === 'employer') {
+      const companyId = await ensureCompanyForUser({
+        userId: selectedUser.id,
+        fullName: selectedUser.full_name,
+        email: selectedUser.email,
+      });
+      if (!companyId) {
+        toast.warning("Role updated, but couldn't auto-create a company stub. Add one manually from Companies.");
+      }
     }
 
     // Send role upgrade email if changed to employer
