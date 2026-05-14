@@ -11,7 +11,7 @@ import { Helmet } from 'react-helmet';
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { signUp, signIn, signInWithGoogle, signInWithLinkedIn, resendConfirmation, resetPassword, user } = useAuth();
+  const { signUp, signIn, signInWithGoogle, signInWithLinkedIn, resendConfirmation, resetPassword, user, userRole } = useAuth();
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -27,7 +27,7 @@ const Auth = () => {
 
   // Redirect if already logged in
   if (user) {
-    navigate('/');
+    navigate(userRole === 'employer' ? '/setup-company' : '/');
     return null;
   }
 
