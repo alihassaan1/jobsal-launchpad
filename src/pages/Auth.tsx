@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,14 +11,17 @@ import { Helmet } from 'react-helmet';
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { signUp, signIn, signInWithGoogle, signInWithLinkedIn, resendConfirmation, resetPassword, user, userRole } = useAuth();
+  const [searchParams] = useSearchParams();
+  const startsAsEmployer = searchParams.get('type') === 'employer';
+  const { signUp, signIn, signInWithGoogle, signInWithLinkedIn, resendConfirmation, resetPassword, user, userRole, loading: authLoading } = useAuth();
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerName, setRegisterName] = useState('');
-  const [accountType, setAccountType] = useState<'job_seeker' | 'employer'>('job_seeker');
+  const [accountType, setAccountType] = useState<'job_seeker' | 'employer'>(startsAsEmployer ? 'employer' : 'job_seeker');
+  const [authTab, setAuthTab] = useState(startsAsEmployer ? 'register' : 'login');
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
@@ -27,6 +30,7 @@ const Auth = () => {
 
   // Redirect if already logged in
   if (user) {
+    if (authLoading || !userRole) return null;
     navigate(userRole === 'employer' ? '/setup-company' : '/');
     return null;
   }
@@ -48,10 +52,10 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     const emailUsed = registerEmail;
-    const { error } = await signUp(registerEmail, registerPassword, registerName, accountType);
+    const { error, signedIn } = await signUp(registerEmail, registerPassword, registerName, accountType);
     setLoading(false);
     if (!error) {
-      if (accountType === 'employer') {
+      if (accountType === 'employer' && signedIn) {
         navigate('/setup-company');
         return;
       }
@@ -112,7 +116,7 @@ const Auth = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs value={authTab} onValueChange={setAuthTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
