@@ -46,18 +46,6 @@ const EmployerDashboard = () => {
     },
   });
 
-  if (authLoading || (!!user && !userRole)) {
-    return <div className="min-h-screen bg-background" />;
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  if (userRole !== "employer" && userRole !== "admin") {
-    return <Navigate to="/" replace />;
-  }
-
   // Fetch employer's jobs
   const { data: jobs, isLoading } = useQuery({
     queryKey: ["employerJobs", company?.id],
@@ -73,6 +61,18 @@ const EmployerDashboard = () => {
       return data;
     },
   });
+
+  if (authLoading || (!!user && !userRole)) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth?type=employer" replace />;
+  }
+
+  if (userRole !== "employer" && userRole !== "admin") {
+    return <Navigate to="/" replace />;
+  }
 
   // Delete job mutation
   const deleteJobMutation = useMutation({
