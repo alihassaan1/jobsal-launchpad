@@ -42,6 +42,7 @@ export default function AdminUsers() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [newRole, setNewRole] = useState("");
+  const [resettingUserId, setResettingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -177,6 +178,44 @@ export default function AdminUsers() {
     toast.success("User role updated successfully");
     setSelectedUser(null);
     fetchUsers();
+  };
+
+  const resetUserPassword = async (user: any) => {
+    if (!confirm(`Reset password for ${user.email} to "Login123"?`)) return;
+
+    setResettingUserId(user.id);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) {
+        toast.error("Your admin session expired. Sign in again before resetting passwords.");
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('admin-reset-password', {
+        body: { email: user.email, password: 'Login123' },
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (error || (data as any)?.error) {
+        let message = (data as any)?.error || error?.message || 'Failed to reset password';
+        const context = (error as any)?.context;
+        if (context?.json) {
+          try {
+            const body = await context.clone().json();
+            message = body?.error || message;
+          } catch {
+            // Keep the original function error message.
+          }
+        }
+        toast.error(message);
+        return;
+      }
+
+      toast.success(`Password reset to Login123 for ${user.email}`);
+    } finally {
+      setResettingUserId(null);
+    }
   };
 
   const filteredUsers = users.filter(user => {
@@ -372,17 +411,8 @@ export default function AdminUsers() {
                           size="sm"
                           variant="outline"
                           title="Reset password to Login123"
-                          onClick={async () => {
-                            if (!confirm(`Reset password for ${user.email} to "Login123"?`)) return;
-                            const { data, error } = await supabase.functions.invoke('admin-reset-password', {
-                              body: { email: user.email, password: 'Login123' },
-                            });
-                            if (error || (data as any)?.error) {
-                              toast.error((data as any)?.error || error?.message || 'Failed to reset password');
-                            } else {
-                              toast.success(`Password reset to Login123 for ${user.email}`);
-                            }
-                          }}
+                          disabled={resettingUserId === user.id}
+                          onClick={() => resetUserPassword(user)}
                         >
                           <KeyRound className="h-4 w-4" />
                         </Button>
