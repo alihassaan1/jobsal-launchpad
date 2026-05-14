@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Briefcase, Plus, Eye, Users, Edit, Trash2, MapPin, DollarSign } from "lucide-react";
+import { Briefcase, Plus, Eye, Users, Edit, Trash2, MapPin, DollarSign, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const EmployerDashboard = () => {
@@ -108,29 +108,14 @@ const EmployerDashboard = () => {
     },
   });
 
-  if (!company) {
-    return (
-      <div className="min-h-screen bg-background">
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <Briefcase className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">Jobs.al</span>
-            </Link>
-          </div>
-        </header>
-        <div className="container mx-auto px-4 py-12">
-          <Card className="p-12 text-center">
-            <CardTitle className="text-2xl mb-4">Create Your Company Profile</CardTitle>
-            <CardDescription className="mb-6">
-              You need to create a company profile before posting jobs
-            </CardDescription>
-            <Button onClick={() => navigate("/setup-company")}>Create Company Profile</Button>
-          </Card>
-        </div>
-      </div>
-    );
-  }
+  const isDraft =
+    !company ||
+    !company.name ||
+    company.name.endsWith("(Draft)") ||
+    !company.description ||
+    !company.industry ||
+    !company.location;
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -162,15 +147,40 @@ const EmployerDashboard = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8">
+        {isDraft && (
+          <Card className="mb-6 border-primary/40 bg-primary/5">
+            <CardHeader>
+              <div className="flex items-start gap-4">
+                <div className="rounded-full bg-primary/10 p-2 text-primary">
+                  <AlertCircle className="h-5 w-5" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-primary">Complete your company profile</CardTitle>
+                  <CardDescription className="mt-1 text-foreground/80">
+                    You need to finish setting up your company before you can post jobs.
+                  </CardDescription>
+                </div>
+                <Button onClick={() => navigate("/setup-company")}>
+                  Complete profile
+                </Button>
+              </div>
+            </CardHeader>
+          </Card>
+        )}
+
         {/* Company Header */}
         <Card className="mb-8">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-3xl mb-2">{company.name}</CardTitle>
-                <CardDescription className="text-base">{company.description}</CardDescription>
+                <CardTitle className="text-3xl mb-2">{company?.name || "Your Company"}</CardTitle>
+                <CardDescription className="text-base">
+                  {company?.description || "Add a description to help candidates learn about your company."}
+                </CardDescription>
               </div>
-              <Button variant="outline" onClick={() => navigate("/setup-company")}>Edit Company</Button>
+              <Button variant="outline" onClick={() => navigate("/setup-company")}>
+                {isDraft ? "Set up Company" : "Edit Company"}
+              </Button>
             </div>
           </CardHeader>
         </Card>
@@ -222,9 +232,12 @@ const EmployerDashboard = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Your Job Postings</CardTitle>
-              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <Dialog open={isCreateDialogOpen} onOpenChange={(open) => { if (isDraft) return; setIsCreateDialogOpen(open); }}>
                 <DialogTrigger asChild>
-                  <Button>
+                  <Button
+                    disabled={isDraft}
+                    title={isDraft ? "Complete your company profile first." : undefined}
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Post New Job
                   </Button>
@@ -236,15 +249,26 @@ const EmployerDashboard = () => {
                       Fill in the details to {editingJob ? "update your" : "create a new"} job posting
                     </DialogDescription>
                   </DialogHeader>
-                  <JobForm
-                    companyId={company.id}
-                    job={editingJob}
-                    onSuccess={() => {
-                      setIsCreateDialogOpen(false);
-                      setEditingJob(null);
-                      queryClient.invalidateQueries({ queryKey: ["employerJobs"] });
-                    }}
-                  />
+                  {isDraft || !company ? (
+                    <div className="p-6 text-center space-y-4">
+                      <p className="text-muted-foreground">
+                        Complete your company profile before posting jobs.
+                      </p>
+                      <Button onClick={() => { setIsCreateDialogOpen(false); navigate("/setup-company"); }}>
+                        Complete profile
+                      </Button>
+                    </div>
+                  ) : (
+                    <JobForm
+                      companyId={company.id}
+                      job={editingJob}
+                      onSuccess={() => {
+                        setIsCreateDialogOpen(false);
+                        setEditingJob(null);
+                        queryClient.invalidateQueries({ queryKey: ["employerJobs"] });
+                      }}
+                    />
+                  )}
                 </DialogContent>
               </Dialog>
             </div>
