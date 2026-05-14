@@ -17,6 +17,11 @@ Deno.serve(async (req) => {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    if (typeof password !== "string" || password.length < 6) {
+      return new Response(JSON.stringify({ error: "Password must be at least 6 characters" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -24,6 +29,11 @@ Deno.serve(async (req) => {
 
     // Verify caller is admin
     const authHeader = req.headers.get("Authorization") ?? "";
+    if (!authHeader.toLowerCase().startsWith("bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const userClient = createClient(SUPABASE_URL, ANON, {
       global: { headers: { Authorization: authHeader } },
     });
@@ -66,7 +76,16 @@ Deno.serve(async (req) => {
     });
     if (updErr) throw updErr;
 
-    return new Response(JSON.stringify({ success: true, user_id: targetId }), {
+    // Verify the new credential before reporting success, so admins don't get a
+    // false-positive reset message if Supabase rejects or delays the update.
+    const verifier = createClient(SUPABASE_URL, ANON);
+    const { error: verifyErr } = await verifier.auth.signInWithPassword({ email, password });
+    if (verifyErr) {
+      throw new Error(`Password update did not verify: ${verifyErr.message}`);
+    }
+    await verifier.auth.signOut();
+
+    return new Response(JSON.stringify({ success: true, user_id: targetId, verified: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
