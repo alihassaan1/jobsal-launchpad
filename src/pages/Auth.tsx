@@ -40,7 +40,7 @@ const Auth = () => {
     const { error } = await signIn(loginEmail, loginPassword);
     setLoading(false);
     if (!error) {
-      navigate(startsAsEmployer ? '/setup-company' : '/');
+      navigate(startsAsEmployer ? '/employer-dashboard' : '/');
     } else {
       setLoginError(error.message || 'Login failed');
     }
