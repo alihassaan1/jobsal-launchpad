@@ -35,7 +35,7 @@ export default function Footer() {
               <li><Link to="/setup-company" className="hover:text-primary transition-colors">{t('footer.postJob')}</Link></li>
               <li><Link to="/pricing" className="hover:text-primary transition-colors">{t('footer.pricingPlans')}</Link></li>
               <li><Link to="/dashboard" className="hover:text-primary transition-colors">{t('footer.employerDashboard')}</Link></li>
-              <li><Link to="/auth" className="hover:text-primary transition-colors">{t('footer.employerSignup')}</Link></li>
+              <li><Link to="/auth?type=employer" className="hover:text-primary transition-colors">{t('footer.employerSignup')}</Link></li>
             </ul>
           </div>
           <div>
