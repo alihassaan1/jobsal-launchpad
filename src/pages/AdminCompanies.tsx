@@ -23,25 +23,112 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Search, CheckCircle, Star, Ban, Eye, Building2 } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Search, CheckCircle, Star, Ban, Eye, Building2, Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
 import { LoadingState } from "@/components/admin/LoadingState";
 import { EmptyState } from "@/components/admin/EmptyState";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function AdminCompanies() {
+  const { user } = useAuth();
   const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newCompany, setNewCompany] = useState({
+    name: "",
+    description: "",
+    industry: "",
+    location: "",
+    website: "",
+    email: "",
+    phone: "",
+    logo_url: "",
+    owner_email: "",
+  });
 
   useEffect(() => {
     fetchCompanies();
   }, []);
+
+  const generateSlug = (name: string) =>
+    name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);
+
+  const handleCreateCompany = async () => {
+    if (!newCompany.name.trim()) {
+      toast.error("Company name is required");
+      return;
+    }
+    if (!user) {
+      toast.error("You must be signed in");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      // Resolve owner: if admin entered an email, look up that user; otherwise self.
+      let ownerId = user.id;
+      const ownerEmail = newCompany.owner_email.trim().toLowerCase();
+      if (ownerEmail) {
+        const { data: ownerProfile, error: ownerErr } = await supabase
+          .from('profiles')
+          .select('id')
+          .ilike('email', ownerEmail)
+          .maybeSingle();
+        if (ownerErr) {
+          console.warn('Owner lookup error:', ownerErr);
+        }
+        if (!ownerProfile) {
+          toast.error(`No user found with email ${ownerEmail}. Leave blank to assign to yourself.`);
+          setCreating(false);
+          return;
+        }
+        ownerId = ownerProfile.id;
+      }
+
+      const { error } = await supabase.from('companies').insert({
+        name: newCompany.name.trim(),
+        slug: generateSlug(newCompany.name),
+        description: newCompany.description || null,
+        industry: newCompany.industry || null,
+        location: newCompany.location || null,
+        website: newCompany.website || null,
+        email: newCompany.email || null,
+        phone: newCompany.phone || null,
+        logo_url: newCompany.logo_url || null,
+        owner_id: ownerId,
+      });
+
+      if (error) throw error;
+
+      toast.success("Company created");
+      setCreateOpen(false);
+      setNewCompany({
+        name: "", description: "", industry: "", location: "",
+        website: "", email: "", phone: "", logo_url: "", owner_email: "",
+      });
+      fetchCompanies();
+    } catch (err: any) {
+      console.error('Create company error:', err);
+      toast.error(err.message || "Failed to create company");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const fetchCompanies = async () => {
     setLoading(true);
@@ -157,9 +244,125 @@ export default function AdminCompanies() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Company Management</h1>
-        <p className="text-muted-foreground mt-1">Manage companies, verification, and sponsorships</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Company Management</h1>
+          <p className="text-muted-foreground mt-1">Manage companies, verification, and sponsorships</p>
+        </div>
+        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Company
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Add a new company</DialogTitle>
+              <DialogDescription>
+                Create a company profile manually. Leave "Owner email" blank to assign it to your own admin account.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div>
+                <Label htmlFor="c-name">Company Name *</Label>
+                <Input
+                  id="c-name"
+                  value={newCompany.name}
+                  onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })}
+                  placeholder="Acme Sh.p.k."
+                />
+              </div>
+              <div>
+                <Label htmlFor="c-owner">Owner email (optional)</Label>
+                <Input
+                  id="c-owner"
+                  type="email"
+                  value={newCompany.owner_email}
+                  onChange={(e) => setNewCompany({ ...newCompany, owner_email: e.target.value })}
+                  placeholder="owner@company.com — must already have an account"
+                />
+              </div>
+              <div>
+                <Label htmlFor="c-desc">Description</Label>
+                <Textarea
+                  id="c-desc"
+                  rows={3}
+                  value={newCompany.description}
+                  onChange={(e) => setNewCompany({ ...newCompany, description: e.target.value })}
+                  placeholder="Short description of the company"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="c-industry">Industry</Label>
+                  <Input
+                    id="c-industry"
+                    value={newCompany.industry}
+                    onChange={(e) => setNewCompany({ ...newCompany, industry: e.target.value })}
+                    placeholder="Technology"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="c-location">Location</Label>
+                  <Input
+                    id="c-location"
+                    value={newCompany.location}
+                    onChange={(e) => setNewCompany({ ...newCompany, location: e.target.value })}
+                    placeholder="Tirana, Albania"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="c-website">Website</Label>
+                <Input
+                  id="c-website"
+                  value={newCompany.website}
+                  onChange={(e) => setNewCompany({ ...newCompany, website: e.target.value })}
+                  placeholder="https://company.com"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="c-email">Contact email</Label>
+                  <Input
+                    id="c-email"
+                    type="email"
+                    value={newCompany.email}
+                    onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })}
+                    placeholder="hr@company.com"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="c-phone">Phone</Label>
+                  <Input
+                    id="c-phone"
+                    value={newCompany.phone}
+                    onChange={(e) => setNewCompany({ ...newCompany, phone: e.target.value })}
+                    placeholder="+355 ..."
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="c-logo">Logo URL</Label>
+                <Input
+                  id="c-logo"
+                  value={newCompany.logo_url}
+                  onChange={(e) => setNewCompany({ ...newCompany, logo_url: e.target.value })}
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setCreateOpen(false)} disabled={creating}>
+                Cancel
+              </Button>
+              <Button onClick={handleCreateCompany} disabled={creating || !newCompany.name.trim()}>
+                {creating ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating…</> : "Create company"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Filters */}
