@@ -28,7 +28,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Search, UserCog, Users as UsersIcon, FileText, ExternalLink } from "lucide-react";
+import { Search, UserCog, Users as UsersIcon, FileText, ExternalLink, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
 import { LoadingState } from "@/components/admin/LoadingState";
