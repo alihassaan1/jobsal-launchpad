@@ -29,7 +29,7 @@ const Auth = () => {
   // Redirect if already logged in
   if (user) {
     if (authLoading || !userRole) return null;
-    navigate(userRole === 'employer' ? '/setup-company' : '/');
+    navigate(userRole === 'employer' ? '/employer-dashboard' : '/');
     return null;
   }
 
