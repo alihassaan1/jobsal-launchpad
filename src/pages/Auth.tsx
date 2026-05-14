@@ -11,14 +11,16 @@ import { Helmet } from 'react-helmet';
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { signUp, signIn, signInWithGoogle, signInWithLinkedIn, user } = useAuth();
-  
+  const { signUp, signIn, signInWithGoogle, signInWithLinkedIn, resendConfirmation, user } = useAuth();
+
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerName, setRegisterName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
   // Redirect if already logged in
   if (user) {
@@ -39,13 +41,24 @@ const Auth = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const emailUsed = registerEmail;
     const { error } = await signUp(registerEmail, registerPassword, registerName);
     setLoading(false);
     if (!error) {
+      // If signUp signed them in, the user effect above will redirect.
+      // Otherwise, surface a clear "check your email / or just sign in" state.
+      setPendingEmail(emailUsed);
       setRegisterEmail('');
       setRegisterPassword('');
       setRegisterName('');
     }
+  };
+
+  const handleResend = async () => {
+    if (!pendingEmail) return;
+    setResending(true);
+    await resendConfirmation(pendingEmail);
+    setResending(false);
   };
 
   return (
