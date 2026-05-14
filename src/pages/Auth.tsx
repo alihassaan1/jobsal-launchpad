@@ -11,7 +11,7 @@ import { Helmet } from 'react-helmet';
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { signUp, signIn, signInWithGoogle, signInWithLinkedIn, resendConfirmation, user } = useAuth();
+  const { signUp, signIn, signInWithGoogle, signInWithLinkedIn, resendConfirmation, resetPassword, user } = useAuth();
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -21,6 +21,8 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [resettingPw, setResettingPw] = useState(false);
 
   // Redirect if already logged in
   if (user) {
@@ -31,10 +33,13 @@ const Auth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setLoginError(null);
     const { error } = await signIn(loginEmail, loginPassword);
     setLoading(false);
     if (!error) {
       navigate('/');
+    } else {
+      setLoginError(error.message || 'Login failed');
     }
   };
 
@@ -58,6 +63,23 @@ const Auth = () => {
     if (!pendingEmail) return;
     setResending(true);
     await resendConfirmation(pendingEmail);
+    setResending(false);
+  };
+
+  const handleResetPassword = async () => {
+    if (!loginEmail) {
+      setLoginError('Enter your email above first, then click "Forgot password".');
+      return;
+    }
+    setResettingPw(true);
+    await resetPassword(loginEmail);
+    setResettingPw(false);
+  };
+
+  const handleResendFromLogin = async () => {
+    if (!loginEmail) return;
+    setResending(true);
+    await resendConfirmation(loginEmail);
     setResending(false);
   };
 
@@ -118,6 +140,34 @@ const Auth = () => {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleResetPassword}
+                    disabled={resettingPw}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    {resettingPw ? 'Sending reset link…' : 'Forgot password?'}
+                  </button>
+                </div>
+                {loginError && (
+                  <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm space-y-2">
+                    <p className="font-medium text-destructive">{loginError}</p>
+                    <p className="text-muted-foreground text-xs">
+                      Double-check your email and password. If you signed up but never confirmed,
+                      a corporate email scanner may have invalidated the link — reset your password
+                      below to regain access.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button type="button" size="sm" variant="outline" onClick={handleResetPassword} disabled={resettingPw || !loginEmail}>
+                        {resettingPw ? 'Sending…' : 'Reset password'}
+                      </Button>
+                      <Button type="button" size="sm" variant="ghost" onClick={handleResendFromLogin} disabled={resending || !loginEmail}>
+                        {resending ? 'Sending…' : 'Resend confirmation'}
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </form>
 
               <div className="relative my-6">
