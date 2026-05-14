@@ -1,92 +1,54 @@
+# Fix the Employer → Company flow
 
+## Why it's broken today
 
-# Bing Webmaster Tools Keyword Analysis & SEO Update Plan
+Two separate concepts are being confused:
 
-## Key Findings from Bing Data (436 keywords)
+- **Role** (`user_roles.role = 'employer'`) — a permission flag.
+- **Company** (`companies` row with `owner_id = user.id`) — the actual business entity that appears in Admin → Companies.
 
-### Bing vs Google — What's New
+Promoting a user to `employer` in Admin → Users only flips the role. It does **not** create a `companies` row. Admin → Companies lists rows from the `companies` table, so the newly promoted employer never appears there until they (or an admin) explicitly create a company. There is also no prompt forcing the employer to complete `SetupCompany` after promotion, so many employers sit in limbo.
 
-Bing reveals keyword clusters that barely appeared in GSC, representing untapped audiences:
+## Goal
 
-**1. Foreigners/Expats Cluster (HIGH VALUE — 50+ combined impressions)**
-| Keyword | Impressions | Clicks | Position |
-|---------|-------------|--------|----------|
-| albania jobs for foreigners | 17 | 3 | 5.6 |
-| jobs in albania for expats | 5 | 0 | 2.0 |
-| english speaking jobs in albania | 5 | 0 | 6.4 |
-| jobs in albania for british people | 4 | 1 | 6.0 |
-| jobs albania foreigners | 4 | 0 | 2.0 |
-| jobs for americans in albania | 2 | 0 | 7.0 |
-| albania jobs for indian | 2 | 0 | 5.0 |
+Make "promote to employer" produce a usable employer account end-to-end, and make Admin → Companies reflect every employer (even those who haven't finished setup).
 
-This is a completely new audience segment not targeted anywhere on the site.
+## Plan
 
-**2. Job Synonyms Missing from Current Meta**
-| Keyword | Impressions | Position |
-|---------|-------------|----------|
-| job openings in albania | 9 | 2.2 |
-| job opportunities in albania | 8 | 2.5 |
-| vacancies albania | 8 | 3.2 |
-| albania job apply | 12 | 4.2 |
-| hiring in albania | 3 | 2.0 |
-| job offers in albania | 2 | 1.0 |
+### 1. Auto-create a draft company on employer promotion
+- In `AdminUsers.tsx`, when a role change sets a user to `employer`, after upserting `user_roles`, check `companies` for a row with `owner_id = userId`.
+- If none exists, insert a draft company:
+  - `name`: user's `full_name` or email prefix + " (Draft)"
+  - `slug`: generated from name + short uuid suffix to guarantee uniqueness
+  - `owner_id`: that user
+  - `email`: user's email
+  - `is_verified: false`
+- Same logic runs when an admin manually creates a user with the employer role.
 
-**3. Industry-Specific Queries (not targeted at all)**
-- banking jobs albania (13 imp)
-- nursing jobs, hotel jobs, aviation jobs, pharmacy jobs, engineering jobs
+### 2. Same auto-create on self-signup as employer
+- In `AuthContext.signUp` (or the post-signup hook in `Auth.tsx`), when the chosen account type is "employer", create the draft company immediately after the role is assigned. This keeps signup and admin promotion consistent.
 
-**4. City Queries Beyond Tirana**
-- jobs in durres albania (3 imp, 1 click)
-- vlore albania jobs (1 imp)
-- jobs in south albania (1 imp)
+### 3. Make Admin → Companies show all employers
+- Update `AdminCompanies.tsx` to also fetch all users with the `employer` role and left-merge them with the companies list.
+- Employers without a `companies` row appear with a "No company yet" badge and a one-click **"Create company"** action that opens the existing Add Company dialog pre-filled with that owner.
+- Add a status filter: All / Has company / Missing company / Unverified.
 
-**5. Competitor Brand Queries (people looking for alternatives)**
-- indeed albania (9 imp, 0 clicks, pos 3.4)
-- indeed.com albania (3 imp)
-- indeed jobs albania (2 imp)
+### 4. Force employer onboarding in the app
+- Add a guard in `EmployerDashboard` (and other Employer* pages) that, if the logged-in employer has no `companies` row, redirects to `/setup-company` with an explanatory banner.
+- After successful company creation in `SetupCompany`, redirect to `EmployerDashboard`.
 
-### Performance Summary
-- Top keyword: "jobs in albania" — 125 impressions, 19 clicks, position 2.6 (much better than Google's 46.6!)
-- "albania jobs" — 34 imp, 14 clicks, 41% CTR at position 1.8
-- Brand query "jobs.al" — only 2 impressions (low brand awareness on Bing)
+### 5. Notification + audit
+- Reuse the existing `role-upgrade-employer` email and append a CTA linking to `/setup-company`.
+- Log the auto-created draft company in `ai_agent_logs` (or a simple console log) so admins can trace it.
 
----
+## Technical notes
 
-## Implementation Plan
+- No schema migration required — `companies` already supports everything needed.
+- RLS already allows admins to insert any company and employers to insert their own; the auto-create from `AdminUsers` runs as the admin, so it satisfies the admin policy. The signup-time auto-create runs as the new user, which satisfies the existing `Employers can create companies` policy because the role is assigned first.
+- Slug uniqueness: use `slugify(name) + '-' + crypto.randomUUID().slice(0,6)` to avoid collisions on common names.
+- Keep the existing manual "Add Company" dialog — it's still useful for admins creating companies on behalf of users who don't yet have an account.
 
-### 1. Update Homepage Meta (Index.tsx)
-Add Bing-discovered keywords to the `keywords` meta tag:
-- Add: "job openings in albania", "job opportunities in albania", "albania jobs for foreigners", "english speaking jobs in albania", "hiring in albania", "vacancies albania", "job offers albania"
-- Update description to naturally include "job openings" and "job opportunities"
+## Out of scope
 
-### 2. Update Jobs Page Meta (Jobs.tsx)
-- Add to keywords: "job openings", "job opportunities", "vacancies", "albania job apply", "hiring in albania"
-- Update description to include "job openings" and "hiring" synonyms
-
-### 3. Update Blog Page Meta (Blog.tsx)
-- Add career-related Bing terms: "career opportunities albania", "employment in albania"
-
-### 4. Update index.html Global Meta
-- Add new keyword terms to the default keywords meta tag
-- Update description with "job openings" and "opportunities" synonyms
-
-### 5. Update Companies Page (Companies.tsx)
-- Add "employment company in albania", "companies hiring in albania" to keywords
-
-### 6. Update ResumeBuilderLanding Meta
-- Add "job apply albania", "cv for albania jobs" terms
-
-### 7. Update JobsByLocation (JobsByLocation.tsx)
-- Ensure Durres and other cities have keyword coverage for "jobs in durres albania", "jobs tirana"
-
----
-
-### Files to Modify
-1. **`index.html`** — Expand default keywords with Bing-discovered terms
-2. **`src/pages/Index.tsx`** — Add foreigners/expats and synonym keywords
-3. **`src/pages/Jobs.tsx`** — Add "job openings", "opportunities", "hiring" terms
-4. **`src/pages/Blog.tsx`** — Add employment-related long-tail keywords
-5. **`src/pages/Companies.tsx`** — Add "companies hiring" keywords
-6. **`src/pages/ResumeBuilderLanding.tsx`** — Add application-related terms
-7. **`src/pages/JobsByLocation.tsx`** — Verify city-specific keyword coverage
-
+- Redesigning the employer onboarding wizard itself.
+- Changing the role data model (still `user_roles` table, no role column on profiles).
