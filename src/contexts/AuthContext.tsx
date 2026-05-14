@@ -88,6 +88,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
 
+      if (accountType === 'employer') {
+        const { data, error } = await supabase.functions.invoke('employer-signup', {
+          body: { email, password, fullName },
+        });
+
+        if (error || (data as any)?.error) {
+          const message = (data as any)?.error || error?.message || 'Employer signup failed';
+          if (message.toLowerCase().includes('already registered')) {
+            const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+            if (!signInError) {
+              toast({ title: "Welcome back!", description: "Continue setting up your company profile." });
+              return { error: null, signedIn: true };
+            }
+          }
+          toast({ title: "Employer signup failed", description: message, variant: "destructive" });
+          return { error: error || new Error(message), signedIn: false };
+        }
+
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInError) {
+          toast({ title: "Account created", description: "Sign in with your new password to continue." });
+          return { error: null, signedIn: false };
+        }
+
+        toast({ title: "Employer account created!", description: "You're signed in and ready to set up your company." });
+        return { error: null, signedIn: true };
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
