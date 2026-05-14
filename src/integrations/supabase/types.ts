@@ -2051,6 +2051,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      become_employer: { Args: never; Returns: undefined }
       calculate_text_similarity: {
         Args: { text1: string; text2: string }
         Returns: number
