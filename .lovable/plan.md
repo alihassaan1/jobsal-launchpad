@@ -1,25 +1,49 @@
-## Plan
+## Goal
+After signup or login, employers land on the Employer Dashboard (not the homepage). If their company profile is missing or still a draft, a prominent banner blocks job posting until they complete it.
 
-### 1. Sort companies list by latest signup
-In `src/pages/AdminCompanies.tsx` (`fetchCompanies`), the final list is built as `[...companiesEnriched, ...orphanRows]`, which appends orphan employers at the end regardless of date. Fix by sorting the combined array by `created_at` descending before `setCompanies(...)`.
+## Changes
 
-### 2. Remove email confirmation completely
-Two parts:
+### 1. Redirect employers to `/employer-dashboard`
+Currently `src/pages/Auth.tsx` sends employers to `/setup-company` after login/register, and the "already logged in" guard does the same. Job seekers go to `/`.
 
-**a) Disable it in Lovable Cloud (you do this once):**
-Cloud → Users → Auth settings → Email provider → turn **Confirm email** OFF → Save. This is a platform setting, not code — I cannot toggle it for you.
+Update both the post-login, post-register, and "already authenticated" branches so:
+- `userRole === 'employer'` → `/employer-dashboard`
+- everyone else → `/` (unchanged)
 
-**b) Simplify signup code so it no longer relies on the confirmation workaround:**
-- `supabase/functions/employer-signup/index.ts` — keep but no longer needed for confirmation bypass; either delete or leave (it still does role + company seed). Recommend keeping it for the role-assignment side-effect, just remove `email_confirm: true` reasoning from comments.
-- `src/pages/Auth.tsx` / `src/contexts/AuthContext.tsx` — remove any "check your email to confirm" messaging and the post-signup branching that handles unconfirmed users. After signup, sign the user in directly and redirect.
-- Remove the admin "Reset password to Login123" button workaround from `src/pages/AdminUsers.tsx`? → Leave it (still useful), but stop surfacing it as the recovery path for new signups.
+The dashboard itself will surface the setup CTA via the banner below, so users still get pushed to complete their profile — just with full context around them.
 
-### Files to change
-- `src/pages/AdminCompanies.tsx` — sort merged list by `created_at` desc.
-- `src/pages/Auth.tsx` — remove "confirm your email" UI/messaging; always proceed to signed-in state after signup.
-- `src/contexts/AuthContext.tsx` — drop confirmation-pending branches in `signUp`.
-- `supabase/functions/employer-signup/index.ts` — comment cleanup only.
+### 2. "Complete your company profile" banner on Employer Dashboard
+In `src/pages/EmployerDashboard.tsx`, after the `company` query resolves, compute:
 
-### What I will NOT do
-- Will not toggle the Supabase auth setting (you do that in Cloud → Users).
-- Will not touch unrelated business logic.
+```
+const isDraft = !company
+  || !company.name
+  || company.name.endsWith("(Draft)")
+  || !company.description
+  || !company.industry
+  || !company.location;
+```
+
+(Treats the auto-created draft row from `ensureCompanyForUser` as incomplete; also treats any company missing core fields as incomplete.)
+
+When `isDraft` is true, render a prominent banner at the top of the dashboard (above the jobs section) using existing design tokens:
+- Title: "Complete your company profile"
+- Body: "You need to finish setting up your company before you can post jobs."
+- Primary CTA button: "Complete profile" → navigates to `/setup-company`
+- Use `bg-primary/10`, `border-primary/30`, `text-primary` styling consistent with the rest of the app (Albanian Red theme).
+
+### 3. Gate job posting while draft
+While `isDraft` is true:
+- Disable the "Post a Job" / Create Job button (and any "New Job" trigger) with a tooltip or helper text: "Complete your company profile first."
+- If a user somehow opens the create-job dialog, show the same message inside the dialog instead of the form.
+
+### 4. No backend changes
+No schema migrations, no edge function changes. Pure frontend routing + UI.
+
+## Files touched
+- `src/pages/Auth.tsx` — redirect employers to `/employer-dashboard` in 3 spots (already-logged-in guard, `handleLogin`, `handleRegister`).
+- `src/pages/EmployerDashboard.tsx` — add `isDraft` derivation, banner component, and disabled state on the create-job CTA.
+
+## Out of scope
+- Changing what `ensureCompanyForUser` writes (the "(Draft)" suffix stays as the draft signal).
+- Any changes to `SetupCompany.tsx` itself.
