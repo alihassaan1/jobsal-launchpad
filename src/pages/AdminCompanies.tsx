@@ -268,12 +268,23 @@ export default function AdminCompanies() {
   };
 
   const filteredCompanies = companies.filter(company => {
-    const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (company.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (company.profiles?.email || '').toLowerCase().includes(searchTerm.toLowerCase());
     if (filter === "verified") return matchesSearch && company.is_verified;
-    if (filter === "unverified") return matchesSearch && !company.is_verified;
+    if (filter === "unverified") return matchesSearch && !company.is_verified && !company.is_orphan_employer;
     if (filter === "sponsored") return matchesSearch && company.is_sponsored;
+    if (filter === "missing") return matchesSearch && company.is_orphan_employer;
     return matchesSearch;
   });
+
+  const startCreateForOwner = (ownerEmail: string | null | undefined) => {
+    setNewCompany({
+      name: "", description: "", industry: "", location: "",
+      website: "", email: "", phone: "", logo_url: "",
+      owner_email: ownerEmail || "",
+    });
+    setCreateOpen(true);
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -416,7 +427,8 @@ export default function AdminCompanies() {
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Companies</SelectItem>
+                <SelectItem value="all">All (incl. employers without company)</SelectItem>
+                <SelectItem value="missing">Missing company</SelectItem>
                 <SelectItem value="verified">Verified Only</SelectItem>
                 <SelectItem value="unverified">Unverified</SelectItem>
                 <SelectItem value="sponsored">Sponsored</SelectItem>
@@ -455,11 +467,11 @@ export default function AdminCompanies() {
               </TableHeader>
               <TableBody>
                 {filteredCompanies.map((company) => (
-                  <TableRow key={company.id}>
+                  <TableRow key={company.id} className={company.is_orphan_employer ? "bg-amber-50/50 dark:bg-amber-950/10" : undefined}>
                     <TableCell>
                       <div>
                         <div className="font-medium">{company.name}</div>
-                        <div className="text-sm text-muted-foreground">{company.location}</div>
+                        <div className="text-sm text-muted-foreground">{company.location || (company.is_orphan_employer ? '—' : '')}</div>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -469,7 +481,11 @@ export default function AdminCompanies() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {company.is_verified ? (
+                      {company.is_orphan_employer ? (
+                        <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-400">
+                          No company yet
+                        </Badge>
+                      ) : company.is_verified ? (
                         <Badge variant="default" className="bg-green-600">
                           <CheckCircle className="mr-1 h-3 w-3" />
                           Verified
@@ -479,20 +495,24 @@ export default function AdminCompanies() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Select
-                        value={company.sponsorship_plan}
-                        onValueChange={(value) => updateSponsorshipTier(company.id, value)}
-                      >
-                        <SelectTrigger className="w-[130px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">None</SelectItem>
-                          <SelectItem value="silver">Silver</SelectItem>
-                          <SelectItem value="gold">Gold</SelectItem>
-                          <SelectItem value="platinum">Platinum</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {company.is_orphan_employer ? (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      ) : (
+                        <Select
+                          value={company.sponsorship_plan}
+                          onValueChange={(value) => updateSponsorshipTier(company.id, value)}
+                        >
+                          <SelectTrigger className="w-[130px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">None</SelectItem>
+                            <SelectItem value="silver">Silver</SelectItem>
+                            <SelectItem value="gold">Gold</SelectItem>
+                            <SelectItem value="platinum">Platinum</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{company.jobs_count || 0}</Badge>
@@ -505,13 +525,24 @@ export default function AdminCompanies() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant={company.is_verified ? "outline" : "default"}
-                          onClick={() => toggleVerification(company.id, company.is_verified)}
-                        >
-                          {company.is_verified ? <Ban className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
-                        </Button>
+                        {company.is_orphan_employer ? (
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => startCreateForOwner(company.profiles?.email)}
+                          >
+                            <Plus className="h-4 w-4 mr-1" />
+                            Create company
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant={company.is_verified ? "outline" : "default"}
+                            onClick={() => toggleVerification(company.id, company.is_verified)}
+                          >
+                            {company.is_verified ? <Ban className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
