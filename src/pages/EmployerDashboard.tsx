@@ -108,29 +108,14 @@ const EmployerDashboard = () => {
     },
   });
 
-  if (!company) {
-    return (
-      <div className="min-h-screen bg-background">
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <Briefcase className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">Jobs.al</span>
-            </Link>
-          </div>
-        </header>
-        <div className="container mx-auto px-4 py-12">
-          <Card className="p-12 text-center">
-            <CardTitle className="text-2xl mb-4">Create Your Company Profile</CardTitle>
-            <CardDescription className="mb-6">
-              You need to create a company profile before posting jobs
-            </CardDescription>
-            <Button onClick={() => navigate("/setup-company")}>Create Company Profile</Button>
-          </Card>
-        </div>
-      </div>
-    );
-  }
+  const isDraft =
+    !company ||
+    !company.name ||
+    company.name.endsWith("(Draft)") ||
+    !company.description ||
+    !company.industry ||
+    !company.location;
+
 
   return (
     <div className="min-h-screen bg-background">
