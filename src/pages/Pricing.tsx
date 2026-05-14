@@ -294,7 +294,7 @@ export default function Pricing() {
                         </Button>
                       </Link>
                     ) : (
-                      <Link to="/auth">
+                      <Link to="/auth?type=employer">
                         <Button className="w-full" variant={plan.is_popular ? "default" : "outline"}>
                           Get Started
                         </Button>
