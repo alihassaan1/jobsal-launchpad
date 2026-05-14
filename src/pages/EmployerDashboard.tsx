@@ -170,7 +170,7 @@ const EmployerDashboard = () => {
                 <CardTitle className="text-3xl mb-2">{company.name}</CardTitle>
                 <CardDescription className="text-base">{company.description}</CardDescription>
               </div>
-              <Button variant="outline">Edit Company</Button>
+              <Button variant="outline" onClick={() => navigate("/setup-company")}>Edit Company</Button>
             </div>
           </CardHeader>
         </Card>
