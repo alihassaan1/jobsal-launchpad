@@ -301,6 +301,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signInWithLinkedIn,
     signOut,
     resetPassword,
+    resendConfirmation,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
