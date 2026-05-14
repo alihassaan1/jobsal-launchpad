@@ -48,32 +48,64 @@ export default function AdminCompanies() {
     try {
       const { data, error } = await supabase
         .from('companies')
-        .select(`
-          *,
-          profiles!companies_owner_id_fkey(full_name, email)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching companies:', error);
         toast.error("Failed to load companies");
-      } else if (data) {
-        // Count jobs for each company
-        const companiesWithCounts = await Promise.all(
-          data.map(async (company) => {
-            const { count } = await supabase
-              .from('jobs')
-              .select('*', { count: 'exact', head: true })
-              .eq('company_id', company.id);
-            
-            return {
-              ...company,
-              jobs_count: count || 0
-            };
-          })
-        );
-        setCompanies(companiesWithCounts);
+        setCompanies([]);
+        return;
       }
+
+      const list = data ?? [];
+      if (list.length === 0) {
+        setCompanies([]);
+        return;
+      }
+
+      // Fetch owner profiles separately (no FK to public.profiles, so no PostgREST embed)
+      const ownerIds = Array.from(
+        new Set(list.map((c: any) => c.owner_id).filter(Boolean))
+      );
+
+      let profilesById: Record<string, { full_name: string | null; email: string | null }> = {};
+      if (ownerIds.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .in('id', ownerIds);
+
+        if (profilesError) {
+          console.warn('Could not load owner profiles:', profilesError);
+        } else if (profilesData) {
+          profilesById = Object.fromEntries(
+            profilesData.map((p: any) => [p.id, { full_name: p.full_name, email: p.email }])
+          );
+        }
+      }
+
+      // Count jobs per company in a single query
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('jobs')
+        .select('company_id')
+        .in('company_id', list.map((c: any) => c.id));
+
+      const jobsCountById: Record<string, number> = {};
+      if (!jobsError && jobsData) {
+        for (const j of jobsData as any[]) {
+          if (!j.company_id) continue;
+          jobsCountById[j.company_id] = (jobsCountById[j.company_id] || 0) + 1;
+        }
+      }
+
+      setCompanies(
+        list.map((c: any) => ({
+          ...c,
+          profiles: profilesById[c.owner_id] || null,
+          jobs_count: jobsCountById[c.id] || 0,
+        }))
+      );
     } catch (error) {
       console.error('Error:', error);
       toast.error("Failed to load companies");
