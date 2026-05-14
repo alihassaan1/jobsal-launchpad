@@ -146,53 +146,86 @@ export default function AdminCompanies() {
       }
 
       const list = data ?? [];
-      if (list.length === 0) {
-        setCompanies([]);
-        return;
-      }
 
-      // Fetch owner profiles separately (no FK to public.profiles, so no PostgREST embed)
-      const ownerIds = Array.from(
-        new Set(list.map((c: any) => c.owner_id).filter(Boolean))
+      // Fetch all employer user_roles so we can surface employers without a company yet
+      const { data: employerRoles, error: rolesErr } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'employer');
+      if (rolesErr) console.warn('Could not load employer roles:', rolesErr);
+
+      const employerIds = Array.from(new Set((employerRoles || []).map((r: any) => r.user_id)));
+      const ownersWithCompanies = new Set(list.map((c: any) => c.owner_id));
+      const orphanEmployerIds = employerIds.filter((id) => !ownersWithCompanies.has(id));
+
+      // Profiles needed: owners of existing companies + orphan employers
+      const profileIds = Array.from(
+        new Set([
+          ...list.map((c: any) => c.owner_id).filter(Boolean),
+          ...orphanEmployerIds,
+        ])
       );
 
-      let profilesById: Record<string, { full_name: string | null; email: string | null }> = {};
-      if (ownerIds.length > 0) {
+      let profilesById: Record<string, { full_name: string | null; email: string | null; created_at?: string }> = {};
+      if (profileIds.length > 0) {
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select('id, full_name, email')
-          .in('id', ownerIds);
+          .select('id, full_name, email, created_at')
+          .in('id', profileIds);
 
         if (profilesError) {
           console.warn('Could not load owner profiles:', profilesError);
         } else if (profilesData) {
           profilesById = Object.fromEntries(
-            profilesData.map((p: any) => [p.id, { full_name: p.full_name, email: p.email }])
+            profilesData.map((p: any) => [p.id, { full_name: p.full_name, email: p.email, created_at: p.created_at }])
           );
         }
       }
 
       // Count jobs per company in a single query
-      const { data: jobsData, error: jobsError } = await supabase
-        .from('jobs')
-        .select('company_id')
-        .in('company_id', list.map((c: any) => c.id));
+      let jobsCountById: Record<string, number> = {};
+      if (list.length > 0) {
+        const { data: jobsData, error: jobsError } = await supabase
+          .from('jobs')
+          .select('company_id')
+          .in('company_id', list.map((c: any) => c.id));
 
-      const jobsCountById: Record<string, number> = {};
-      if (!jobsError && jobsData) {
-        for (const j of jobsData as any[]) {
-          if (!j.company_id) continue;
-          jobsCountById[j.company_id] = (jobsCountById[j.company_id] || 0) + 1;
+        if (!jobsError && jobsData) {
+          for (const j of jobsData as any[]) {
+            if (!j.company_id) continue;
+            jobsCountById[j.company_id] = (jobsCountById[j.company_id] || 0) + 1;
+          }
         }
       }
 
-      setCompanies(
-        list.map((c: any) => ({
-          ...c,
-          profiles: profilesById[c.owner_id] || null,
-          jobs_count: jobsCountById[c.id] || 0,
-        }))
-      );
+      const companiesEnriched = list.map((c: any) => ({
+        ...c,
+        profiles: profilesById[c.owner_id] || null,
+        jobs_count: jobsCountById[c.id] || 0,
+        is_orphan_employer: false,
+      }));
+
+      // Synthetic rows for employers without a company
+      const orphanRows = orphanEmployerIds.map((uid) => {
+        const p = profilesById[uid];
+        return {
+          id: `orphan-${uid}`,
+          owner_id: uid,
+          name: p?.full_name || p?.email?.split('@')[0] || 'Unknown employer',
+          location: null,
+          is_verified: false,
+          sponsorship_plan: 'none',
+          is_sponsored: false,
+          views_count: 0,
+          followers_count: 0,
+          jobs_count: 0,
+          created_at: p?.created_at || new Date().toISOString(),
+          profiles: p ? { full_name: p.full_name, email: p.email } : null,
+          is_orphan_employer: true,
+        };
+      });
+
+      setCompanies([...companiesEnriched, ...orphanRows]);
     } catch (error) {
       console.error('Error:', error);
       toast.error("Failed to load companies");
@@ -235,12 +268,23 @@ export default function AdminCompanies() {
   };
 
   const filteredCompanies = companies.filter(company => {
-    const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (company.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (company.profiles?.email || '').toLowerCase().includes(searchTerm.toLowerCase());
     if (filter === "verified") return matchesSearch && company.is_verified;
-    if (filter === "unverified") return matchesSearch && !company.is_verified;
+    if (filter === "unverified") return matchesSearch && !company.is_verified && !company.is_orphan_employer;
     if (filter === "sponsored") return matchesSearch && company.is_sponsored;
+    if (filter === "missing") return matchesSearch && company.is_orphan_employer;
     return matchesSearch;
   });
+
+  const startCreateForOwner = (ownerEmail: string | null | undefined) => {
+    setNewCompany({
+      name: "", description: "", industry: "", location: "",
+      website: "", email: "", phone: "", logo_url: "",
+      owner_email: ownerEmail || "",
+    });
+    setCreateOpen(true);
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -383,7 +427,8 @@ export default function AdminCompanies() {
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Companies</SelectItem>
+                <SelectItem value="all">All (incl. employers without company)</SelectItem>
+                <SelectItem value="missing">Missing company</SelectItem>
                 <SelectItem value="verified">Verified Only</SelectItem>
                 <SelectItem value="unverified">Unverified</SelectItem>
                 <SelectItem value="sponsored">Sponsored</SelectItem>
@@ -422,11 +467,11 @@ export default function AdminCompanies() {
               </TableHeader>
               <TableBody>
                 {filteredCompanies.map((company) => (
-                  <TableRow key={company.id}>
+                  <TableRow key={company.id} className={company.is_orphan_employer ? "bg-amber-50/50 dark:bg-amber-950/10" : undefined}>
                     <TableCell>
                       <div>
                         <div className="font-medium">{company.name}</div>
-                        <div className="text-sm text-muted-foreground">{company.location}</div>
+                        <div className="text-sm text-muted-foreground">{company.location || (company.is_orphan_employer ? '—' : '')}</div>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -436,7 +481,11 @@ export default function AdminCompanies() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {company.is_verified ? (
+                      {company.is_orphan_employer ? (
+                        <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-400">
+                          No company yet
+                        </Badge>
+                      ) : company.is_verified ? (
                         <Badge variant="default" className="bg-green-600">
                           <CheckCircle className="mr-1 h-3 w-3" />
                           Verified
@@ -446,20 +495,24 @@ export default function AdminCompanies() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Select
-                        value={company.sponsorship_plan}
-                        onValueChange={(value) => updateSponsorshipTier(company.id, value)}
-                      >
-                        <SelectTrigger className="w-[130px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">None</SelectItem>
-                          <SelectItem value="silver">Silver</SelectItem>
-                          <SelectItem value="gold">Gold</SelectItem>
-                          <SelectItem value="platinum">Platinum</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {company.is_orphan_employer ? (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      ) : (
+                        <Select
+                          value={company.sponsorship_plan}
+                          onValueChange={(value) => updateSponsorshipTier(company.id, value)}
+                        >
+                          <SelectTrigger className="w-[130px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">None</SelectItem>
+                            <SelectItem value="silver">Silver</SelectItem>
+                            <SelectItem value="gold">Gold</SelectItem>
+                            <SelectItem value="platinum">Platinum</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{company.jobs_count || 0}</Badge>
@@ -472,13 +525,24 @@ export default function AdminCompanies() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant={company.is_verified ? "outline" : "default"}
-                          onClick={() => toggleVerification(company.id, company.is_verified)}
-                        >
-                          {company.is_verified ? <Ban className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
-                        </Button>
+                        {company.is_orphan_employer ? (
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => startCreateForOwner(company.profiles?.email)}
+                          >
+                            <Plus className="h-4 w-4 mr-1" />
+                            Create company
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant={company.is_verified ? "outline" : "default"}
+                            onClick={() => toggleVerification(company.id, company.is_verified)}
+                          >
+                            {company.is_verified ? <Ban className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
