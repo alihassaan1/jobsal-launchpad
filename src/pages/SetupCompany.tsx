@@ -42,7 +42,7 @@ const COMPANY_SIZES = [
 ];
 
 export default function SetupCompany() {
-  const { user, userRole } = useAuth();
+  const { user, userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -59,8 +59,12 @@ export default function SetupCompany() {
     logo_url: ""
   });
 
+  if (authLoading) {
+    return null;
+  }
+
   if (!user) {
-    navigate("/auth");
+    navigate("/auth?type=employer");
     return null;
   }
 
@@ -83,32 +87,50 @@ export default function SetupCompany() {
     setIsLoading(true);
 
     try {
+      if (userRole !== 'employer' && userRole !== 'admin') {
+        const { error: roleError } = await supabase.rpc('become_employer' as any);
+        if (roleError) throw roleError;
+      }
+
       const slug = generateSlug(formData.name);
 
-      const { error } = await supabase
+      const { data: existingCompany } = await supabase
         .from("companies")
-        .insert({
-          name: formData.name,
-          slug: slug,
-          description: formData.description,
-          industry: formData.industry,
-          company_size: formData.company_size,
-          location: formData.location,
-          website: formData.website,
-          email: formData.email || user.email,
-          phone: formData.phone,
-          logo_url: formData.logo_url,
-          owner_id: user.id
-        });
+        .select("id")
+        .eq("owner_id", user.id)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
 
-      if (error) throw error;
+      const companyPayload = {
+        name: formData.name,
+        description: formData.description,
+        industry: formData.industry,
+        company_size: formData.company_size,
+        location: formData.location,
+        website: formData.website,
+        email: formData.email || user.email,
+        phone: formData.phone,
+        logo_url: formData.logo_url,
+        owner_id: user.id
+      };
 
-      // Update user role to employer if not already
-      if (userRole !== 'employer' && userRole !== 'admin') {
-        await supabase.from("user_roles").upsert({
-          user_id: user.id,
-          role: 'employer'
-        });
+      if (existingCompany?.id) {
+        const { error } = await supabase
+          .from("companies")
+          .update(companyPayload)
+          .eq("id", existingCompany.id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("companies")
+          .insert({
+            ...companyPayload,
+            slug,
+          });
+
+        if (error) throw error;
       }
 
       toast.success("Company profile created successfully!");
