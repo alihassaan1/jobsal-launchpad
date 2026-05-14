@@ -10,7 +10,7 @@ interface AuthContextType {
   session: Session | null;
   userRole: UserRole | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, accountType?: 'job_seeker' | 'employer') => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, accountType?: 'job_seeker' | 'employer') => Promise<{ error: any; signedIn?: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<void>;
   signInWithLinkedIn: () => Promise<void>;
@@ -115,14 +115,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               title: "Welcome back!",
               description: "You already have an account — we've signed you in.",
             });
-            return { error: null };
+            return { error: null, signedIn: true };
           }
           toast({
             title: "Account already exists",
             description: "This email is already registered. Please sign in instead, or use 'Forgot password' to reset it.",
             variant: "destructive",
           });
-          return { error };
+          return { error, signedIn: false };
         }
 
         toast({
@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           description: error.message,
           variant: "destructive",
         });
-        return { error };
+        return { error, signedIn: false };
       }
 
       // If a session was returned, email confirmation is OFF — user is signed in immediately.
@@ -139,6 +139,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           title: "Account created!",
           description: "You're signed in and ready to go.",
         });
+        return { error: null, signedIn: true };
       } else {
         // Email confirmation is ON. Try sign-in immediately as a fallback in case
         // confirmation is disabled or the user has confirmed via another channel.
@@ -148,6 +149,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             title: "Account created!",
             description: "You're signed in and ready to go.",
           });
+          return { error: null, signedIn: true };
         } else {
           toast({
             title: "Check your email",
@@ -156,7 +158,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       }
 
-      return { error: null };
+      return { error: null, signedIn: false };
     } catch (error: any) {
       return { error };
     }
