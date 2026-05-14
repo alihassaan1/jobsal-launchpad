@@ -83,6 +83,11 @@ export default function SetupCompany() {
     setIsLoading(true);
 
     try {
+      if (userRole !== 'employer' && userRole !== 'admin') {
+        const { error: roleError } = await supabase.rpc('become_employer' as any);
+        if (roleError) throw roleError;
+      }
+
       const slug = generateSlug(formData.name);
 
       const { error } = await supabase
@@ -102,14 +107,6 @@ export default function SetupCompany() {
         });
 
       if (error) throw error;
-
-      // Update user role to employer if not already
-      if (userRole !== 'employer' && userRole !== 'admin') {
-        await supabase.from("user_roles").upsert({
-          user_id: user.id,
-          role: 'employer'
-        });
-      }
 
       toast.success("Company profile created successfully!");
       navigate("/dashboard");
