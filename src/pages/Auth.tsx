@@ -53,7 +53,7 @@ const Auth = () => {
     setLoading(false);
     if (!error) {
       if (signedIn) {
-        navigate(accountType === 'employer' ? '/setup-company' : '/');
+        navigate(accountType === 'employer' ? '/employer-dashboard' : '/');
         return;
       }
       setRegisterEmail('');
