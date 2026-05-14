@@ -147,15 +147,40 @@ const EmployerDashboard = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8">
+        {isDraft && (
+          <Card className="mb-6 border-primary/40 bg-primary/5">
+            <CardHeader>
+              <div className="flex items-start gap-4">
+                <div className="rounded-full bg-primary/10 p-2 text-primary">
+                  <AlertCircle className="h-5 w-5" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-primary">Complete your company profile</CardTitle>
+                  <CardDescription className="mt-1 text-foreground/80">
+                    You need to finish setting up your company before you can post jobs.
+                  </CardDescription>
+                </div>
+                <Button onClick={() => navigate("/setup-company")}>
+                  Complete profile
+                </Button>
+              </div>
+            </CardHeader>
+          </Card>
+        )}
+
         {/* Company Header */}
         <Card className="mb-8">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-3xl mb-2">{company.name}</CardTitle>
-                <CardDescription className="text-base">{company.description}</CardDescription>
+                <CardTitle className="text-3xl mb-2">{company?.name || "Your Company"}</CardTitle>
+                <CardDescription className="text-base">
+                  {company?.description || "Add a description to help candidates learn about your company."}
+                </CardDescription>
               </div>
-              <Button variant="outline" onClick={() => navigate("/setup-company")}>Edit Company</Button>
+              <Button variant="outline" onClick={() => navigate("/setup-company")}>
+                {isDraft ? "Set up Company" : "Edit Company"}
+              </Button>
             </div>
           </CardHeader>
         </Card>
