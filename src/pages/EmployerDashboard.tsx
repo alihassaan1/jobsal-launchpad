@@ -232,9 +232,12 @@ const EmployerDashboard = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Your Job Postings</CardTitle>
-              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <Dialog open={isCreateDialogOpen} onOpenChange={(open) => { if (isDraft) return; setIsCreateDialogOpen(open); }}>
                 <DialogTrigger asChild>
-                  <Button>
+                  <Button
+                    disabled={isDraft}
+                    title={isDraft ? "Complete your company profile first." : undefined}
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Post New Job
                   </Button>
@@ -246,15 +249,26 @@ const EmployerDashboard = () => {
                       Fill in the details to {editingJob ? "update your" : "create a new"} job posting
                     </DialogDescription>
                   </DialogHeader>
-                  <JobForm
-                    companyId={company.id}
-                    job={editingJob}
-                    onSuccess={() => {
-                      setIsCreateDialogOpen(false);
-                      setEditingJob(null);
-                      queryClient.invalidateQueries({ queryKey: ["employerJobs"] });
-                    }}
-                  />
+                  {isDraft || !company ? (
+                    <div className="p-6 text-center space-y-4">
+                      <p className="text-muted-foreground">
+                        Complete your company profile before posting jobs.
+                      </p>
+                      <Button onClick={() => { setIsCreateDialogOpen(false); navigate("/setup-company"); }}>
+                        Complete profile
+                      </Button>
+                    </div>
+                  ) : (
+                    <JobForm
+                      companyId={company.id}
+                      job={editingJob}
+                      onSuccess={() => {
+                        setIsCreateDialogOpen(false);
+                        setEditingJob(null);
+                        queryClient.invalidateQueries({ queryKey: ["employerJobs"] });
+                      }}
+                    />
+                  )}
                 </DialogContent>
               </Dialog>
             </div>
