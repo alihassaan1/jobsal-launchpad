@@ -76,7 +76,16 @@ Deno.serve(async (req) => {
     });
     if (updErr) throw updErr;
 
-    return new Response(JSON.stringify({ success: true, user_id: targetId }), {
+    // Verify the new credential before reporting success, so admins don't get a
+    // false-positive reset message if Supabase rejects or delays the update.
+    const verifier = createClient(SUPABASE_URL, ANON);
+    const { error: verifyErr } = await verifier.auth.signInWithPassword({ email, password });
+    if (verifyErr) {
+      throw new Error(`Password update did not verify: ${verifyErr.message}`);
+    }
+    await verifier.auth.signOut();
+
+    return new Response(JSON.stringify({ success: true, user_id: targetId, verified: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
