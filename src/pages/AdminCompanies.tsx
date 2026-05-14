@@ -146,53 +146,86 @@ export default function AdminCompanies() {
       }
 
       const list = data ?? [];
-      if (list.length === 0) {
-        setCompanies([]);
-        return;
-      }
 
-      // Fetch owner profiles separately (no FK to public.profiles, so no PostgREST embed)
-      const ownerIds = Array.from(
-        new Set(list.map((c: any) => c.owner_id).filter(Boolean))
+      // Fetch all employer user_roles so we can surface employers without a company yet
+      const { data: employerRoles, error: rolesErr } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'employer');
+      if (rolesErr) console.warn('Could not load employer roles:', rolesErr);
+
+      const employerIds = Array.from(new Set((employerRoles || []).map((r: any) => r.user_id)));
+      const ownersWithCompanies = new Set(list.map((c: any) => c.owner_id));
+      const orphanEmployerIds = employerIds.filter((id) => !ownersWithCompanies.has(id));
+
+      // Profiles needed: owners of existing companies + orphan employers
+      const profileIds = Array.from(
+        new Set([
+          ...list.map((c: any) => c.owner_id).filter(Boolean),
+          ...orphanEmployerIds,
+        ])
       );
 
-      let profilesById: Record<string, { full_name: string | null; email: string | null }> = {};
-      if (ownerIds.length > 0) {
+      let profilesById: Record<string, { full_name: string | null; email: string | null; created_at?: string }> = {};
+      if (profileIds.length > 0) {
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select('id, full_name, email')
-          .in('id', ownerIds);
+          .select('id, full_name, email, created_at')
+          .in('id', profileIds);
 
         if (profilesError) {
           console.warn('Could not load owner profiles:', profilesError);
         } else if (profilesData) {
           profilesById = Object.fromEntries(
-            profilesData.map((p: any) => [p.id, { full_name: p.full_name, email: p.email }])
+            profilesData.map((p: any) => [p.id, { full_name: p.full_name, email: p.email, created_at: p.created_at }])
           );
         }
       }
 
       // Count jobs per company in a single query
-      const { data: jobsData, error: jobsError } = await supabase
-        .from('jobs')
-        .select('company_id')
-        .in('company_id', list.map((c: any) => c.id));
+      let jobsCountById: Record<string, number> = {};
+      if (list.length > 0) {
+        const { data: jobsData, error: jobsError } = await supabase
+          .from('jobs')
+          .select('company_id')
+          .in('company_id', list.map((c: any) => c.id));
 
-      const jobsCountById: Record<string, number> = {};
-      if (!jobsError && jobsData) {
-        for (const j of jobsData as any[]) {
-          if (!j.company_id) continue;
-          jobsCountById[j.company_id] = (jobsCountById[j.company_id] || 0) + 1;
+        if (!jobsError && jobsData) {
+          for (const j of jobsData as any[]) {
+            if (!j.company_id) continue;
+            jobsCountById[j.company_id] = (jobsCountById[j.company_id] || 0) + 1;
+          }
         }
       }
 
-      setCompanies(
-        list.map((c: any) => ({
-          ...c,
-          profiles: profilesById[c.owner_id] || null,
-          jobs_count: jobsCountById[c.id] || 0,
-        }))
-      );
+      const companiesEnriched = list.map((c: any) => ({
+        ...c,
+        profiles: profilesById[c.owner_id] || null,
+        jobs_count: jobsCountById[c.id] || 0,
+        is_orphan_employer: false,
+      }));
+
+      // Synthetic rows for employers without a company
+      const orphanRows = orphanEmployerIds.map((uid) => {
+        const p = profilesById[uid];
+        return {
+          id: `orphan-${uid}`,
+          owner_id: uid,
+          name: p?.full_name || p?.email?.split('@')[0] || 'Unknown employer',
+          location: null,
+          is_verified: false,
+          sponsorship_plan: 'none',
+          is_sponsored: false,
+          views_count: 0,
+          followers_count: 0,
+          jobs_count: 0,
+          created_at: p?.created_at || new Date().toISOString(),
+          profiles: p ? { full_name: p.full_name, email: p.email } : null,
+          is_orphan_employer: true,
+        };
+      });
+
+      setCompanies([...companiesEnriched, ...orphanRows]);
     } catch (error) {
       console.error('Error:', error);
       toast.error("Failed to load companies");
