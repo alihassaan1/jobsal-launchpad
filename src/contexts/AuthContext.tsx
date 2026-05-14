@@ -10,7 +10,7 @@ interface AuthContextType {
   session: Session | null;
   userRole: UserRole | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, accountType?: 'job_seeker' | 'employer') => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<void>;
   signInWithLinkedIn: () => Promise<void>;
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, fullName: string, accountType: 'job_seeker' | 'employer' = 'job_seeker') => {
     try {
       const redirectUrl = `${window.location.origin}/`;
 
@@ -95,6 +95,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           emailRedirectTo: redirectUrl,
           data: {
             full_name: fullName,
+            account_type: accountType,
           }
         }
       });
