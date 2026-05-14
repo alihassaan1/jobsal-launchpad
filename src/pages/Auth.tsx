@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Briefcase } from 'lucide-react';
+import { Briefcase, Building2, User } from 'lucide-react';
 import { Helmet } from 'react-helmet';
 
 const Auth = () => {
@@ -18,6 +18,7 @@ const Auth = () => {
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerName, setRegisterName] = useState('');
+  const [accountType, setAccountType] = useState<'job_seeker' | 'employer'>('job_seeker');
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
@@ -47,9 +48,13 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     const emailUsed = registerEmail;
-    const { error } = await signUp(registerEmail, registerPassword, registerName);
+    const { error } = await signUp(registerEmail, registerPassword, registerName, accountType);
     setLoading(false);
     if (!error) {
+      if (accountType === 'employer') {
+        navigate('/setup-company');
+        return;
+      }
       // If signUp signed them in, the user effect above will redirect.
       // Otherwise, surface a clear "check your email / or just sign in" state.
       setPendingEmail(emailUsed);
@@ -274,8 +279,31 @@ const Auth = () => {
                     minLength={6}
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label>Account type</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      type="button"
+                      variant={accountType === 'job_seeker' ? 'default' : 'outline'}
+                      onClick={() => setAccountType('job_seeker')}
+                      className="justify-start"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Job seeker
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={accountType === 'employer' ? 'default' : 'outline'}
+                      onClick={() => setAccountType('employer')}
+                      className="justify-start"
+                    >
+                      <Building2 className="mr-2 h-4 w-4" />
+                      Employer
+                    </Button>
+                  </div>
+                </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Creating account...' : 'Create Account'}
+                  {loading ? 'Creating account...' : accountType === 'employer' ? 'Create Employer Account' : 'Create Account'}
                 </Button>
               </form>
 
