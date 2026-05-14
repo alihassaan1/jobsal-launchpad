@@ -51,29 +51,18 @@ const Auth = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const emailUsed = registerEmail;
     const { error, signedIn } = await signUp(registerEmail, registerPassword, registerName, accountType);
     setLoading(false);
     if (!error) {
-      if (accountType === 'employer' && signedIn) {
-        navigate('/setup-company');
+      if (signedIn) {
+        navigate(accountType === 'employer' ? '/setup-company' : '/');
         return;
       }
-      // If signUp signed them in, the user effect above will redirect.
-      // Otherwise, surface a clear "check your email / or just sign in" state.
-      setPendingEmail(emailUsed);
       setRegisterEmail('');
       setRegisterPassword('');
       setRegisterName('');
       setAuthTab('login');
     }
-  };
-
-  const handleResend = async () => {
-    if (!pendingEmail) return;
-    setResending(true);
-    await resendConfirmation(pendingEmail);
-    setResending(false);
   };
 
   const handleResetPassword = async () => {
@@ -84,13 +73,6 @@ const Auth = () => {
     setResettingPw(true);
     await resetPassword(loginEmail);
     setResettingPw(false);
-  };
-
-  const handleResendFromLogin = async () => {
-    if (!loginEmail) return;
-    setResending(true);
-    await resendConfirmation(loginEmail);
-    setResending(false);
   };
 
   return (
