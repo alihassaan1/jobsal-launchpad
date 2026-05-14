@@ -161,31 +161,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { error, signedIn: false };
       }
 
-      // If a session was returned, email confirmation is OFF — user is signed in immediately.
+      // Email confirmation is disabled — sign the user in immediately.
       if (data?.session) {
-        toast({
-          title: "Account created!",
-          description: "You're signed in and ready to go.",
-        });
+        toast({ title: "Account created!", description: "You're signed in and ready to go." });
         return { error: null, signedIn: true };
-      } else {
-        // Email confirmation is ON. Try sign-in immediately as a fallback in case
-        // confirmation is disabled or the user has confirmed via another channel.
-        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-        if (!signInError) {
-          toast({
-            title: "Account created!",
-            description: "You're signed in and ready to go.",
-          });
-          return { error: null, signedIn: true };
-        } else {
-          toast({
-            title: "Check your email",
-            description: "We sent a confirmation link. If it doesn't work (some email scanners click links automatically), just come back and sign in — your account is ready.",
-          });
-        }
       }
 
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (!signInError) {
+        toast({ title: "Account created!", description: "You're signed in and ready to go." });
+        return { error: null, signedIn: true };
+      }
+
+      toast({
+        title: "Account created",
+        description: "Please sign in with your new password.",
+      });
       return { error: null, signedIn: false };
     } catch (error: any) {
       return { error };
