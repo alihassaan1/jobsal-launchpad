@@ -13,7 +13,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const startsAsEmployer = searchParams.get('type') === 'employer';
-  const { signUp, signIn, signInWithGoogle, signInWithLinkedIn, resetPassword, user, userRole, loading: authLoading } = useAuth();
+  const { signUp, signIn, resetPassword, user, userRole, loading: authLoading } = useAuth();
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
