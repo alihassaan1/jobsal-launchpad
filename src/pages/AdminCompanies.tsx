@@ -225,7 +225,12 @@ export default function AdminCompanies() {
         };
       });
 
-      setCompanies([...companiesEnriched, ...orphanRows]);
+      const merged = [...companiesEnriched, ...orphanRows].sort((a, b) => {
+        const ta = new Date(a.created_at || 0).getTime();
+        const tb = new Date(b.created_at || 0).getTime();
+        return tb - ta;
+      });
+      setCompanies(merged);
     } catch (error) {
       console.error('Error:', error);
       toast.error("Failed to load companies");

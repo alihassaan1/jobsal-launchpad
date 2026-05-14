@@ -13,7 +13,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const startsAsEmployer = searchParams.get('type') === 'employer';
-  const { signUp, signIn, signInWithGoogle, signInWithLinkedIn, resendConfirmation, resetPassword, user, userRole, loading: authLoading } = useAuth();
+  const { signUp, signIn, signInWithGoogle, signInWithLinkedIn, resetPassword, user, userRole, loading: authLoading } = useAuth();
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -23,8 +23,6 @@ const Auth = () => {
   const [accountType, setAccountType] = useState<'job_seeker' | 'employer'>(startsAsEmployer ? 'employer' : 'job_seeker');
   const [authTab, setAuthTab] = useState(startsAsEmployer ? 'register' : 'login');
   const [loading, setLoading] = useState(false);
-  const [resending, setResending] = useState(false);
-  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [resettingPw, setResettingPw] = useState(false);
 
@@ -51,29 +49,18 @@ const Auth = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const emailUsed = registerEmail;
     const { error, signedIn } = await signUp(registerEmail, registerPassword, registerName, accountType);
     setLoading(false);
     if (!error) {
-      if (accountType === 'employer' && signedIn) {
-        navigate('/setup-company');
+      if (signedIn) {
+        navigate(accountType === 'employer' ? '/setup-company' : '/');
         return;
       }
-      // If signUp signed them in, the user effect above will redirect.
-      // Otherwise, surface a clear "check your email / or just sign in" state.
-      setPendingEmail(emailUsed);
       setRegisterEmail('');
       setRegisterPassword('');
       setRegisterName('');
       setAuthTab('login');
     }
-  };
-
-  const handleResend = async () => {
-    if (!pendingEmail) return;
-    setResending(true);
-    await resendConfirmation(pendingEmail);
-    setResending(false);
   };
 
   const handleResetPassword = async () => {
@@ -84,13 +71,6 @@ const Auth = () => {
     setResettingPw(true);
     await resetPassword(loginEmail);
     setResettingPw(false);
-  };
-
-  const handleResendFromLogin = async () => {
-    if (!loginEmail) return;
-    setResending(true);
-    await resendConfirmation(loginEmail);
-    setResending(false);
   };
 
   return (
@@ -164,16 +144,11 @@ const Auth = () => {
                   <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm space-y-2">
                     <p className="font-medium text-destructive">{loginError}</p>
                     <p className="text-muted-foreground text-xs">
-                      Double-check your email and password. If you signed up but never confirmed,
-                      a corporate email scanner may have invalidated the link — reset your password
-                      below to regain access.
+                      Double-check your email and password, or use "Forgot password" to reset it.
                     </p>
                     <div className="flex flex-wrap gap-2">
                       <Button type="button" size="sm" variant="outline" onClick={handleResetPassword} disabled={resettingPw || !loginEmail}>
                         {resettingPw ? 'Sending…' : 'Reset password'}
-                      </Button>
-                      <Button type="button" size="sm" variant="ghost" onClick={handleResendFromLogin} disabled={resending || !loginEmail}>
-                        {resending ? 'Sending…' : 'Resend confirmation'}
                       </Button>
                     </div>
                   </div>
@@ -231,24 +206,6 @@ const Auth = () => {
             </TabsContent>
 
             <TabsContent value="register">
-              {pendingEmail && (
-                <div className="mb-4 rounded-md border border-primary/30 bg-primary/5 p-4 text-sm">
-                  <p className="font-medium mb-1">Account created for {pendingEmail}</p>
-                  <p className="text-muted-foreground mb-3">
-                    If a confirmation email was sent, check your inbox. Some corporate email
-                    scanners auto-click verification links — if that happens, just sign in below
-                    with the password you chose. Your account is ready.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button type="button" size="sm" variant="outline" onClick={handleResend} disabled={resending}>
-                      {resending ? 'Resending…' : 'Resend confirmation email'}
-                    </Button>
-                    <Button type="button" size="sm" variant="ghost" onClick={() => setPendingEmail(null)}>
-                      Dismiss
-                    </Button>
-                  </div>
-                </div>
-              )}
               <form onSubmit={handleRegister} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="register-name">Full Name</Label>
