@@ -28,7 +28,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Search, UserCog, Users as UsersIcon, FileText, ExternalLink } from "lucide-react";
+import { Search, UserCog, Users as UsersIcon, FileText, ExternalLink, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
 import { LoadingState } from "@/components/admin/LoadingState";
@@ -329,6 +329,7 @@ export default function AdminUsers() {
                         )}
                       </TableCell>
                       <TableCell>
+                        <div className="flex gap-2">
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button
@@ -367,6 +368,25 @@ export default function AdminUsers() {
                             </DialogFooter>
                           </DialogContent>
                         </Dialog>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          title="Reset password to Login123"
+                          onClick={async () => {
+                            if (!confirm(`Reset password for ${user.email} to "Login123"?`)) return;
+                            const { data, error } = await supabase.functions.invoke('admin-reset-password', {
+                              body: { email: user.email, password: 'Login123' },
+                            });
+                            if (error || (data as any)?.error) {
+                              toast.error((data as any)?.error || error?.message || 'Failed to reset password');
+                            } else {
+                              toast.success(`Password reset to Login123 for ${user.email}`);
+                            }
+                          }}
+                        >
+                          <KeyRound className="h-4 w-4" />
+                        </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
