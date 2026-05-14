@@ -64,7 +64,7 @@ export default function SetupCompany() {
   }
 
   if (!user) {
-    navigate("/auth");
+    navigate("/auth?type=employer");
     return null;
   }
 
