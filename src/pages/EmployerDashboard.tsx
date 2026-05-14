@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,33 +23,40 @@ import { Briefcase, Plus, Eye, Users, Edit, Trash2, MapPin, DollarSign } from "l
 import { useToast } from "@/hooks/use-toast";
 
 const EmployerDashboard = () => {
-  const { user, userRole } = useAuth();
+  const { user, userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<any>(null);
 
-  // Redirect if not employer
-  if (userRole !== "employer" && userRole !== "admin") {
-    navigate("/");
-    return null;
-  }
-
   // Fetch employer's company
   const { data: company } = useQuery({
     queryKey: ["employerCompany", user?.id],
+    enabled: !!user?.id && (userRole === "employer" || userRole === "admin"),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies")
         .select("*")
         .eq("owner_id", user!.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
     },
   });
+
+  if (authLoading || (!!user && !userRole)) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (userRole !== "employer" && userRole !== "admin") {
+    return <Navigate to="/" replace />;
+  }
 
   // Fetch employer's jobs
   const { data: jobs, isLoading } = useQuery({
