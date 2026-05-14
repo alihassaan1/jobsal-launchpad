@@ -146,16 +146,11 @@ const Auth = () => {
                   <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm space-y-2">
                     <p className="font-medium text-destructive">{loginError}</p>
                     <p className="text-muted-foreground text-xs">
-                      Double-check your email and password. If you signed up but never confirmed,
-                      a corporate email scanner may have invalidated the link — reset your password
-                      below to regain access.
+                      Double-check your email and password, or use "Forgot password" to reset it.
                     </p>
                     <div className="flex flex-wrap gap-2">
                       <Button type="button" size="sm" variant="outline" onClick={handleResetPassword} disabled={resettingPw || !loginEmail}>
                         {resettingPw ? 'Sending…' : 'Reset password'}
-                      </Button>
-                      <Button type="button" size="sm" variant="ghost" onClick={handleResendFromLogin} disabled={resending || !loginEmail}>
-                        {resending ? 'Sending…' : 'Resend confirmation'}
                       </Button>
                     </div>
                   </div>
