@@ -208,24 +208,6 @@ const Auth = () => {
             </TabsContent>
 
             <TabsContent value="register">
-              {pendingEmail && (
-                <div className="mb-4 rounded-md border border-primary/30 bg-primary/5 p-4 text-sm">
-                  <p className="font-medium mb-1">Account created for {pendingEmail}</p>
-                  <p className="text-muted-foreground mb-3">
-                    If a confirmation email was sent, check your inbox. Some corporate email
-                    scanners auto-click verification links — if that happens, just sign in below
-                    with the password you chose. Your account is ready.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button type="button" size="sm" variant="outline" onClick={handleResend} disabled={resending}>
-                      {resending ? 'Resending…' : 'Resend confirmation email'}
-                    </Button>
-                    <Button type="button" size="sm" variant="ghost" onClick={() => setPendingEmail(null)}>
-                      Dismiss
-                    </Button>
-                  </div>
-                </div>
-              )}
               <form onSubmit={handleRegister} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="register-name">Full Name</Label>
