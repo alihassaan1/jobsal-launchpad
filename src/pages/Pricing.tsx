@@ -293,8 +293,8 @@ export default function Pricing() {
                       <Button className="w-full" variant="outline" disabled>
                         Current Plan
                       </Button>
-                    ) : plan.slug === "enterprise" ? (
-                      <Button className="w-full" variant={plan.is_popular ? "default" : "outline"}>
+                    ) : plan.slug === "enterprise" || plan.slug === "corporate" || plan.is_corporate ? (
+                      <Button className="w-full" variant={plan.is_popular ? "default" : "outline"} onClick={() => window.location.href = "mailto:sales@jobs.al?subject=Corporate plan inquiry"}>
                         Contact Sales
                       </Button>
                     ) : user && userRole === "employer" ? (
