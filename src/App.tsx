@@ -58,6 +58,7 @@ import EmployerAdCheckout from "./pages/EmployerAdCheckout";
 import EmployerBilling from "./pages/EmployerBilling";
 import CandidateVisibility from "./pages/CandidateVisibility";
 import EmployerTalentPool from "./pages/EmployerTalentPool";
+import ImpersonationBanner from "./components/ImpersonationBanner";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <ImpersonationBanner />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />

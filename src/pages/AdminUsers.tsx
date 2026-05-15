@@ -28,12 +28,13 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Search, UserCog, Users as UsersIcon, FileText, ExternalLink, KeyRound } from "lucide-react";
+import { Search, UserCog, Users as UsersIcon, FileText, ExternalLink, KeyRound, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
 import { LoadingState } from "@/components/admin/LoadingState";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { ensureCompanyForUser } from "@/lib/ensureCompany";
+import { setImpersonationState } from "@/components/ImpersonationBanner";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
@@ -43,6 +44,7 @@ export default function AdminUsers() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [newRole, setNewRole] = useState("");
   const [resettingUserId, setResettingUserId] = useState<string | null>(null);
+  const [impersonatingId, setImpersonatingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
