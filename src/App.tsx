@@ -42,7 +42,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/AdminBlog";
 import AdminEmails from "./pages/AdminEmails";
-import Sitemap from "./pages/Sitemap";
+
 import Companies from "./pages/Companies";
 import CompanyProfile from "./pages/CompanyProfile";
 import EmployerCompanyProfile from "./pages/EmployerCompanyProfile";
@@ -127,7 +127,7 @@ const App = () => (
             <Route path="/companies/:slug" element={<CompanyProfile />} />
             <Route path="/dashboard/company" element={<EmployerCompanyProfile />} />
             <Route path="/setup-company" element={<SetupCompany />} />
-            <Route path="/sitemap.xml" element={<Sitemap />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
