@@ -220,6 +220,65 @@ export default function AdminUsers() {
     }
   };
 
+  const impersonateUser = async (user: any) => {
+    const role = user.user_roles?.[0]?.role;
+    if (role === 'admin') {
+      toast.error("Cannot impersonate another admin.");
+      return;
+    }
+    if (!confirm(`Sign in as ${user.email}? You'll see the app exactly as they do. Use the banner at the top to return to your admin account. This action is logged.`)) return;
+
+    setImpersonatingId(user.id);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const adminAccess = sessionData.session?.access_token;
+      const adminRefresh = sessionData.session?.refresh_token;
+      if (!adminAccess || !adminRefresh) {
+        toast.error("Your admin session expired. Sign in again.");
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('admin-impersonate', {
+        body: { target_user_id: user.id },
+        headers: { Authorization: `Bearer ${adminAccess}` },
+      });
+      if (error || (data as any)?.error) {
+        toast.error((data as any)?.error || error?.message || 'Impersonation failed');
+        return;
+      }
+
+      const hashed_token = (data as any)?.hashed_token;
+      if (!hashed_token) {
+        toast.error('No session token returned.');
+        return;
+      }
+
+      // Save admin tokens BEFORE switching session
+      setImpersonationState({
+        admin_access_token: adminAccess,
+        admin_refresh_token: adminRefresh,
+        target_email: user.email,
+        target_name: user.full_name || user.email,
+      });
+
+      const { error: otpError } = await supabase.auth.verifyOtp({
+        type: 'magiclink',
+        token_hash: hashed_token,
+      });
+      if (otpError) {
+        setImpersonationState(null);
+        toast.error(`Failed to start impersonation: ${otpError.message}`);
+        return;
+      }
+
+      toast.success(`Signed in as ${user.email}`);
+      // Send to homepage so they land where the user normally would
+      window.location.href = '/';
+    } finally {
+      setImpersonatingId(null);
+    }
+  };
+
   const filteredUsers = users.filter(user => {
     const matchesSearch = 
       user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
