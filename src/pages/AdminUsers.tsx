@@ -477,6 +477,15 @@ export default function AdminUsers() {
                         >
                           <KeyRound className="h-4 w-4" />
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          title="Sign in as this user (logged & reversible)"
+                          disabled={impersonatingId === user.id || role === 'admin'}
+                          onClick={() => impersonateUser(user)}
+                        >
+                          <LogIn className="h-4 w-4" />
+                        </Button>
                         </div>
                       </TableCell>
                     </TableRow>
