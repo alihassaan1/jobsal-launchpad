@@ -113,6 +113,8 @@ const App = () => (
             <Route path="/employer/ads" element={<EmployerAds />} />
             <Route path="/employer/ads/checkout" element={<EmployerAdCheckout />} />
             <Route path="/employer/billing" element={<EmployerBilling />} />
+            <Route path="/employer/talent" element={<EmployerTalentPool />} />
+            <Route path="/candidate/visibility" element={<CandidateVisibility />} />
             <Route path="/recommended-jobs" element={<RecommendedJobs />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/ai-resume-builder" element={<ResumeBuilderLanding />} />
