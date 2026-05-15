@@ -218,6 +218,39 @@ export type Database = {
           },
         ]
       }
+      admin_impersonation_logs: {
+        Row: {
+          admin_user_id: string
+          ended_at: string | null
+          id: string
+          ip_address: string | null
+          started_at: string
+          target_email: string | null
+          target_user_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          admin_user_id: string
+          ended_at?: string | null
+          id?: string
+          ip_address?: string | null
+          started_at?: string
+          target_email?: string | null
+          target_user_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          admin_user_id?: string
+          ended_at?: string | null
+          id?: string
+          ip_address?: string | null
+          started_at?: string
+          target_email?: string | null
+          target_user_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       admin_settings: {
         Row: {
           created_at: string | null
