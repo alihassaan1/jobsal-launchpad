@@ -29,7 +29,7 @@ const Auth = () => {
   // Redirect if already logged in
   if (user) {
     if (authLoading || !userRole) return null;
-    navigate(userRole === 'employer' ? '/employer-dashboard' : '/');
+    navigate(userRole === 'employer' ? '/dashboard' : '/');
     return null;
   }
 
@@ -40,7 +40,7 @@ const Auth = () => {
     const { error } = await signIn(loginEmail, loginPassword);
     setLoading(false);
     if (!error) {
-      navigate(startsAsEmployer ? '/employer-dashboard' : '/');
+      navigate(startsAsEmployer ? '/dashboard' : '/');
     } else {
       setLoginError(error.message || 'Login failed');
     }
@@ -53,7 +53,7 @@ const Auth = () => {
     setLoading(false);
     if (!error) {
       if (signedIn) {
-        navigate(accountType === 'employer' ? '/employer-dashboard' : '/');
+        navigate(accountType === 'employer' ? '/dashboard' : '/');
         return;
       }
       setRegisterEmail('');
