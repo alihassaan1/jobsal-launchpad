@@ -75,6 +75,15 @@ const CandidateDashboard = () => {
           <p className="text-muted-foreground">Track and manage your job applications</p>
         </div>
 
+        {/* Talent Pool opt-in promo */}
+        <div className="mb-6 rounded-xl border border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h3 className="font-semibold text-lg">Let employers find you</h3>
+            <p className="text-sm text-muted-foreground">Opt in to the Talent Pool and get discovered for roles that aren't even posted yet. You stay anonymous until you respond.</p>
+          </div>
+          <a href="/candidate/visibility" className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 whitespace-nowrap">Manage visibility</a>
+        </div>
+
         {/* Stats */}
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <Card>
