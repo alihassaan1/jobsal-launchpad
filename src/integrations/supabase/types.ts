@@ -481,11 +481,189 @@ export type Database = {
         }
         Relationships: []
       }
+      candidate_outreach: {
+        Row: {
+          candidate_user_id: string
+          company_id: string
+          created_at: string
+          delivered_at: string | null
+          email_status: string
+          id: string
+          job_id: string | null
+          message: string
+          read_at: string | null
+          replied_at: string | null
+          sender_user_id: string
+          sent_at: string
+          subject: string
+        }
+        Insert: {
+          candidate_user_id: string
+          company_id: string
+          created_at?: string
+          delivered_at?: string | null
+          email_status?: string
+          id?: string
+          job_id?: string | null
+          message: string
+          read_at?: string | null
+          replied_at?: string | null
+          sender_user_id: string
+          sent_at?: string
+          subject: string
+        }
+        Update: {
+          candidate_user_id?: string
+          company_id?: string
+          created_at?: string
+          delivered_at?: string | null
+          email_status?: string
+          id?: string
+          job_id?: string | null
+          message?: string
+          read_at?: string | null
+          replied_at?: string | null
+          sender_user_id?: string
+          sent_at?: string
+          subject?: string
+        }
+        Relationships: []
+      }
+      candidate_shortlist_items: {
+        Row: {
+          added_by: string
+          candidate_user_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          shortlist_id: string
+        }
+        Insert: {
+          added_by: string
+          candidate_user_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          shortlist_id: string
+        }
+        Update: {
+          added_by?: string
+          candidate_user_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          shortlist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_shortlist_items_shortlist_id_fkey"
+            columns: ["shortlist_id"]
+            isOneToOne: false
+            referencedRelation: "candidate_shortlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      candidate_shortlists: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      candidate_visibility: {
+        Row: {
+          allow_contact: boolean
+          availability:
+            | Database["public"]["Enums"]["candidate_availability"]
+            | null
+          created_at: string
+          desired_categories: string[] | null
+          desired_locations: string[] | null
+          desired_role: string | null
+          headline: string | null
+          id: string
+          is_searchable: boolean
+          min_salary: number | null
+          salary_currency: string | null
+          top_skills: string[] | null
+          updated_at: string
+          user_id: string
+          years_experience: number | null
+        }
+        Insert: {
+          allow_contact?: boolean
+          availability?:
+            | Database["public"]["Enums"]["candidate_availability"]
+            | null
+          created_at?: string
+          desired_categories?: string[] | null
+          desired_locations?: string[] | null
+          desired_role?: string | null
+          headline?: string | null
+          id?: string
+          is_searchable?: boolean
+          min_salary?: number | null
+          salary_currency?: string | null
+          top_skills?: string[] | null
+          updated_at?: string
+          user_id: string
+          years_experience?: number | null
+        }
+        Update: {
+          allow_contact?: boolean
+          availability?:
+            | Database["public"]["Enums"]["candidate_availability"]
+            | null
+          created_at?: string
+          desired_categories?: string[] | null
+          desired_locations?: string[] | null
+          desired_role?: string | null
+          headline?: string | null
+          id?: string
+          is_searchable?: boolean
+          min_salary?: number | null
+          salary_currency?: string | null
+          top_skills?: string[] | null
+          updated_at?: string
+          user_id?: string
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           banner_url: string | null
+          benefits_summary: string | null
+          brand_gallery: Json | null
+          brand_video_url: string | null
+          branded_page_enabled: boolean | null
           company_size: string | null
           created_at: string
+          culture: string | null
           description: string | null
           email: string | null
           followers_count: number | null
@@ -497,12 +675,14 @@ export type Database = {
           is_verified: boolean | null
           location: string | null
           logo_url: string | null
+          mission: string | null
           name: string
           owner_id: string
           phone: string | null
           slug: string
           social_links: Json | null
           sponsorship_plan: string | null
+          testimonials: Json | null
           top_employer_end_date: string | null
           top_employer_plan_type: string | null
           top_employer_start_date: string | null
@@ -512,8 +692,13 @@ export type Database = {
         }
         Insert: {
           banner_url?: string | null
+          benefits_summary?: string | null
+          brand_gallery?: Json | null
+          brand_video_url?: string | null
+          branded_page_enabled?: boolean | null
           company_size?: string | null
           created_at?: string
+          culture?: string | null
           description?: string | null
           email?: string | null
           followers_count?: number | null
@@ -525,12 +710,14 @@ export type Database = {
           is_verified?: boolean | null
           location?: string | null
           logo_url?: string | null
+          mission?: string | null
           name: string
           owner_id: string
           phone?: string | null
           slug: string
           social_links?: Json | null
           sponsorship_plan?: string | null
+          testimonials?: Json | null
           top_employer_end_date?: string | null
           top_employer_plan_type?: string | null
           top_employer_start_date?: string | null
@@ -540,8 +727,13 @@ export type Database = {
         }
         Update: {
           banner_url?: string | null
+          benefits_summary?: string | null
+          brand_gallery?: Json | null
+          brand_video_url?: string | null
+          branded_page_enabled?: boolean | null
           company_size?: string | null
           created_at?: string
+          culture?: string | null
           description?: string | null
           email?: string | null
           followers_count?: number | null
@@ -553,12 +745,14 @@ export type Database = {
           is_verified?: boolean | null
           location?: string | null
           logo_url?: string | null
+          mission?: string | null
           name?: string
           owner_id?: string
           phone?: string | null
           slug?: string
           social_links?: Json | null
           sponsorship_plan?: string | null
+          testimonials?: Json | null
           top_employer_end_date?: string | null
           top_employer_plan_type?: string | null
           top_employer_start_date?: string | null
@@ -658,6 +852,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      company_member_invites: {
+        Row: {
+          accepted_at: string | null
+          company_id: string
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          role: Database["public"]["Enums"]["company_member_role"]
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          company_id: string
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          role?: Database["public"]["Enums"]["company_member_role"]
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          company_id?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          role?: Database["public"]["Enums"]["company_member_role"]
+          token?: string
+        }
+        Relationships: []
+      }
+      company_members: {
+        Row: {
+          accepted_at: string
+          company_id: string
+          created_at: string
+          id: string
+          invited_by: string | null
+          role: Database["public"]["Enums"]["company_member_role"]
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          company_id: string
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["company_member_role"]
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["company_member_role"]
+          user_id?: string
+        }
+        Relationships: []
       }
       credit_notes: {
         Row: {
@@ -1731,6 +1991,33 @@ export type Database = {
         }
         Relationships: []
       }
+      resume_unlocks: {
+        Row: {
+          candidate_user_id: string
+          company_id: string
+          employer_user_id: string
+          id: string
+          month_bucket: string
+          unlocked_at: string
+        }
+        Insert: {
+          candidate_user_id: string
+          company_id: string
+          employer_user_id: string
+          id?: string
+          month_bucket?: string
+          unlocked_at?: string
+        }
+        Update: {
+          candidate_user_id?: string
+          company_id?: string
+          employer_user_id?: string
+          id?: string
+          month_bucket?: string
+          unlocked_at?: string
+        }
+        Relationships: []
+      }
       resumes: {
         Row: {
           ai_match_score: number | null
@@ -1840,6 +2127,8 @@ export type Database = {
           ai_access: boolean | null
           analytics_enabled: boolean | null
           ats_access: boolean | null
+          branded_page: boolean | null
+          bulk_export: boolean | null
           company_page: boolean | null
           created_at: string | null
           currency: string | null
@@ -1848,6 +2137,7 @@ export type Database = {
           featured_jobs_limit: number
           id: string
           is_active: boolean | null
+          is_corporate: boolean | null
           is_popular: boolean | null
           job_posts_limit: number
           name: string
@@ -1855,14 +2145,19 @@ export type Database = {
           price_yearly: number
           priority_support: boolean | null
           resume_views_limit: number
+          seat_limit: number | null
           slug: string
           support_level: string | null
+          talent_pool_access: boolean | null
+          talent_pool_views_limit: number | null
           updated_at: string | null
         }
         Insert: {
           ai_access?: boolean | null
           analytics_enabled?: boolean | null
           ats_access?: boolean | null
+          branded_page?: boolean | null
+          bulk_export?: boolean | null
           company_page?: boolean | null
           created_at?: string | null
           currency?: string | null
@@ -1871,6 +2166,7 @@ export type Database = {
           featured_jobs_limit?: number
           id?: string
           is_active?: boolean | null
+          is_corporate?: boolean | null
           is_popular?: boolean | null
           job_posts_limit?: number
           name: string
@@ -1878,14 +2174,19 @@ export type Database = {
           price_yearly?: number
           priority_support?: boolean | null
           resume_views_limit?: number
+          seat_limit?: number | null
           slug: string
           support_level?: string | null
+          talent_pool_access?: boolean | null
+          talent_pool_views_limit?: number | null
           updated_at?: string | null
         }
         Update: {
           ai_access?: boolean | null
           analytics_enabled?: boolean | null
           ats_access?: boolean | null
+          branded_page?: boolean | null
+          bulk_export?: boolean | null
           company_page?: boolean | null
           created_at?: string | null
           currency?: string | null
@@ -1894,6 +2195,7 @@ export type Database = {
           featured_jobs_limit?: number
           id?: string
           is_active?: boolean | null
+          is_corporate?: boolean | null
           is_popular?: boolean | null
           job_posts_limit?: number
           name?: string
@@ -1901,8 +2203,11 @@ export type Database = {
           price_yearly?: number
           priority_support?: boolean | null
           resume_views_limit?: number
+          seat_limit?: number | null
           slug?: string
           support_level?: string | null
+          talent_pool_access?: boolean | null
+          talent_pool_views_limit?: number | null
           updated_at?: string | null
         }
         Relationships: []
@@ -2048,7 +2353,28 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      searchable_candidates: {
+        Row: {
+          allow_contact: boolean | null
+          availability:
+            | Database["public"]["Enums"]["candidate_availability"]
+            | null
+          avatar_url: string | null
+          desired_categories: string[] | null
+          desired_locations: string[] | null
+          desired_role: string | null
+          headline: string | null
+          initial: string | null
+          min_salary: number | null
+          profile_location: string | null
+          salary_currency: string | null
+          top_skills: string[] | null
+          updated_at: string | null
+          user_id: string | null
+          years_experience: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       become_employer: { Args: never; Returns: undefined }
@@ -2057,6 +2383,11 @@ export type Database = {
         Returns: number
       }
       can_post_job: { Args: { user_id: string }; Returns: boolean }
+      company_has_talent_pool: {
+        Args: { _company_id: string }
+        Returns: boolean
+      }
+      current_user_has_talent_pool: { Args: never; Returns: boolean }
       generate_credit_note_number: { Args: never; Returns: string }
       generate_invoice_number: { Args: never; Returns: string }
       get_ai_agent_analytics: {
@@ -2085,6 +2416,18 @@ export type Database = {
       }
       increment_job_views: { Args: { job_id: string }; Returns: undefined }
       increment_post_views: { Args: { post_slug: string }; Returns: undefined }
+      is_company_member: {
+        Args: {
+          _company_id: string
+          _min_role?: Database["public"]["Enums"]["company_member_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      unlock_candidate: {
+        Args: { _candidate_user_id: string; _company_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       ad_product_type:
@@ -2102,6 +2445,12 @@ export type Database = {
         | "interview"
         | "rejected"
         | "hired"
+      candidate_availability:
+        | "immediate"
+        | "one_month"
+        | "three_months"
+        | "passive"
+      company_member_role: "owner" | "recruiter" | "viewer"
       discount_type: "percentage" | "fixed"
       experience_level: "entry" | "mid" | "senior" | "executive"
       job_type:
@@ -2258,6 +2607,13 @@ export const Constants = {
         "rejected",
         "hired",
       ],
+      candidate_availability: [
+        "immediate",
+        "one_month",
+        "three_months",
+        "passive",
+      ],
+      company_member_role: ["owner", "recruiter", "viewer"],
       discount_type: ["percentage", "fixed"],
       experience_level: ["entry", "mid", "senior", "executive"],
       job_type: [
