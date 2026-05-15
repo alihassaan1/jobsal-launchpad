@@ -294,7 +294,7 @@ export default function Pricing() {
                         Current Plan
                       </Button>
                     ) : plan.slug === "enterprise" || plan.slug === "corporate" || plan.is_corporate ? (
-                      <Button className="w-full" variant={plan.is_popular ? "default" : "outline"} onClick={() => window.location.href = "mailto:sales@jobs.al?subject=Corporate plan inquiry"}>
+                      <Button className="w-full" variant={plan.is_popular ? "default" : "outline"} onClick={() => window.location.href = "mailto:info@jobs.al?subject=Corporate plan inquiry"}>
                         Contact Sales
                       </Button>
                     ) : user && userRole === "employer" ? (
