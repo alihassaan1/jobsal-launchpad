@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Briefcase, ArrowLeft, FileText, Mail, Phone, MapPin, Calendar, Download, Sparkles, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Navigation from "@/components/Navigation";
 
 const ATSJobApplications = () => {
   const { jobId } = useParams();
@@ -193,23 +194,7 @@ const ATSJobApplications = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <Briefcase className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">Jobs.al</span>
-          </Link>
-          <div className="flex gap-2">
-            <Link to="/dashboard">
-              <Button variant="ghost">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Dashboard
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       <div className="container mx-auto px-4 py-8">
         {/* Job Header */}

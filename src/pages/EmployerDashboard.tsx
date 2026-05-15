@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Briefcase, Plus, Eye, Users, Edit, Trash2, MapPin, DollarSign, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Navigation from "@/components/Navigation";
 
 const EmployerDashboard = () => {
   const { user, userRole, loading: authLoading } = useAuth();
@@ -119,32 +120,7 @@ const EmployerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <Briefcase className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">Jobs.al</span>
-          </Link>
-          <div className="flex gap-2">
-            <Link to="/dashboard/company">
-              <Button variant="ghost">Company Profile</Button>
-            </Link>
-            <Link to="/employer/analytics">
-              <Button variant="ghost">Analytics</Button>
-            </Link>
-            <Link to="/employer/subscription">
-              <Button variant="ghost">Subscription</Button>
-            </Link>
-            <Link to="/jobs">
-              <Button variant="ghost">Browse Jobs</Button>
-            </Link>
-            <Link to="/">
-              <Button variant="outline">Home</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       <div className="container mx-auto px-4 py-8">
         {isDraft && (

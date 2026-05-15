@@ -13,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Navigation from "@/components/Navigation";
 
 export default function RecommendedJobs() {
   const { user, userRole } = useAuth();
@@ -91,23 +92,7 @@ export default function RecommendedJobs() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <Briefcase className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">Jobs.al</span>
-          </Link>
-          <div className="flex gap-2">
-            <Link to="/jobs">
-              <Button variant="ghost">Browse All Jobs</Button>
-            </Link>
-            <Link to="/my-applications">
-              <Button variant="ghost">My Applications</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}

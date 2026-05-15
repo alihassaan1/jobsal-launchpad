@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Briefcase, Check, Star, Users, BarChart, Building2, Headphones } from "lucide-react";
 import { useState } from "react";
 import { Helmet } from "react-helmet";
+import Navigation from "@/components/Navigation";
 
 export default function Pricing() {
   const { user, userRole } = useAuth();
@@ -81,29 +82,7 @@ export default function Pricing() {
         <meta property="og:description" content="Affordable recruitment solutions for businesses of all sizes. Start hiring in Albania today." />
       </Helmet>
       <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <Briefcase className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">Jobs.al</span>
-          </Link>
-          <div className="flex gap-2">
-            <Link to="/jobs">
-              <Button variant="ghost">Browse Jobs</Button>
-            </Link>
-            {user ? (
-              <Link to={userRole === "employer" ? "/dashboard" : "/my-applications"}>
-                <Button variant="outline">Dashboard</Button>
-              </Link>
-            ) : (
-              <Link to="/auth">
-                <Button>Sign In</Button>
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
+        <Navigation />
 
       <div className="container mx-auto px-4 py-16">
         {/* Hero Section */}

@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Helmet } from "react-helmet";
 import { JOB_CATEGORIES, ALBANIAN_CITIES } from "@/lib/i18n";
+import Navigation from "@/components/Navigation";
 
 const Jobs = () => {
   const navigate = useNavigate();
@@ -105,29 +106,7 @@ const Jobs = () => {
         <meta property="og:image" content="https://jobs.al/og-image.jpg" />
       </Helmet>
       <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <Briefcase className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">Jobs.al</span>
-          </Link>
-          <nav className="flex items-center gap-4">
-            <Link to="/">
-              <Button variant="ghost">{t('common.home')}</Button>
-            </Link>
-            {user ? (
-              <Link to="/dashboard">
-                <Button>{t('nav.dashboard')}</Button>
-              </Link>
-            ) : (
-              <Link to="/auth">
-                <Button>{t('nav.login')}</Button>
-              </Link>
-            )}
-          </nav>
-        </div>
-      </header>
+      <Navigation />
 
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary/10 via-background to-background py-12">
