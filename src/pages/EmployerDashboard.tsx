@@ -161,6 +161,28 @@ const EmployerDashboard = () => {
           </CardHeader>
         </Card>
 
+        {/* Quick links */}
+        <div className="grid md:grid-cols-3 gap-4 mb-8">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer border-primary/30 bg-gradient-to-br from-primary/5 to-transparent" onClick={() => navigate("/employer/talent")}>
+            <CardHeader>
+              <CardTitle className="text-lg">🔍 Talent Pool</CardTitle>
+              <CardDescription>Search opted-in candidates and reach out directly. Don't wait for applications.</CardDescription>
+            </CardHeader>
+          </Card>
+          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate("/employer/analytics")}>
+            <CardHeader>
+              <CardTitle className="text-lg">📊 Analytics</CardTitle>
+              <CardDescription>Job performance, views and applications.</CardDescription>
+            </CardHeader>
+          </Card>
+          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate("/employer/subscription")}>
+            <CardHeader>
+              <CardTitle className="text-lg">💼 My Plan</CardTitle>
+              <CardDescription>Upgrade for unlimited posts and Talent Pool access.</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+
         {/* Stats */}
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <Card>

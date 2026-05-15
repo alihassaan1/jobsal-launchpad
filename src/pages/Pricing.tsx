@@ -204,6 +204,37 @@ export default function Pricing() {
                           job posts
                         </span>
                       </li>
+                      {plan.talent_pool_access && (
+                        <li className="flex items-start gap-2">
+                          <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span>
+                            <strong>
+                              {plan.talent_pool_views_limit === -1
+                                ? "Unlimited"
+                                : plan.talent_pool_views_limit}
+                            </strong>{" "}
+                            talent pool unlocks/mo
+                          </span>
+                        </li>
+                      )}
+                      {plan.seat_limit > 1 && (
+                        <li className="flex items-start gap-2">
+                          <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span><strong>{plan.seat_limit}</strong> recruiter seats</span>
+                        </li>
+                      )}
+                      {plan.branded_page && (
+                        <li className="flex items-start gap-2">
+                          <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span>Branded company page</span>
+                        </li>
+                      )}
+                      {plan.bulk_export && (
+                        <li className="flex items-start gap-2">
+                          <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span>Bulk CV export (ZIP + CSV)</span>
+                        </li>
+                      )}
                       <li className="flex items-start gap-2">
                         <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
                         <span>
@@ -212,7 +243,7 @@ export default function Pricing() {
                               ? "Unlimited"
                               : plan.resume_views_limit}
                           </strong>{" "}
-                          resume views
+                          resume views (applicants)
                         </span>
                       </li>
                       {plan.featured_jobs_limit > 0 && (
@@ -262,8 +293,8 @@ export default function Pricing() {
                       <Button className="w-full" variant="outline" disabled>
                         Current Plan
                       </Button>
-                    ) : plan.slug === "enterprise" ? (
-                      <Button className="w-full" variant={plan.is_popular ? "default" : "outline"}>
+                    ) : plan.slug === "enterprise" || plan.slug === "corporate" || plan.is_corporate ? (
+                      <Button className="w-full" variant={plan.is_popular ? "default" : "outline"} onClick={() => window.location.href = "mailto:sales@jobs.al?subject=Corporate plan inquiry"}>
                         Contact Sales
                       </Button>
                     ) : user && userRole === "employer" ? (
