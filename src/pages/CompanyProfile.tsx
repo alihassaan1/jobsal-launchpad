@@ -385,11 +385,6 @@ const CompanyProfile = () => {
                     <span className="text-muted-foreground">Followers</span>
                     <span className="font-semibold">{company.followers_count || 0}</span>
                   </div>
-                  <Separator />
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Profile Views</span>
-                    <span className="font-semibold">{company.views_count || 0}</span>
-                  </div>
                   {company.founded_year && (
                     <>
                       <Separator />
