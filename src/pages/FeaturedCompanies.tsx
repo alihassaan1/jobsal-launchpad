@@ -12,7 +12,7 @@ const FeaturedCompanies = () => {
     queryKey: ["featured-companies"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("companies")
+        .from("companies_public")
         .select(`
           *,
           jobs(count)

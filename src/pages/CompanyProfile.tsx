@@ -37,7 +37,7 @@ const CompanyProfile = () => {
     queryKey: ["company", slug],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("companies")
+        .from("companies_public")
         .select(`
           *,
           jobs(*)
@@ -60,7 +60,7 @@ const CompanyProfile = () => {
     queryFn: async () => {
       if (!company?.id) return [];
       const { data, error } = await supabase
-        .from("posts")
+        .from("posts_public")
         .select("*")
         .eq("company_id", company.id)
         .eq("is_sponsored", true)

@@ -50,7 +50,7 @@ const BlogSection = () => {
 
   const fetchLatestPosts = async () => {
     const { data } = await supabase
-      .from('posts')
+      .from('posts_public')
       .select('id, title, slug, excerpt, featured_image, category, published_at')
       .eq('is_published', true)
       .order('published_at', { ascending: false })
@@ -147,7 +147,7 @@ const Index = () => {
   const fetchFeaturedJobs = async () => {
     try {
       const { data, error } = await supabase
-        .from('jobs')
+        .from('jobs_public')
         .select(`
           *,
           companies:company_id (

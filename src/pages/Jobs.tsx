@@ -30,10 +30,10 @@ const Jobs = () => {
     queryKey: ["jobs", searchTerm, category, location, jobType],
     queryFn: async () => {
       let query = supabase
-        .from("jobs")
+        .from("jobs_public")
         .select(`
           *,
-          companies (
+          companies_public (
             name,
             logo_url,
             location

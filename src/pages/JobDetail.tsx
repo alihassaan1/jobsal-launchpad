@@ -22,10 +22,10 @@ const JobDetail = () => {
     queryKey: ["job", slug],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("jobs")
+        .from("jobs_public")
         .select(`
           *,
-          companies (
+          companies_public (
             name,
             logo_url,
             description,
@@ -53,10 +53,10 @@ const JobDetail = () => {
     enabled: !!job?.category,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("jobs")
+        .from("jobs_public")
         .select(`
           *,
-          companies (name, logo_url)
+          companies_public (name, logo_url)
         `)
         .eq("category", job!.category)
         .eq("is_active", true)
