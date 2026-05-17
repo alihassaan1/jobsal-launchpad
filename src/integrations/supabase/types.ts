@@ -2524,6 +2524,7 @@ export type Database = {
           culture: string | null
           description: string | null
           email: string | null
+          followers_count: number | null
           founded_year: number | null
           id: string | null
           industry: string | null
@@ -2557,6 +2558,7 @@ export type Database = {
           culture?: string | null
           description?: string | null
           email?: string | null
+          followers_count?: number | null
           founded_year?: number | null
           id?: string | null
           industry?: string | null
@@ -2590,6 +2592,7 @@ export type Database = {
           culture?: string | null
           description?: string | null
           email?: string | null
+          followers_count?: number | null
           founded_year?: number | null
           id?: string | null
           industry?: string | null
@@ -2744,6 +2747,7 @@ export type Database = {
           tags: string[] | null
           title: string | null
           updated_at: string | null
+          views_count: number | null
         }
         Insert: {
           author_id?: string | null
@@ -2766,6 +2770,7 @@ export type Database = {
           tags?: string[] | null
           title?: string | null
           updated_at?: string | null
+          views_count?: number | null
         }
         Update: {
           author_id?: string | null
@@ -2788,6 +2793,7 @@ export type Database = {
           tags?: string[] | null
           title?: string | null
           updated_at?: string | null
+          views_count?: number | null
         }
         Relationships: [
           {
