@@ -267,15 +267,15 @@ const JobDetail = () => {
                     Save Job
                   </Button>
                 </div>
-                {(userRole === "admin" || (user && job.posted_by === user.id)) && (
+                {canSeeStats && (
                   <div className="flex justify-around text-center py-4 border rounded-lg">
                     <div>
-                      <div className="text-2xl font-bold text-primary">{job.views_count}</div>
+                      <div className="text-2xl font-bold text-primary">{jobStats?.views_count ?? 0}</div>
                       <div className="text-sm text-muted-foreground">Views</div>
                     </div>
                     <Separator orientation="vertical" />
                     <div>
-                      <div className="text-2xl font-bold text-primary">{job.applications_count}</div>
+                      <div className="text-2xl font-bold text-primary">{jobStats?.applications_count ?? 0}</div>
                       <div className="text-sm text-muted-foreground">Applications</div>
                     </div>
                     <Separator orientation="vertical" />
