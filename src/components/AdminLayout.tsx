@@ -351,20 +351,25 @@ function AdminSidebar() {
 }
 
 export default function AdminLayout() {
-  const { userRole, loading } = useAuth();
+  const { user, userRole, loading } = useAuth();
   const navigate = useNavigate();
+  // Wait for both auth session AND role lookup before deciding.
+  const roleResolving = !!user && userRole === null;
 
   useEffect(() => {
-    if (!loading && userRole !== 'admin') {
+    if (loading || roleResolving) return;
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    if (userRole !== 'admin') {
       navigate('/');
       toast.error("Access denied");
     }
-  }, [loading, userRole, navigate]);
+  }, [loading, roleResolving, user, userRole, navigate]);
 
-  if (loading) return null;
-  if (userRole !== 'admin') {
-    return null;
-  }
+  if (loading || roleResolving) return null;
+  if (!user || userRole !== 'admin') return null;
 
   return (
     <SidebarProvider defaultOpen={true}>
