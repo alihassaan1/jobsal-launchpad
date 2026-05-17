@@ -241,10 +241,6 @@ const CompanyProfile = () => {
                             {company.company_size} employees
                           </div>
                         )}
-                        <div className="flex items-center gap-1">
-                          <Eye className="w-4 h-4" />
-                          {company.views_count || 0} views
-                        </div>
                       </div>
                     </div>
 
