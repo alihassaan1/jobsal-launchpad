@@ -251,26 +251,28 @@ const JobDetail = () => {
                     Save Job
                   </Button>
                 </div>
-                <div className="flex justify-around text-center py-4 border rounded-lg">
-                  <div>
-                    <div className="text-2xl font-bold text-primary">{job.views_count}</div>
-                    <div className="text-sm text-muted-foreground">Views</div>
-                  </div>
-                  <Separator orientation="vertical" />
-                  <div>
-                    <div className="text-2xl font-bold text-primary">{job.applications_count}</div>
-                    <div className="text-sm text-muted-foreground">Applications</div>
-                  </div>
-                  <Separator orientation="vertical" />
-                  <div>
-                    <div className="text-2xl font-bold text-primary">
-                      {job.application_deadline
-                        ? Math.ceil((new Date(job.application_deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-                        : "∞"}
+                {(userRole === "admin" || (user && job.posted_by === user.id)) && (
+                  <div className="flex justify-around text-center py-4 border rounded-lg">
+                    <div>
+                      <div className="text-2xl font-bold text-primary">{job.views_count}</div>
+                      <div className="text-sm text-muted-foreground">Views</div>
                     </div>
-                    <div className="text-sm text-muted-foreground">Days Left</div>
+                    <Separator orientation="vertical" />
+                    <div>
+                      <div className="text-2xl font-bold text-primary">{job.applications_count}</div>
+                      <div className="text-sm text-muted-foreground">Applications</div>
+                    </div>
+                    <Separator orientation="vertical" />
+                    <div>
+                      <div className="text-2xl font-bold text-primary">
+                        {job.application_deadline
+                          ? Math.ceil((new Date(job.application_deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+                          : "∞"}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Days Left</div>
+                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
