@@ -68,6 +68,22 @@ const JobDetail = () => {
     },
   });
 
+  // Owner/admin-only stats (views/applications) — base table requires ownership via RLS
+  const canSeeStats = !!user && (userRole === "admin" || job?.posted_by === user.id);
+  const { data: jobStats } = useQuery({
+    queryKey: ["jobStats", job?.id, user?.id],
+    enabled: !!job?.id && canSeeStats,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("views_count, applications_count")
+        .eq("id", job!.id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const formatSalary = (min: number | null, max: number | null, currency: string) => {
     if (!min && !max) return "Negotiable";
     if (min && max) return `${currency}${min.toLocaleString()} - ${currency}${max.toLocaleString()}`;
