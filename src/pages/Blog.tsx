@@ -38,7 +38,7 @@ const Blog = () => {
   const fetchPosts = async () => {
     setLoading(true);
     let query = supabase
-      .from('posts')
+      .from('posts_public')
       .select('*, profiles!posts_author_id_fkey(full_name)')
       .eq('is_published', true)
       .order('published_at', { ascending: false })
@@ -70,7 +70,7 @@ const Blog = () => {
 
   const fetchPopularPosts = async () => {
     const { data } = await supabase
-      .from('posts')
+      .from('posts_public')
       .select('id, title, slug, views_count')
       .eq('is_published', true)
       .order('views_count', { ascending: false })
@@ -81,7 +81,7 @@ const Blog = () => {
 
   const fetchCategories = async () => {
     const { data } = await supabase
-      .from('posts')
+      .from('posts_public')
       .select('category')
       .eq('is_published', true);
 

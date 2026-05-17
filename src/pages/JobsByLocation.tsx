@@ -235,8 +235,8 @@ export default function JobsByLocation() {
     queryKey: ["jobs-by-location", city],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("jobs")
-        .select(`*, companies (name, logo_url, location)`)
+        .from("jobs_public")
+        .select(`*, companies:companies_public(name, logo_url, location)`)
         .eq("is_active", true)
         .ilike("location", `%${city}%`)
         .order("created_at", { ascending: false })
@@ -252,7 +252,7 @@ export default function JobsByLocation() {
     queryKey: ["companies-by-location", city],
     queryFn: async () => {
       const { data } = await supabase
-        .from("companies")
+        .from("companies_public")
         .select("id, name, slug, logo_url, industry")
         .ilike("location", `%${city}%`)
         .limit(5);

@@ -22,10 +22,10 @@ const JobDetail = () => {
     queryKey: ["job", slug],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("jobs")
+        .from("jobs_public")
         .select(`
           *,
-          companies (
+          companies:companies_public(
             name,
             logo_url,
             description,
@@ -53,16 +53,32 @@ const JobDetail = () => {
     enabled: !!job?.category,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("jobs")
+        .from("jobs_public")
         .select(`
           *,
-          companies (name, logo_url)
+          companies:companies_public(name, logo_url)
         `)
         .eq("category", job!.category)
         .eq("is_active", true)
         .neq("id", job!.id)
         .limit(3);
 
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Owner/admin-only stats (views/applications) — base table requires ownership via RLS
+  const canSeeStats = !!user && (userRole === "admin" || job?.posted_by === user.id);
+  const { data: jobStats } = useQuery({
+    queryKey: ["jobStats", job?.id, user?.id],
+    enabled: !!job?.id && canSeeStats,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("views_count, applications_count")
+        .eq("id", job!.id)
+        .single();
       if (error) throw error;
       return data;
     },
@@ -251,15 +267,15 @@ const JobDetail = () => {
                     Save Job
                   </Button>
                 </div>
-                {(userRole === "admin" || (user && job.posted_by === user.id)) && (
+                {canSeeStats && (
                   <div className="flex justify-around text-center py-4 border rounded-lg">
                     <div>
-                      <div className="text-2xl font-bold text-primary">{job.views_count}</div>
+                      <div className="text-2xl font-bold text-primary">{jobStats?.views_count ?? 0}</div>
                       <div className="text-sm text-muted-foreground">Views</div>
                     </div>
                     <Separator orientation="vertical" />
                     <div>
-                      <div className="text-2xl font-bold text-primary">{job.applications_count}</div>
+                      <div className="text-2xl font-bold text-primary">{jobStats?.applications_count ?? 0}</div>
                       <div className="text-sm text-muted-foreground">Applications</div>
                     </div>
                     <Separator orientation="vertical" />

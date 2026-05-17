@@ -316,8 +316,8 @@ export default function JobsByCategory() {
     queryKey: ["jobs-by-category", category],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("jobs")
-        .select(`*, companies (name, logo_url, location)`)
+        .from("jobs_public")
+        .select(`*, companies:companies_public(name, logo_url, location)`)
         .eq("is_active", true)
         .ilike("category", `%${category}%`)
         .order("created_at", { ascending: false })
@@ -333,7 +333,7 @@ export default function JobsByCategory() {
     queryKey: ["related-posts", category],
     queryFn: async () => {
       const { data } = await supabase
-        .from("posts")
+        .from("posts_public")
         .select("id, title, slug, excerpt")
         .eq("is_published", true)
         .or(`category.ilike.%${category}%,tags.cs.{${category?.toLowerCase()}}`)

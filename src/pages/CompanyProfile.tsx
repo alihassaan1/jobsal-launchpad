@@ -37,7 +37,7 @@ const CompanyProfile = () => {
     queryKey: ["company", slug],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("companies")
+        .from("companies_public")
         .select(`
           *,
           jobs(*)
@@ -60,7 +60,7 @@ const CompanyProfile = () => {
     queryFn: async () => {
       if (!company?.id) return [];
       const { data, error } = await supabase
-        .from("posts")
+        .from("posts_public")
         .select("*")
         .eq("company_id", company.id)
         .eq("is_sponsored", true)
@@ -241,10 +241,6 @@ const CompanyProfile = () => {
                             {company.company_size} employees
                           </div>
                         )}
-                        <div className="flex items-center gap-1">
-                          <Eye className="w-4 h-4" />
-                          {company.views_count || 0} views
-                        </div>
                       </div>
                     </div>
 
@@ -388,11 +384,6 @@ const CompanyProfile = () => {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Followers</span>
                     <span className="font-semibold">{company.followers_count || 0}</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Profile Views</span>
-                    <span className="font-semibold">{company.views_count || 0}</span>
                   </div>
                   {company.founded_year && (
                     <>

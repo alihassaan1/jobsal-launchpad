@@ -30,10 +30,10 @@ const Jobs = () => {
     queryKey: ["jobs", searchTerm, category, location, jobType],
     queryFn: async () => {
       let query = supabase
-        .from("jobs")
+        .from("jobs_public")
         .select(`
           *,
-          companies (
+          companies:companies_public(
             name,
             logo_url,
             location
@@ -261,7 +261,7 @@ const Jobs = () => {
                       <Clock className="h-4 w-4" />
                       {t('jobs.posted')} {new Date(job.created_at).toLocaleDateString()}
                     </span>
-                    <span>{job.applications_count} {t('jobs.applications')}</span>
+                    
                   </div>
                 </CardContent>
               </Card>

@@ -27,7 +27,7 @@ const BlogPost = () => {
 
   const fetchPost = async () => {
     const { data, error } = await supabase
-      .from('posts')
+      .from('posts_public')
       .select('*, profiles!posts_author_id_fkey(full_name, avatar_url), blog_authors(name, bio, location)')
       .eq('slug', slug)
       .eq('is_published', true)
@@ -68,7 +68,7 @@ const BlogPost = () => {
 
   const fetchRelatedPosts = async (category: string, currentId: string) => {
     const { data } = await supabase
-      .from('posts')
+      .from('posts_public')
       .select('id, title, slug, excerpt, featured_image, category, published_at')
       .eq('category', category)
       .eq('is_published', true)

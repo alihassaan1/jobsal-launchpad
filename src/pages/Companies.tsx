@@ -44,7 +44,7 @@ const Companies = () => {
     queryKey: ["companies", searchTerm],
     queryFn: async () => {
       let query = supabase
-        .from("companies")
+        .from("companies_public")
         .select(`
           *,
           jobs(count)

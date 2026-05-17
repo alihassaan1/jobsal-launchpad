@@ -26,7 +26,7 @@ export const TopEmployers = () => {
     try {
       // Get companies marked as top employers with active placements
       const { data: companies, error } = await supabase
-        .from("companies")
+        .from("companies_public")
         .select("id, name, slug, logo_url, location")
         .eq("is_top_employer", true)
         .gte("top_employer_end_date", new Date().toISOString())
@@ -44,7 +44,7 @@ export const TopEmployers = () => {
       const employersWithCounts = await Promise.all(
         companies.map(async (company) => {
           const { count } = await supabase
-            .from("jobs")
+            .from("jobs_public")
             .select("*", { count: "exact", head: true })
             .eq("company_id", company.id)
             .eq("is_active", true);
