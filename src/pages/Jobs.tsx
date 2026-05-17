@@ -33,7 +33,7 @@ const Jobs = () => {
         .from("jobs_public")
         .select(`
           *,
-          companies_public (
+          companies:companies_public(
             name,
             logo_url,
             location

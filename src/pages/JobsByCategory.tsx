@@ -317,7 +317,7 @@ export default function JobsByCategory() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("jobs_public")
-        .select(`*, companies_public (name, logo_url, location)`)
+        .select(`*, companies:companies_public(name, logo_url, location)`)
         .eq("is_active", true)
         .ilike("category", `%${category}%`)
         .order("created_at", { ascending: false })

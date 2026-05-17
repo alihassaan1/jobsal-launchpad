@@ -25,7 +25,7 @@ const JobDetail = () => {
         .from("jobs_public")
         .select(`
           *,
-          companies_public (
+          companies:companies_public(
             name,
             logo_url,
             description,
@@ -56,7 +56,7 @@ const JobDetail = () => {
         .from("jobs_public")
         .select(`
           *,
-          companies_public (name, logo_url)
+          companies:companies_public(name, logo_url)
         `)
         .eq("category", job!.category)
         .eq("is_active", true)
