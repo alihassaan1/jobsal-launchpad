@@ -1280,15 +1280,20 @@ serve(async (req) => {
       html: template.html,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    const didFail = !!emailResponse.error;
+    if (didFail) {
+      console.error("Resend send failed:", emailResponse.error);
+    } else {
+      console.log("Email sent successfully:", emailResponse.data?.id);
+    }
 
-    // Log the email
+    // Log the email (accurate status)
     const { error: logError } = await supabase.from("email_logs").insert({
       user_id: userId || null,
       template_slug: templateSlug,
       email_to: to,
       subject: template.subject,
-      status: emailResponse.error ? "failed" : "sent",
+      status: didFail ? "failed" : "sent",
       sent_at: new Date().toISOString(),
       error_message: emailResponse.error?.message || null,
       metadata: data,
@@ -1299,9 +1304,13 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, data: emailResponse }),
+      JSON.stringify({
+        success: !didFail,
+        data: emailResponse.data,
+        error: emailResponse.error?.message || null,
+      }),
       {
-        status: 200,
+        status: didFail ? 502 : 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
