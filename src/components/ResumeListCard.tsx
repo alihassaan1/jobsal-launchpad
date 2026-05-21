@@ -51,8 +51,8 @@ export function ResumeListCard({ resume, onDelete, showActions = true }: ResumeL
     if (resume.is_uploaded && resume.resume_file_url) {
       window.open(resume.resume_file_url, '_blank');
     } else {
-      // Navigate to resume builder view
-      window.location.href = `/my-resumes?id=${resume.id}`;
+      // Open the builder loaded with this resume's data
+      window.location.href = `/resume-builder?id=${resume.id}`;
     }
   };
 
