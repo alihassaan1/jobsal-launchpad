@@ -94,6 +94,10 @@ export default function Navigation() {
                       <DropdownMenuItem onClick={() => navigate('/my-applications')}>
                         {t('nav.myApplications')}
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/saved-jobs')}>
+                        <Bookmark className="mr-2 h-4 w-4" />
+                        Saved Jobs
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/my-resumes')}>
                         {t('nav.myResumes')}
                       </DropdownMenuItem>
