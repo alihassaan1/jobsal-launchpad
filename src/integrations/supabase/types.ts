@@ -2620,6 +2620,7 @@ export type Database = {
       jobs_public: {
         Row: {
           application_deadline: string | null
+          applications_count: number | null
           benefits: string[] | null
           category: string | null
           company_id: string | null
@@ -2647,9 +2648,11 @@ export type Database = {
           slug: string | null
           title: string | null
           updated_at: string | null
+          views_count: number | null
         }
         Insert: {
           application_deadline?: string | null
+          applications_count?: number | null
           benefits?: string[] | null
           category?: string | null
           company_id?: string | null
@@ -2677,9 +2680,11 @@ export type Database = {
           slug?: string | null
           title?: string | null
           updated_at?: string | null
+          views_count?: number | null
         }
         Update: {
           application_deadline?: string | null
+          applications_count?: number | null
           benefits?: string[] | null
           category?: string | null
           company_id?: string | null
@@ -2707,6 +2712,7 @@ export type Database = {
           slug?: string | null
           title?: string | null
           updated_at?: string | null
+          views_count?: number | null
         }
         Relationships: [
           {
