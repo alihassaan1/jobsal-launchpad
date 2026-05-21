@@ -19,6 +19,7 @@ import ATSJobApplications from "./pages/ATSJobApplications";
 import ResumeTemplates from "./pages/ResumeTemplates";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import MyResumes from "./pages/MyResumes";
+import SavedJobs from "./pages/SavedJobs";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSubscriptions from "./pages/AdminSubscriptions";
 import AdminAnalytics from "./pages/AdminAnalytics";
