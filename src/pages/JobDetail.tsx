@@ -297,8 +297,9 @@ const JobDetail = () => {
                   >
                     {hasApplied ? "Already Applied" : job.is_active ? "Apply Now" : "Position Closed"}
                   </Button>
-                  <Button variant="outline" size="lg">
-                    Save Job
+                  <Button variant="outline" size="lg" onClick={handleToggleSave}>
+                    <Bookmark className={`h-4 w-4 mr-2 ${isSaved ? "fill-current" : ""}`} />
+                    {isSaved ? "Saved" : "Save Job"}
                   </Button>
                 </div>
                 {canSeeStats && (
