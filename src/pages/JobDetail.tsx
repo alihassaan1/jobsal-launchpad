@@ -108,13 +108,45 @@ const JobDetail = () => {
     },
   });
 
+  const { data: isSaved } = useQuery({
+    queryKey: ["isSaved", job?.id, user?.id],
+    enabled: !!job?.id && !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("saved_jobs")
+        .select("id")
+        .eq("job_id", job!.id)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return !!data;
+    },
+  });
+
+  const handleToggleSave = async () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    if (!job?.id) return;
+    if (isSaved) {
+      const { error } = await supabase.from("saved_jobs").delete().eq("user_id", user.id).eq("job_id", job.id);
+      if (error) return toast.error("Failed to remove");
+      toast.success("Removed from saved jobs");
+    } else {
+      const { error } = await supabase.from("saved_jobs").insert({ user_id: user.id, job_id: job.id });
+      if (error) return toast.error("Failed to save");
+      toast.success("Job saved");
+    }
+    queryClient.invalidateQueries({ queryKey: ["isSaved", job.id, user.id] });
+  };
+
   const handleApply = () => {
     if (!user) {
       navigate("/auth");
       return;
     }
     if (userRole !== "job_seeker") {
-      alert("Only job seekers can apply to jobs");
+      toast.error("Only job seekers can apply to jobs");
       return;
     }
     setIsApplyDialogOpen(true);
