@@ -19,6 +19,7 @@ import ATSJobApplications from "./pages/ATSJobApplications";
 import ResumeTemplates from "./pages/ResumeTemplates";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import MyResumes from "./pages/MyResumes";
+import SavedJobs from "./pages/SavedJobs";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSubscriptions from "./pages/AdminSubscriptions";
 import AdminAnalytics from "./pages/AdminAnalytics";
@@ -86,6 +87,7 @@ const App = () => (
             <Route path="/resume-templates" element={<ResumeTemplates />} />
             <Route path="/resume-builder" element={<ResumeBuilder />} />
             <Route path="/my-resumes" element={<MyResumes />} />
+            <Route path="/saved-jobs" element={<SavedJobs />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminLayout />}>

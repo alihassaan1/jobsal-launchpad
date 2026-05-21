@@ -1,21 +1,23 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Briefcase, MapPin, DollarSign, Building2, Calendar, Users, Share2, ArrowLeft } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Building2, Calendar, Users, Share2, ArrowLeft, Bookmark } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import ApplyToJobDialog from "@/components/ApplyToJobDialog";
 import { Helmet } from "react-helmet";
 import Navigation from "@/components/Navigation";
+import { toast } from "sonner";
 
 const JobDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user, userRole } = useAuth();
+  const queryClient = useQueryClient();
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
 
   const { data: job, isLoading } = useQuery({
@@ -106,13 +108,45 @@ const JobDetail = () => {
     },
   });
 
+  const { data: isSaved } = useQuery({
+    queryKey: ["isSaved", job?.id, user?.id],
+    enabled: !!job?.id && !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("saved_jobs")
+        .select("id")
+        .eq("job_id", job!.id)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return !!data;
+    },
+  });
+
+  const handleToggleSave = async () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    if (!job?.id) return;
+    if (isSaved) {
+      const { error } = await supabase.from("saved_jobs").delete().eq("user_id", user.id).eq("job_id", job.id);
+      if (error) return toast.error("Failed to remove");
+      toast.success("Removed from saved jobs");
+    } else {
+      const { error } = await supabase.from("saved_jobs").insert({ user_id: user.id, job_id: job.id });
+      if (error) return toast.error("Failed to save");
+      toast.success("Job saved");
+    }
+    queryClient.invalidateQueries({ queryKey: ["isSaved", job.id, user.id] });
+  };
+
   const handleApply = () => {
     if (!user) {
       navigate("/auth");
       return;
     }
     if (userRole !== "job_seeker") {
-      alert("Only job seekers can apply to jobs");
+      toast.error("Only job seekers can apply to jobs");
       return;
     }
     setIsApplyDialogOpen(true);
@@ -263,8 +297,9 @@ const JobDetail = () => {
                   >
                     {hasApplied ? "Already Applied" : job.is_active ? "Apply Now" : "Position Closed"}
                   </Button>
-                  <Button variant="outline" size="lg">
-                    Save Job
+                  <Button variant="outline" size="lg" onClick={handleToggleSave}>
+                    <Bookmark className={`h-4 w-4 mr-2 ${isSaved ? "fill-current" : ""}`} />
+                    {isSaved ? "Saved" : "Save Job"}
                   </Button>
                 </div>
                 {canSeeStats && (

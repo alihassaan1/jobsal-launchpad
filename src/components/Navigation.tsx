@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User, Sparkles } from "lucide-react";
+import { LogOut, User, Sparkles, Bookmark } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navigation() {
@@ -23,31 +23,31 @@ export default function Navigation() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
-            <a href="/" className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent relative">
+            <Link to="/" className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent relative">
               jobs.al
               <div className="absolute inset-0 bg-gradient-hero bg-clip-text text-transparent opacity-50 animate-shine"></div>
-            </a>
+            </Link>
             <nav className="hidden md:flex space-x-6">
-              <a href="/jobs" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
+              <Link to="/jobs" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
                 {t('nav.findJobs')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <a href="/companies" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
+              </Link>
+              <Link to="/companies" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
                 {t('nav.companies')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <a href="/ai-resume-builder" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
+              </Link>
+              <Link to="/ai-resume-builder" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
                 {t('nav.resumeBuilder')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <a href="/blog" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
+              </Link>
+              <Link to="/blog" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
                 {t('nav.blog')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <a href="/pricing" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
+              </Link>
+              <Link to="/pricing" className="text-foreground hover:text-primary transition-colors duration-300 relative group">
                 {t('nav.pricing')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-              </a>
+              </Link>
             </nav>
           </div>
           <div className="flex items-center space-x-4">
@@ -93,6 +93,10 @@ export default function Navigation() {
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/my-applications')}>
                         {t('nav.myApplications')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/saved-jobs')}>
+                        <Bookmark className="mr-2 h-4 w-4" />
+                        Saved Jobs
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/my-resumes')}>
                         {t('nav.myResumes')}
