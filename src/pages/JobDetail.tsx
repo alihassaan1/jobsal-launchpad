@@ -1,16 +1,17 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Briefcase, MapPin, DollarSign, Building2, Calendar, Users, Share2, ArrowLeft } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Building2, Calendar, Users, Share2, ArrowLeft, Bookmark } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import ApplyToJobDialog from "@/components/ApplyToJobDialog";
 import { Helmet } from "react-helmet";
 import Navigation from "@/components/Navigation";
+import { toast } from "sonner";
 
 const JobDetail = () => {
   const { slug } = useParams();
