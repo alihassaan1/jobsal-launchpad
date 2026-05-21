@@ -17,6 +17,7 @@ const JobDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user, userRole } = useAuth();
+  const queryClient = useQueryClient();
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
 
   const { data: job, isLoading } = useQuery({
