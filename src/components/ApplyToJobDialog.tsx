@@ -90,7 +90,7 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
         .select("id")
         .eq("job_id", job.id)
         .eq("applicant_id", user!.id)
-        .single();
+        .maybeSingle();
 
       if (existing) {
         throw new Error("You have already applied to this job");

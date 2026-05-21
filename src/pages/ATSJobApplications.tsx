@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams, Link, Navigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ import Navigation from "@/components/Navigation";
 
 const ATSJobApplications = () => {
   const { jobId } = useParams();
-  const { user, userRole } = useAuth();
+  const { user, userRole, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -31,10 +31,9 @@ const ATSJobApplications = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [rankedCandidates, setRankedCandidates] = useState<any[]>([]);
 
-  if (userRole !== "employer" && userRole !== "admin") {
-    navigate("/");
-    return null;
-  }
+  if (authLoading || (!!user && !userRole)) return <div className="min-h-screen bg-background" />;
+  if (!user) return <Navigate to="/auth" replace />;
+  if (userRole !== "employer" && userRole !== "admin") return <Navigate to="/" replace />;
 
   // Fetch job details
   const { data: job } = useQuery({
