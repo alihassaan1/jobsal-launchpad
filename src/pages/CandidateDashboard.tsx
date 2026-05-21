@@ -2,38 +2,35 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Briefcase, MapPin, Clock, FileText, Eye } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const CandidateDashboard = () => {
-  const { user, userRole } = useAuth();
-  const navigate = useNavigate();
-
-  if (userRole !== "job_seeker") {
-    navigate("/");
-    return null;
-  }
+  const { user, userRole, loading: authLoading } = useAuth();
+  const { toast } = useToast();
 
   const { data: applications, isLoading } = useQuery({
     queryKey: ["myApplications", user?.id],
+    enabled: !!user?.id,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("applications")
         .select(`
           *,
-          jobs (
+          jobs:jobs_public (
             id,
             title,
             slug,
             location,
             job_type,
             is_active,
-            companies (
+            companies:companies_public (
               name,
               logo_url
             )
@@ -46,6 +43,21 @@ const CandidateDashboard = () => {
       return data;
     },
   });
+
+  const openResume = async (path: string) => {
+    const { data, error } = await supabase.storage.from("resumes").createSignedUrl(path, 60);
+    if (error || !data?.signedUrl) {
+      toast({ title: "Couldn't open resume", description: error?.message || "File unavailable", variant: "destructive" });
+      return;
+    }
+    window.open(data.signedUrl, "_blank");
+  };
+
+  if (authLoading || (!!user && !userRole)) {
+    return <div className="min-h-screen bg-background" />;
+  }
+  if (!user) return <Navigate to="/auth" replace />;
+  if (userRole !== "job_seeker") return <Navigate to="/" replace />;
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -156,10 +168,10 @@ const CandidateDashboard = () => {
                           <div className="flex items-start justify-between">
                             <div className="flex gap-4 flex-1">
                               <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                                {application.jobs.companies?.logo_url ? (
+                                {application.jobs?.companies?.logo_url ? (
                                   <img
                                     src={application.jobs.companies.logo_url}
-                                    alt={application.jobs.companies?.name}
+                                    alt={application.jobs?.companies?.name || ""}
                                     className="w-12 h-12 object-contain"
                                   />
                                 ) : (
@@ -167,16 +179,22 @@ const CandidateDashboard = () => {
                                 )}
                               </div>
                               <div className="flex-1">
-                                <CardTitle className="text-xl mb-2">{application.jobs.title}</CardTitle>
+                                <CardTitle className="text-xl mb-2">
+                                  {application.jobs?.title || "Job no longer available"}
+                                </CardTitle>
                                 <CardDescription className="flex flex-wrap gap-4">
-                                  <span className="flex items-center gap-1">
-                                    <Briefcase className="h-4 w-4" />
-                                    {application.jobs.companies?.name}
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <MapPin className="h-4 w-4" />
-                                    {application.jobs.location}
-                                  </span>
+                                  {application.jobs?.companies?.name && (
+                                    <span className="flex items-center gap-1">
+                                      <Briefcase className="h-4 w-4" />
+                                      {application.jobs.companies.name}
+                                    </span>
+                                  )}
+                                  {application.jobs?.location && (
+                                    <span className="flex items-center gap-1">
+                                      <MapPin className="h-4 w-4" />
+                                      {application.jobs.location}
+                                    </span>
+                                  )}
                                   <span className="flex items-center gap-1">
                                     <Clock className="h-4 w-4" />
                                     Applied {new Date(application.created_at).toLocaleDateString()}
@@ -199,21 +217,18 @@ const CandidateDashboard = () => {
                         </CardHeader>
                         <CardContent>
                           <div className="flex gap-2">
-                            <Link to={`/jobs/${application.jobs.slug}`}>
-                              <Button variant="outline" size="sm">
-                                View Job
-                              </Button>
-                            </Link>
+                            {application.jobs?.slug && (
+                              <Link to={`/jobs/${application.jobs.slug}`}>
+                                <Button variant="outline" size="sm">
+                                  View Job
+                                </Button>
+                              </Link>
+                            )}
                             {application.resume_url && (
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => {
-                                  const { data } = supabase.storage
-                                    .from("resumes")
-                                    .getPublicUrl(application.resume_url);
-                                  window.open(data.publicUrl, "_blank");
-                                }}
+                                onClick={() => openResume(application.resume_url)}
                               >
                                 <FileText className="h-4 w-4 mr-1" />
                                 View Resume

@@ -101,7 +101,7 @@ const JobDetail = () => {
         .select("id")
         .eq("job_id", job!.id)
         .eq("applicant_id", user!.id)
-        .single();
+        .maybeSingle();
       return !!data;
     },
   });

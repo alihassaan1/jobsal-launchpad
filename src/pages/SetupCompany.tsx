@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Navigation from "@/components/Navigation";
@@ -60,12 +60,11 @@ export default function SetupCompany() {
   });
 
   if (authLoading) {
-    return null;
+    return <div className="min-h-screen bg-background" />;
   }
 
   if (!user) {
-    navigate("/auth?type=employer");
-    return null;
+    return <Navigate to="/auth?type=employer" replace />;
   }
 
   const generateSlug = (name: string) => {

@@ -2882,6 +2882,16 @@ export type Database = {
           total_tokens: number
         }[]
       }
+      get_job_employer_contact: {
+        Args: { _job_id: string }
+        Returns: {
+          company_name: string
+          employer_email: string
+          employer_name: string
+          job_title: string
+          owner_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

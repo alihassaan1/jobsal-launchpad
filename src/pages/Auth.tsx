@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,11 +26,9 @@ const Auth = () => {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [resettingPw, setResettingPw] = useState(false);
 
-  // Redirect if already logged in
-  if (user) {
-    if (authLoading || !userRole) return null;
-    navigate(userRole === 'employer' ? '/dashboard' : '/');
-    return null;
+  // Redirect if already logged in (after role resolves)
+  if (user && !authLoading && userRole) {
+    return <Navigate to={userRole === 'employer' || userRole === 'admin' ? '/dashboard' : '/'} replace />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {

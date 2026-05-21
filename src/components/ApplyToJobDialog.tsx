@@ -32,30 +32,20 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
 
   const sendNewApplicantNotification = async () => {
     try {
-      // Get employer info from job's company
-      const { data: company } = await supabase
-        .from("companies")
-        .select("owner_id, name")
-        .eq("id", job.company_id)
-        .single();
-
-      if (!company) return;
-
-      const { data: employerProfile } = await supabase
-        .from("profiles")
-        .select("email, full_name")
-        .eq("id", company.owner_id)
-        .single();
-
-      if (!employerProfile?.email) return;
+      const { data: contact, error: contactError } = await (supabase.rpc as any)(
+        "get_job_employer_contact",
+        { _job_id: job.id }
+      );
+      if (contactError) throw contactError;
+      const row: any = Array.isArray(contact) ? contact[0] : contact;
+      if (!row?.employer_email) return;
 
       const { data: userProfile } = await supabase
         .from("profiles")
         .select("full_name, email")
         .eq("id", user!.id)
-        .single();
+        .maybeSingle();
 
-      // Get application count for this job
       const { count: totalApplications } = await supabase
         .from("applications")
         .select("*", { count: "exact", head: true })
@@ -63,18 +53,18 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
 
       await supabase.functions.invoke("send-email", {
         body: {
-          to: employerProfile.email,
+          to: row.employer_email,
           templateSlug: "new-applicant",
           data: {
-            employerName: employerProfile.full_name || "",
-            jobTitle: job.title,
+            employerName: row.employer_name || "",
+            jobTitle: row.job_title || job.title,
             location: job.location,
             applicantName: userProfile?.full_name || "Kandidat",
             applicantEmail: userProfile?.email || "",
             appliedDate: new Date().toLocaleDateString("sq-AL"),
             totalApplications: String(totalApplications || 1),
           },
-          userId: company.owner_id,
+          userId: row.owner_id,
         },
       });
     } catch (err) {
@@ -90,7 +80,7 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
         .select("id")
         .eq("job_id", job.id)
         .eq("applicant_id", user!.id)
-        .single();
+        .maybeSingle();
 
       if (existing) {
         throw new Error("You have already applied to this job");
