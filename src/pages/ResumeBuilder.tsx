@@ -129,8 +129,22 @@ export default function ResumeBuilder() {
   useEffect(() => {
     if (existingResume?.data) {
       setResumeData(existingResume.data as unknown as ResumeData);
+      if (existingResume.template_id) {
+        // best-effort: template name is resolved separately via templates table
+      }
     }
   }, [existingResume]);
+
+  // Auto-trigger PDF export when arriving with ?export=1 (e.g. Download from MyResumes)
+  const shouldAutoExport = searchParams.get("export") === "1";
+  useEffect(() => {
+    if (!shouldAutoExport || resumeLoading || !existingResume) return;
+    const t = setTimeout(() => {
+      exportToPDF();
+    }, 600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldAutoExport, resumeLoading, existingResume]);
 
   const saveResumeMutation = useMutation({
     mutationFn: async () => {
