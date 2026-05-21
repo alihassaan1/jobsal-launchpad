@@ -330,12 +330,12 @@ const CompanyProfile = () => {
               {/* Open Positions */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Open Positions ({company.jobs?.length || 0})</CardTitle>
+                  <CardTitle>Open Positions ({companyJobs?.length || 0})</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {company.jobs && company.jobs.length > 0 ? (
+                  {companyJobs && companyJobs.length > 0 ? (
                     <div className="space-y-4">
-                      {company.jobs.filter((job: any) => job.is_active).map((job: any) => (
+                      {companyJobs.map((job: any) => (
                         <Link
                           key={job.id}
                           to={`/jobs/${job.slug}`}
@@ -394,7 +394,7 @@ const CompanyProfile = () => {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Open Jobs</span>
-                    <span className="font-semibold">{company.jobs?.filter((j: any) => j.is_active).length || 0}</span>
+                    <span className="font-semibold">{companyJobs?.length || 0}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between">
@@ -413,7 +413,7 @@ const CompanyProfile = () => {
                 </CardContent>
               </Card>
 
-              {company.jobs && company.jobs.length > 0 && (
+              {companyJobs && companyJobs.length > 0 && (
                 <Button className="w-full" asChild>
                   <Link to="/jobs" state={{ company: company.name }}>
                     View All Jobs
