@@ -46,35 +46,35 @@ export function ResumeUploadDialog({ onUploadSuccess }: ResumeUploadDialogProps)
 
     setUploading(true);
     try {
-      // Upload file to storage
+      // Upload file to (private) storage bucket
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError, data } = await supabase.storage
+
+      const { error: uploadError } = await supabase.storage
         .from('resumes')
-        .upload(fileName, file);
+        .upload(fileName, file, { contentType: file.type, upsert: false });
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('resumes')
-        .getPublicUrl(fileName);
-
-      // Create resume record
+      // Store the storage path (NOT a public URL — bucket is private).
+      // ResumeListCard generates short-lived signed URLs on view/download.
       const { error: insertError } = await supabase
         .from('resumes')
         .insert({
           user_id: user.id,
           title: resumeTitle,
           resume_type: resumeType || null,
-          resume_file_url: publicUrl,
+          resume_file_url: fileName,
           is_uploaded: true,
           is_active: true,
           data: {}
         });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        // Roll back the uploaded file if the DB insert fails
+        await supabase.storage.from('resumes').remove([fileName]);
+        throw insertError;
+      }
 
       toast.success("Resume uploaded successfully!");
       setOpen(false);
@@ -82,9 +82,9 @@ export function ResumeUploadDialog({ onUploadSuccess }: ResumeUploadDialogProps)
       setResumeType("");
       setFile(null);
       onUploadSuccess?.();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error("Failed to upload resume");
+      toast.error(error?.message || "Failed to upload resume");
     } finally {
       setUploading(false);
     }
