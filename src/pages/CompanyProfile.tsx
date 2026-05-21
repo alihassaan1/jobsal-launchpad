@@ -38,21 +38,37 @@ const CompanyProfile = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("companies_public")
-        .select(`
-          *,
-          jobs(*)
-        `)
+        .select("*")
         .eq("slug", slug)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
-      // Increment view count
-      await supabase.rpc("increment_company_views", { company_slug: slug });
+      // Increment view count (fire and forget)
+      if (data) {
+        supabase.rpc("increment_company_views", { company_slug: slug });
+      }
 
       return data;
     },
     enabled: !!slug,
+  });
+
+  // Fetch this company's active jobs from the public view (RLS-safe for anon)
+  const { data: companyJobs } = useQuery({
+    queryKey: ["company-jobs", company?.id],
+    queryFn: async () => {
+      if (!company?.id) return [];
+      const { data, error } = await supabase
+        .from("jobs_public")
+        .select("*")
+        .eq("company_id", company.id)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!company?.id,
   });
 
   const { data: sponsoredPosts } = useQuery({
