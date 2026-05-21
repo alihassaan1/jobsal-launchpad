@@ -135,6 +135,9 @@ export default function ResumeBuilder() {
   const saveResumeMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("User not authenticated");
+      if (!resumeData.personal_info.full_name.trim()) {
+        throw new Error("Please enter your full name before saving");
+      }
 
       if (resumeId) {
         // Update existing resume
