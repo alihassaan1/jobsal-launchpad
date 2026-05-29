@@ -101,6 +101,10 @@ export default function AdminSettings() {
             <FileText className="mr-2 h-4 w-4" />
             Legal
           </TabsTrigger>
+          <TabsTrigger value="social">
+            <Share2 className="mr-2 h-4 w-4" />
+            Social
+          </TabsTrigger>
         </TabsList>
 
         {/* Email Settings */}
