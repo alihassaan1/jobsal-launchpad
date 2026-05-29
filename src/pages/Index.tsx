@@ -229,9 +229,7 @@ const Index = () => {
       <Navigation />
 
       {/* Hero Section */}
-      <section 
-        className="relative py-20 bg-gradient-hero overflow-hidden"
-      >
+      <section className="relative py-20 bg-primary overflow-hidden">
         {/* Subtle geometric pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
