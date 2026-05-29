@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Mail, CreditCard, Palette, Globe, FileText } from "lucide-react";
+import { Mail, CreditCard, Palette, Globe, FileText, Share2 } from "lucide-react";
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<Record<string, string>>({});
