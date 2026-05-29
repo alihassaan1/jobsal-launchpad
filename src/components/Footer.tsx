@@ -1,8 +1,39 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { Facebook, Instagram, Linkedin, Twitter, Youtube, Music2 } from "lucide-react";
+
+const SOCIAL_FIELDS = [
+  { key: "social_facebook", label: "Facebook", Icon: Facebook },
+  { key: "social_instagram", label: "Instagram", Icon: Instagram },
+  { key: "social_linkedin", label: "LinkedIn", Icon: Linkedin },
+  { key: "social_twitter", label: "X", Icon: Twitter },
+  { key: "social_youtube", label: "YouTube", Icon: Youtube },
+  { key: "social_tiktok", label: "TikTok", Icon: Music2 },
+] as const;
 
 export default function Footer() {
   const { t } = useLanguage();
+  const [socials, setSocials] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("admin_settings")
+        .select("key,value")
+        .like("key", "social_%");
+      if (data) {
+        const map: Record<string, string> = {};
+        data.forEach((r: any) => {
+          if (r.value) map[r.key] = r.value;
+        });
+        setSocials(map);
+      }
+    })();
+  }, []);
+
+  const activeSocials = SOCIAL_FIELDS.filter((s) => socials[s.key]);
 
   return (
     <footer className="bg-secondary py-12 border-t">
@@ -49,24 +80,29 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        
+
         {/* Social Links & Bottom Bar */}
         <div className="mt-8 pt-8 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
               {t('footer.madeWith')}
             </p>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                Facebook
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                Instagram
-              </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                LinkedIn
-              </a>
-            </div>
+            {activeSocials.length > 0 && (
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                {activeSocials.map(({ key, label, Icon }) => (
+                  <a
+                    key={key}
+                    href={socials[key]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="hover:text-primary transition-colors"
+                  >
+                    <Icon className="h-5 w-5" />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

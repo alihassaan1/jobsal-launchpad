@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Mail, CreditCard, Palette, Globe, FileText } from "lucide-react";
+import { Mail, CreditCard, Palette, Globe, FileText, Share2 } from "lucide-react";
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<Record<string, string>>({});
@@ -100,6 +100,10 @@ export default function AdminSettings() {
           <TabsTrigger value="legal">
             <FileText className="mr-2 h-4 w-4" />
             Legal
+          </TabsTrigger>
+          <TabsTrigger value="social">
+            <Share2 className="mr-2 h-4 w-4" />
+            Social
           </TabsTrigger>
         </TabsList>
 
@@ -338,6 +342,39 @@ export default function AdminSettings() {
               </div>
               <Button onClick={() => handleSaveSection('Legal', ['terms_url', 'privacy_url', 'contact_phone', 'whatsapp_number'])}>
                 Save Legal Settings
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        {/* Social Media Settings */}
+        <TabsContent value="social">
+          <Card>
+            <CardHeader>
+              <CardTitle>Social Media Links</CardTitle>
+              <CardDescription>URLs shown in the site footer. Leave blank to hide an icon.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {[
+                { key: 'social_facebook', label: 'Facebook URL', placeholder: 'https://facebook.com/jobs.al' },
+                { key: 'social_instagram', label: 'Instagram URL', placeholder: 'https://instagram.com/jobs.al' },
+                { key: 'social_linkedin', label: 'LinkedIn URL', placeholder: 'https://linkedin.com/company/jobs-al' },
+                { key: 'social_twitter', label: 'X / Twitter URL', placeholder: 'https://x.com/jobsal' },
+                { key: 'social_youtube', label: 'YouTube URL', placeholder: 'https://youtube.com/@jobsal' },
+                { key: 'social_tiktok', label: 'TikTok URL', placeholder: 'https://tiktok.com/@jobs.al' },
+              ].map((f) => (
+                <div key={f.key} className="space-y-2">
+                  <Label htmlFor={f.key}>{f.label}</Label>
+                  <Input
+                    id={f.key}
+                    type="url"
+                    value={settings[f.key] || ''}
+                    onChange={(e) => handleInputChange(f.key, e.target.value)}
+                    placeholder={f.placeholder}
+                  />
+                </div>
+              ))}
+              <Button onClick={() => handleSaveSection('Social', ['social_facebook', 'social_instagram', 'social_linkedin', 'social_twitter', 'social_youtube', 'social_tiktok'])}>
+                Save Social Links
               </Button>
             </CardContent>
           </Card>
