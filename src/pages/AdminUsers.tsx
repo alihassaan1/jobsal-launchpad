@@ -72,10 +72,16 @@ export default function AdminUsers() {
         return;
       }
 
-      // 2) Fetch roles and subscriptions in bulk
-      const [rolesRes, subsRes] = await Promise.all([
-        supabase.from('user_roles').select('user_id, role').in('user_id', userIds),
-        supabase.from('subscriptions').select('user_id, tier, status').in('user_id', userIds),
+      // 2) Fetch roles, subscriptions, applications and resumes in bulk (no N+1)
+      const [rolesRes, subsRes, appsRes, resumesRes] = await Promise.all([
+        supabase.from('user_roles').select('user_id, role'),
+        supabase.from('subscriptions').select('user_id, tier, status'),
+        supabase.from('applications').select('applicant_id'),
+        supabase
+          .from('resumes')
+          .select('id, user_id, title, resume_file_url, is_uploaded, created_at')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false }),
       ]);
 
       const roles = rolesRes.data || [];
@@ -95,24 +101,27 @@ export default function AdminUsers() {
         subsMap.set(s.user_id, arr);
       });
 
-      // 3) Count applications and fetch resumes with file URLs per user
-      const usersWithCounts = await Promise.all(
-        (profiles || []).map(async (user: any) => {
-          const [appsResult, resumesResult] = await Promise.all([
-            supabase.from('applications').select('*', { count: 'exact', head: true }).eq('applicant_id', user.id),
-            supabase.from('resumes').select('id, title, resume_file_url, is_uploaded, created_at').eq('user_id', user.id).eq('is_active', true).order('created_at', { ascending: false }),
-          ]);
+      const appsCountMap = new Map<string, number>();
+      (appsRes.data || []).forEach((a: any) => {
+        appsCountMap.set(a.applicant_id, (appsCountMap.get(a.applicant_id) || 0) + 1);
+      });
 
-          return {
-            ...user,
-            user_roles: roleMap.get(user.id) || [],
-            subscriptions: subsMap.get(user.id) || [],
-            applications_count: appsResult.count || 0,
-            resumes_count: resumesResult.data?.length || 0,
-            resumes: resumesResult.data || [],
-          };
-        })
-      );
+      const resumesMap = new Map<string, any[]>();
+      (resumesRes.data || []).forEach((r: any) => {
+        const arr = resumesMap.get(r.user_id) || [];
+        arr.push(r);
+        resumesMap.set(r.user_id, arr);
+      });
+
+      const usersWithCounts = (profiles || []).map((user: any) => ({
+        ...user,
+        user_roles: roleMap.get(user.id) || [],
+        subscriptions: subsMap.get(user.id) || [],
+        applications_count: appsCountMap.get(user.id) || 0,
+        resumes_count: (resumesMap.get(user.id) || []).length,
+        resumes: resumesMap.get(user.id) || [],
+      }));
+
 
       setUsers(usersWithCounts);
     } catch (error) {
