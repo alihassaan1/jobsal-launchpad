@@ -97,7 +97,12 @@ const BlogSection = () => {
                   }}
                 />
               ) : (
-                <div className="absolute inset-0 bg-gradient-primary" />
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col items-center justify-center p-6">
+                  <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-4">
+                    <ImageIcon className="w-8 h-8 text-white/60" />
+                  </div>
+                  <span className="text-white/40 text-sm font-medium">jobs.al blog</span>
+                </div>
               )}
               <h3
                 className="absolute bottom-4 left-4 right-4 text-primary-foreground text-[17px] font-semibold line-clamp-2 opacity-85 transition-all duration-200 group-hover:opacity-100 group-hover:font-bold"
