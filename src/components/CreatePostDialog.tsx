@@ -381,14 +381,18 @@ export function CreatePostDialog({ open, onOpenChange, onSuccess, userId }: Crea
               </div>
 
               <div>
-                <Label htmlFor="manual-image">Featured Image URL</Label>
+                <Label htmlFor="manual-image">Featured Image URL (recommended)</Label>
                 <Input
                   id="manual-image"
                   value={formData.featured_image}
                   onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
                   placeholder="https://example.com/image.jpg"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Recommended: 800x530px (3:2 ratio). Prefer images with darker tones or open space at the bottom so the white title stays readable.
+                </p>
               </div>
+
 
               <div>
                 <Label htmlFor="manual-tags">Tags (comma-separated)</Label>
