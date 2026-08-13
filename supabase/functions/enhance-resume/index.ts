@@ -291,6 +291,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
           status: 'failed',
           errorMessage: 'Rate limit exceeded',
           requestPreview: userPrompt,
+          userId,
         });
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
@@ -308,6 +309,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
           status: 'failed',
           errorMessage: 'AI credits exhausted',
           requestPreview: userPrompt,
+          userId,
         });
         return new Response(
           JSON.stringify({ error: "AI credits exhausted. Please add credits to your workspace." }),
@@ -327,6 +329,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
         status: 'failed',
         errorMessage: errorText,
         requestPreview: userPrompt,
+        userId,
       });
       
       throw new Error("Failed to enhance resume content");
@@ -349,6 +352,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
       durationMs,
       status: 'success',
       requestPreview: userPrompt,
+      userId,
       responsePreview: enhancedText,
     });
 
