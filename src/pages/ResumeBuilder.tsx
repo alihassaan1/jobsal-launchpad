@@ -10,22 +10,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Sparkles, Download, Save, LogOut, User, Palette } from "lucide-react";
+import { Loader2, Sparkles, Download, Save, Palette, Trash2, Plus } from "lucide-react";
 import html2pdf from "html2pdf.js";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import TemplateSelector from "@/components/TemplateSelector";
 import ModernTemplate from "@/components/resume-templates/ModernTemplate";
 import ClassicTemplate from "@/components/resume-templates/ClassicTemplate";
 import CreativeTemplate from "@/components/resume-templates/CreativeTemplate";
 import ExecutiveTemplate from "@/components/resume-templates/ExecutiveTemplate";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
+import { useResumeAISettings, isOn } from "@/hooks/useResumeAISettings";
 
 interface ResumeData {
   personal_info: {
