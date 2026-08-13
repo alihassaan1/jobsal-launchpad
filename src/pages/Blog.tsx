@@ -29,7 +29,7 @@ const formatDate = (dateString: string | null) =>
     : "";
 
 const BlogCardMedia = ({ post, className }: { post: any; className?: string }) => (
-  <div className={`relative overflow-hidden rounded-2xl bg-muted ${className || ""}`}>
+  <div className={`overflow-hidden rounded-2xl bg-muted ${className || "relative h-full w-full"}`}>
     {post.featured_image ? (
       <img
         src={post.featured_image}
@@ -144,10 +144,10 @@ const Blog = () => {
   return (
     <>
       <Helmet>
-        <title>Career Advice & Job Market Insights Albania | Jobs.al Blog</title>
+        <title>Albania Jobs Blog | Career Advice & Job Market Insights</title>
         <meta name="description" content="Expert career advice, resume tips & Albanian job market trends. Discover salary guides, interview tips, career opportunities & employment insights for professionals and expats in Albania." />
         <meta name="keywords" content="career advice albania, job market albania, resume tips, interview tips, salary guide albania, employment trends, career blog" />
-        <meta property="og:title" content="Career Advice & Job Market Insights | Jobs.al Blog" />
+        <meta property="og:title" content="Albania Jobs Blog | Career Advice & Job Market Insights" />
         <meta property="og:description" content="Expert career advice, resume tips & Albanian job market trends for professionals and expats." />
         <meta property="og:url" content="https://jobs.al/blog" />
         <meta property="og:image" content="https://jobs.al/og-image.jpg" />
@@ -159,7 +159,7 @@ const Blog = () => {
         <div className="container mx-auto px-4 py-10">
           {/* Header */}
           <header className="mb-8">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Blog</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Albania Jobs Blog</h1>
             <p className="mt-2 text-sm md:text-base text-muted-foreground">
               Career insights, job market trends, and expert advice
             </p>
