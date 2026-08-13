@@ -218,14 +218,16 @@ const Blog = () => {
                     onClick={() => navigate(`/blog/${featured.slug}`)}
                     className="group block w-full text-left"
                   >
-                    <div className="relative aspect-[21/9] w-full">
+                    <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl">
                       <BlogCardMedia post={featured} className="absolute inset-0" />
-                      <h2
-                        className="absolute bottom-5 left-5 right-5 line-clamp-2 text-left text-2xl font-bold leading-tight text-white group-hover:font-bold md:text-3xl lg:text-4xl"
-                        style={{ textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}
+                      <div
+                        className="absolute bottom-0 left-0 right-0 px-4 pb-3.5 pt-4"
+                        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%)" }}
                       >
-                        {featured.title}
-                      </h2>
+                        <h2 className="line-clamp-2 text-left text-2xl font-bold leading-tight text-white group-hover:font-bold md:text-3xl lg:text-4xl">
+                          {featured.title}
+                        </h2>
+                      </div>
                     </div>
                   </button>
 
