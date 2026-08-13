@@ -198,7 +198,7 @@ export default function ResumeBuilder() {
           .from("resumes")
           .update({
             title: `${resumeData.personal_info.full_name || "My"} Resume`,
-            data: resumeData as any,
+            data: { ...resumeData, template: selectedTemplate } as any,
             updated_at: new Date().toISOString(),
           })
           .eq("id", resumeId)
@@ -225,7 +225,7 @@ export default function ResumeBuilder() {
           const { data, error } = await supabase
             .from("resumes")
             .update({
-              data: resumeData as any,
+              data: { ...resumeData, template: selectedTemplate } as any,
               updated_at: new Date().toISOString(),
             })
             .eq("id", existingResumes[0].id)
@@ -243,7 +243,7 @@ export default function ResumeBuilder() {
             user_id: user.id,
             template_id: templateId || null,
             title: `${resumeData.personal_info.full_name || "My"} Resume`,
-            data: resumeData as any,
+            data: { ...resumeData, template: selectedTemplate } as any,
           }])
           .select()
           .single();
@@ -257,6 +257,7 @@ export default function ResumeBuilder() {
         title: resumeId ? "Resume updated" : "Resume saved",
         description: resumeId ? "Your resume has been updated successfully" : "Your resume has been saved successfully",
       });
+      setIsDirty(false);
       queryClient.invalidateQueries({ queryKey: ["user-resumes"] });
       queryClient.invalidateQueries({ queryKey: ["resume", resumeId] });
       
