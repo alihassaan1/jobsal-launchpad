@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,10 +14,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Eye, Calendar, Loader2, RefreshCw } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, Calendar, Loader2, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { EditPostDialog } from "@/components/EditPostDialog";
+
+type SortKey = 'title' | 'category' | 'language' | 'views_count' | 'created_at';
+type SortDirection = 'asc' | 'desc';
 
 interface Post {
   id: string;
@@ -48,6 +51,50 @@ const AdminBlog = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isSeeding, setIsSeeding] = useState(false);
   const [togglingPublish, setTogglingPublish] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>('created_at');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+  const sortedPosts = useMemo(() => {
+    const sorted = [...posts];
+    sorted.sort((a, b) => {
+      let comparison = 0;
+      switch (sortKey) {
+        case 'title':
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case 'category':
+          comparison = a.category.localeCompare(b.category);
+          break;
+        case 'language':
+          comparison = a.language.localeCompare(b.language);
+          break;
+        case 'views_count':
+          comparison = a.views_count - b.views_count;
+          break;
+        case 'created_at':
+          comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          break;
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+    return sorted;
+  }, [posts, sortKey, sortDirection]);
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortIcon = ({ column }: { column: SortKey }) => {
+    if (sortKey !== column) return <ArrowUpDown className="ml-1 h-3 w-3 text-muted-foreground/70" />;
+    return sortDirection === 'asc'
+      ? <ArrowUp className="ml-1 h-3 w-3 text-primary" />
+      : <ArrowDown className="ml-1 h-3 w-3 text-primary" />;
+  };
 
   useEffect(() => {
     const allowedRoles = ['admin', 'editor'];
@@ -225,17 +272,27 @@ const AdminBlog = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40%]">Title</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Lang</TableHead>
+                  <TableHead className="w-[40%] cursor-pointer" onClick={() => handleSort('title')}>
+                    <span className="flex items-center">Title <SortIcon column="title" /></span>
+                  </TableHead>
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('category')}>
+                    <span className="flex items-center">Category <SortIcon column="category" /></span>
+                  </TableHead>
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('language')}>
+                    <span className="flex items-center">Lang <SortIcon column="language" /></span>
+                  </TableHead>
                   <TableHead>Published</TableHead>
-                  <TableHead>Views</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('views_count')}>
+                    <span className="flex items-center">Views <SortIcon column="views_count" /></span>
+                  </TableHead>
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('created_at')}>
+                    <span className="flex items-center">Date <SortIcon column="created_at" /></span>
+                  </TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {posts.map((post) => (
+                {sortedPosts.map((post) => (
                   <TableRow key={post.id}>
                     <TableCell className="font-medium">
                       <div className="max-w-md">
@@ -273,8 +330,8 @@ const AdminBlog = () => {
                         {formatDate(post.created_at)}
                       </span>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
+                    <TableCell className="text-center">
+                      <div className="flex justify-center gap-1">
                         <Button
                           size="sm"
                           variant="ghost"
