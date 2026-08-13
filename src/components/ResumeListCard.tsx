@@ -45,6 +45,7 @@ function getStoragePath(url: string): string | null {
 
 export function ResumeListCard({ resume, onDelete, showActions = true }: ResumeListCardProps) {
   const [busy, setBusy] = useState<"view" | "download" | "delete" | null>(null);
+  const navigate = useNavigate();
 
   const openUploadedFile = async (action: "view" | "download") => {
     if (!resume.resume_file_url) {
