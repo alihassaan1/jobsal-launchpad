@@ -54,15 +54,18 @@ interface ResumeData {
     date: string;
   }>;
   languages: string[];
+  template?: string;
 }
 
 export default function ResumeBuilder() {
-  const { user, signOut, userRole } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const templateId = searchParams.get("template");
   const resumeId = searchParams.get("id");
   const queryClient = useQueryClient();
+  const { data: aiSettings } = useResumeAISettings();
+  const aiEnabled = isOn(aiSettings, "resume_ai_enabled");
 
   const [resumeData, setResumeData] = useState<ResumeData>({
     personal_info: {
@@ -81,9 +84,33 @@ export default function ResumeBuilder() {
     languages: [],
   });
 
-  const [aiLoading, setAiLoading] = useState(false);
+  const [aiLoadingKey, setAiLoadingKey] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState("modern");
   const [templateSelectorOpen, setTemplateSelectorOpen] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+
+  // Require sign-in: saving is impossible for anonymous visitors
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth?redirect=/resume-builder", { replace: true });
+    }
+  }, [authLoading, user, navigate]);
+
+  // Warn before losing unsaved edits
+  useEffect(() => {
+    if (!isDirty) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
+
+  const updateResume = (updater: (prev: ResumeData) => ResumeData) => {
+    setIsDirty(true);
+    setResumeData(updater);
+  };
 
   const { data: template } = useQuery({
     queryKey: ["resume-template", templateId],
