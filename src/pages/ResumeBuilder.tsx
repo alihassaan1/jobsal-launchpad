@@ -149,10 +149,27 @@ export default function ResumeBuilder() {
   // Load resume data when existingResume is fetched
   useEffect(() => {
     if (existingResume?.data) {
-      setResumeData(existingResume.data as unknown as ResumeData);
-      if (existingResume.template_id) {
-        // best-effort: template name is resolved separately via templates table
-      }
+      const loaded = existingResume.data as unknown as ResumeData;
+      setResumeData({
+        personal_info: {
+          full_name: "",
+          email: "",
+          phone: "",
+          location: "",
+          linkedin: "",
+          portfolio: "",
+          ...(loaded.personal_info || {}),
+        },
+        summary: loaded.summary || "",
+        experience: loaded.experience || [],
+        education: loaded.education || [],
+        skills: loaded.skills || [],
+        certifications: loaded.certifications || [],
+        languages: loaded.languages || [],
+        template: loaded.template,
+      });
+      if (loaded.template) setSelectedTemplate(loaded.template);
+      setIsDirty(false);
     }
   }, [existingResume]);
 
