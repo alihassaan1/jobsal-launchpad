@@ -272,17 +272,27 @@ const AdminBlog = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40%]">Title</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Lang</TableHead>
+                  <TableHead className="w-[40%] cursor-pointer" onClick={() => handleSort('title')}>
+                    <span className="flex items-center">Title <SortIcon column="title" /></span>
+                  </TableHead>
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('category')}>
+                    <span className="flex items-center">Category <SortIcon column="category" /></span>
+                  </TableHead>
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('language')}>
+                    <span className="flex items-center">Lang <SortIcon column="language" /></span>
+                  </TableHead>
                   <TableHead>Published</TableHead>
-                  <TableHead>Views</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('views_count')}>
+                    <span className="flex items-center">Views <SortIcon column="views_count" /></span>
+                  </TableHead>
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('created_at')}>
+                    <span className="flex items-center">Date <SortIcon column="created_at" /></span>
+                  </TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {posts.map((post) => (
+                {sortedPosts.map((post) => (
                   <TableRow key={post.id}>
                     <TableCell className="font-medium">
                       <div className="max-w-md">
