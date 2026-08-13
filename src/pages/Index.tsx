@@ -63,48 +63,52 @@ const BlogSection = () => {
   return (
     <section className="py-16 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Latest from our blog</h2>
-          <p className="text-muted-foreground">Expert career advice and job market insights</p>
+        <div className="flex items-end justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-3xl font-bold">
+              Latest from <span className="text-primary">our blog</span>
+            </h2>
+            <p className="text-muted-foreground mt-2">Expert career advice and job market insights</p>
+          </div>
+          <button
+            onClick={() => navigate('/blog')}
+            className="hidden md:inline-flex items-center text-sm font-medium text-primary hover:underline shrink-0"
+          >
+            View all articles
+            <ArrowRight className="ml-1 h-4 w-4" />
+          </button>
         </div>
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
           {latestPosts.map(post => (
-            <Card 
+            <button
               key={post.id}
-              className="cursor-pointer hover:shadow-lg transition-shadow"
               onClick={() => navigate(`/blog/${post.slug}`)}
+              className="group relative block w-full aspect-[3/2] overflow-hidden rounded-2xl cursor-pointer text-left"
             >
-              {post.featured_image && (
-                <div className="h-48 overflow-hidden bg-muted">
-                  <img 
-                    src={post.featured_image} 
-                    alt={post.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                </div>
+              {post.featured_image ? (
+                <img
+                  src={post.featured_image}
+                  alt={post.title}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-primary" />
               )}
-              <CardHeader>
-                <Badge variant="secondary" className="w-fit mb-2">{post.category.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</Badge>
-                <CardTitle className="text-lg line-clamp-2">{post.title}</CardTitle>
-                <CardDescription className="line-clamp-2">{post.excerpt}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  {new Date(post.published_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </div>
-              </CardContent>
-            </Card>
+              <h3
+                className="absolute bottom-4 left-4 right-4 text-primary-foreground text-[17px] font-medium line-clamp-2 opacity-85 transition-all duration-200 group-hover:opacity-100 group-hover:underline"
+                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
+              >
+                {post.title}
+              </h3>
+            </button>
           ))}
         </div>
+
         <div className="text-center mt-8">
           <Button variant="outline" onClick={() => navigate('/blog')}>
             View All Articles
