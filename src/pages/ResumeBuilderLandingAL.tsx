@@ -14,7 +14,7 @@ import {
   Shield,
   MessageSquare
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -299,7 +299,7 @@ const ResumeBuilderLandingAL = () => {
                 </p>
 
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  Ajo që e bën Jobs.al unike është lidhja e drejtpërdrejtë me punëdhënësit. Kur krijoni një CV në platformën tonë, ajo bëhet automatikisht e zbulueshme nga qindra <a href="/jobs" className="text-primary hover:underline">kompani që marrin në punë aktivisht</a> në Shqipëri. Kjo ju jep një avantazh të konsiderueshëm mbi ndërtuesit tradicionalë të CV-ve që thjesht ju lejojnë të shkarkoni një dokument.
+                  Ajo që e bën Jobs.al unike është lidhja e drejtpërdrejtë me punëdhënësit. Kur krijoni një CV në platformën tonë, ajo bëhet automatikisht e zbulueshme nga qindra <Link to="/jobs" className="text-primary hover:underline">kompani që marrin në punë aktivisht</Link> në Shqipëri. Kjo ju jep një avantazh të konsiderueshëm mbi ndërtuesit tradicionalë të CV-ve që thjesht ju lejojnë të shkarkoni një dokument.
                 </p>
 
                 <h3 className="text-2xl font-semibold mb-4 text-foreground">
@@ -307,7 +307,7 @@ const ResumeBuilderLandingAL = () => {
                 </h3>
                 
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  Jobs.al nuk është vetëm një ndërtues CV-sh—është një platformë e plotë karriere. Qasja jonë e integruar do të thotë që CV-ja juaj punon për ju 24/7. Punëdhënësit që përdorin ATS tonë mund të zbulojnë profilin tuaj, të përputhin aftësitë tuaja me pozicionet e hapura dhe t'ju kontaktojnë drejtpërdrejt. E kombinuar me <a href="/jobs" className="text-primary hover:underline">tabelën tonë të gjerë të vendeve të punës</a> që ofron mundësi nga <a href="/companies" className="text-primary hover:underline">kompanitë kryesore në Shqipëri</a>, Jobs.al ofron gjithçka që ju nevojitet për të përshpejtuar karrierën tuaj.
+                  Jobs.al nuk është vetëm një ndërtues CV-sh—është një platformë e plotë karriere. Qasja jonë e integruar do të thotë që CV-ja juaj punon për ju 24/7. Punëdhënësit që përdorin ATS tonë mund të zbulojnë profilin tuaj, të përputhin aftësitë tuaja me pozicionet e hapura dhe t'ju kontaktojnë drejtpërdrejt. E kombinuar me <Link to="/jobs" className="text-primary hover:underline">tabelën tonë të gjerë të vendeve të punës</Link> që ofron mundësi nga <Link to="/companies" className="text-primary hover:underline">kompanitë kryesore në Shqipëri</Link>, Jobs.al ofron gjithçka që ju nevojitet për të përshpejtuar karrierën tuaj.
                 </p>
 
                 <p className="text-muted-foreground leading-relaxed">

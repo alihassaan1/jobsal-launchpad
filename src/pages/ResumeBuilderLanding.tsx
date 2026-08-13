@@ -14,7 +14,7 @@ import {
   Shield,
   MessageSquare
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -302,7 +302,7 @@ const ResumeBuilderLanding = () => {
               </p>
 
               <p className="text-muted-foreground leading-relaxed mb-6">
-                What makes Jobs.al unique is the direct connection to employers. When you create a resume on our platform, it automatically becomes discoverable by hundreds of <a href="/jobs" className="text-primary hover:underline">companies actively hiring</a> in Albania. This gives you a significant advantage over traditional resume builders that simply let you download a document.
+                What makes Jobs.al unique is the direct connection to employers. When you create a resume on our platform, it automatically becomes discoverable by hundreds of <Link to="/jobs" className="text-primary hover:underline">companies actively hiring</Link> in Albania. This gives you a significant advantage over traditional resume builders that simply let you download a document.
               </p>
 
               <h3 className="text-2xl font-semibold mb-4 text-foreground">
@@ -310,7 +310,7 @@ const ResumeBuilderLanding = () => {
               </h3>
               
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Jobs.al isn't just a resume builder—it's a complete career platform. Our integrated approach means your resume works for you 24/7. Employers using our ATS can discover your profile, match your skills to open positions, and reach out directly. Combined with our extensive <a href="/jobs" className="text-primary hover:underline">job board</a> featuring opportunities from <a href="/companies" className="text-primary hover:underline">top companies in Albania</a>, Jobs.al provides everything you need to accelerate your career.
+                Jobs.al isn't just a resume builder—it's a complete career platform. Our integrated approach means your resume works for you 24/7. Employers using our ATS can discover your profile, match your skills to open positions, and reach out directly. Combined with our extensive <Link to="/jobs" className="text-primary hover:underline">job board</Link> featuring opportunities from <Link to="/companies" className="text-primary hover:underline">top companies in Albania</Link>, Jobs.al provides everything you need to accelerate your career.
               </p>
 
               <p className="text-muted-foreground leading-relaxed">
