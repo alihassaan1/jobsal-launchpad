@@ -35,7 +35,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarTrigger,
   SidebarInset,
   useSidebar,
   SidebarMenuSub,
