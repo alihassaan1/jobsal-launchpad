@@ -136,12 +136,46 @@ serve(async (req) => {
 
   try {
     const { text, type, targetRole, industry } = await req.json();
-    
-    // Try DeepSeek first, fall back to Lovable AI
+
+    const settings = await getResumeAISettings();
+    const userId = await getUserId(req);
+
+    if (settings.resume_ai_enabled !== 'true') {
+      return new Response(
+        JSON.stringify({ error: "AI resume features are currently disabled by the administrator." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const featureKey = settingKeyForType(type);
+    if (featureKey && settings[featureKey] !== 'true') {
+      return new Response(
+        JSON.stringify({ error: "This AI feature is currently disabled by the administrator." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const dailyLimit = parseInt(settings.resume_ai_daily_limit || '0', 10);
+    if (userId && dailyLimit > 0) {
+      const used = await countTodayUsage(userId);
+      if (used >= dailyLimit) {
+        return new Response(
+          JSON.stringify({
+            error: `You have reached your daily limit of ${dailyLimit} AI generations. Please try again tomorrow.`,
+          }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     const DEEPSEEK_API_KEY = Deno.env.get("DEEPSEEK_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
-    const useDeepSeek = !!DEEPSEEK_API_KEY;
+
+    const configuredModel = settings.resume_ai_model || 'deepseek-chat';
+    // Honour the admin-selected model, falling back to whichever key exists
+    const useDeepSeek = configuredModel.startsWith('deepseek')
+      ? !!DEEPSEEK_API_KEY
+      : !LOVABLE_API_KEY && !!DEEPSEEK_API_KEY;
 
     if (!DEEPSEEK_API_KEY && !LOVABLE_API_KEY) {
       throw new Error("No AI API key is configured");
