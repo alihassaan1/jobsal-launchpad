@@ -210,6 +210,19 @@ function AdminSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r bg-sidebar">
       <SidebarContent className="px-2 pt-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={toggleSidebar}
+              tooltip="Toggle sidebar"
+              className="rounded-lg hover:bg-sidebar-accent hover:translate-x-0.5 transition-all duration-200"
+            >
+              <PanelLeft className="h-4 w-4" />
+              <span>Toggle Sidebar</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+
         {adminMenuItems.map((section) => (
           <Collapsible
             key={section.group}
