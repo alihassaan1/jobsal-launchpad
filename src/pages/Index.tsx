@@ -31,7 +31,6 @@ import Navigation from "@/components/Navigation";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import heroBg from "@/assets/hero-bg.jpg";
-import patternBg from "@/assets/pattern-bg.jpg";
 import FeaturedCompanies from "./FeaturedCompanies";
 import { TopEmployers } from "@/components/TopEmployers";
 import Footer from "@/components/Footer";
@@ -444,45 +443,41 @@ const Index = () => {
       </section>
 
       {/* Job Categories */}
-      <section 
-        className="py-16 relative overflow-hidden"
-        style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02)), url(${patternBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        <div className="absolute inset-0 bg-muted/20"></div>
+      <section className="py-16 md:py-20 relative overflow-hidden bg-primary/[0.04]">
+        {/* Abstract glow mesh background elements */}
+        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12 animate-fade-up">
-            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-              Browse by Category
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-foreground">
+              Browse by <span className="text-primary">Category</span>
             </h2>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Explore job opportunities across different industries
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {jobCategories.map((category, index) => (
-              <Card 
-                key={category.name} 
-                className="text-center hover:shadow-2xl transition-all duration-500 cursor-pointer group border-0 shadow-lg bg-card/95 backdrop-blur hover:-translate-y-2 animate-fade-up" 
+              <Card
+                key={category.name}
+                className="text-center cursor-pointer group bg-card border border-border/50 shadow-lg hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 hover:-translate-y-1 transition-all duration-300 rounded-2xl animate-fade-up"
                 style={{animationDelay: `${index * 0.1}s`}}
                 onClick={() => navigate(`/jobs?category=${encodeURIComponent(category.name)}`)}
               >
-                <CardContent className="p-6 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-500">
-                    {category.icon}
+                <CardContent className="p-6 flex flex-col items-center">
+                  <div className="w-16 h-16 mb-4 flex items-center justify-center bg-muted rounded-xl group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-4xl" role="img" aria-label={category.name}>
+                      {category.icon}
+                    </span>
                   </div>
-                  <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors duration-300 text-lg">
+                  <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors duration-300">
                     {category.name}
                   </h3>
-                  <p className="text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
+                  <p className="text-sm text-muted-foreground">
                     <span className="font-semibold text-primary">{category.count}</span> jobs
                   </p>
-                  <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 rounded-lg transition-colors duration-300"></div>
                 </CardContent>
               </Card>
             ))}
