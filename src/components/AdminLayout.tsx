@@ -21,9 +21,9 @@ import {
   PenTool,
   FileCode,
   Palette,
-  Shield,
   Package,
-  Ticket
+  Ticket,
+  PanelLeft
 } from "lucide-react";
 import {
   Sidebar,
@@ -42,7 +42,6 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
   SidebarFooter,
-  SidebarHeader,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
