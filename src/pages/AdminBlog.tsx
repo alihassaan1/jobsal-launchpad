@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Eye, Calendar, Loader2, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, Calendar, Loader2, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { EditPostDialog } from "@/components/EditPostDialog";
@@ -298,6 +298,12 @@ const AdminBlog = () => {
                       <div className="max-w-md">
                         <p className="truncate">{post.title}</p>
                         <p className="text-xs text-muted-foreground truncate">/blog/{post.slug}</p>
+                        {!post.featured_image && (
+                          <p className="mt-1 flex items-start gap-1 text-xs text-destructive">
+                            <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
+                            Add a featured image for better visibility (recommended: 800x530px, 3:2 ratio)
+                          </p>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
