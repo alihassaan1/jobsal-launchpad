@@ -221,7 +221,7 @@ const Blog = () => {
                     <div className="relative aspect-[21/9] w-full">
                       <BlogCardMedia post={featured} className="absolute inset-0" />
                       <h2
-                        className="absolute bottom-5 left-5 right-5 line-clamp-2 text-xl md:text-2xl font-medium text-white group-hover:font-bold"
+                        className="absolute bottom-5 left-5 right-5 line-clamp-2 text-left text-2xl font-bold leading-tight text-white group-hover:font-bold md:text-3xl lg:text-4xl"
                         style={{ textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}
                       >
                         {featured.title}
