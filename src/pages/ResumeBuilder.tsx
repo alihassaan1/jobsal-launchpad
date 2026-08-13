@@ -273,35 +273,38 @@ export default function ResumeBuilder() {
     },
   });
 
-  const enhanceWithAI = async (text: string, type: string) => {
-    setAiLoading(true);
+  const enhanceWithAI = async (text: string, type: string, loadingKey: string) => {
+    setAiLoadingKey(loadingKey);
     try {
       const { data, error } = await supabase.functions.invoke("enhance-resume", {
         body: { text, type },
       });
 
       if (error) throw error;
-      
+      if (data?.error) throw new Error(data.error);
+      if (!data?.enhancedText) throw new Error("The AI did not return any content. Please try again.");
+
       toast({
         title: "AI Enhancement Complete",
         description: "Content has been enhanced with AI suggestions",
       });
 
-      return data.enhancedText;
+      setIsDirty(true);
+      return data.enhancedText as string;
     } catch (error: any) {
       toast({
         title: "AI Enhancement Failed",
-        description: error.message,
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
       return null;
     } finally {
-      setAiLoading(false);
+      setAiLoadingKey(null);
     }
   };
 
   const addExperience = () => {
-    setResumeData(prev => ({
+    updateResume(prev => ({
       ...prev,
       experience: [...prev.experience, {
         company: "",
@@ -314,8 +317,15 @@ export default function ResumeBuilder() {
     }));
   };
 
+  const removeExperience = (index: number) => {
+    updateResume(prev => ({
+      ...prev,
+      experience: prev.experience.filter((_, i) => i !== index),
+    }));
+  };
+
   const addEducation = () => {
-    setResumeData(prev => ({
+    updateResume(prev => ({
       ...prev,
       education: [...prev.education, {
         institution: "",
@@ -325,6 +335,27 @@ export default function ResumeBuilder() {
         end_date: "",
         gpa: "",
       }],
+    }));
+  };
+
+  const removeEducation = (index: number) => {
+    updateResume(prev => ({
+      ...prev,
+      education: prev.education.filter((_, i) => i !== index),
+    }));
+  };
+
+  const addCertification = () => {
+    updateResume(prev => ({
+      ...prev,
+      certifications: [...prev.certifications, { name: "", issuer: "", date: "" }],
+    }));
+  };
+
+  const removeCertification = (index: number) => {
+    updateResume(prev => ({
+      ...prev,
+      certifications: prev.certifications.filter((_, i) => i !== index),
     }));
   };
 
