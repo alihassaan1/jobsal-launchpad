@@ -77,7 +77,7 @@ export default function AdminPromoCodes() {
         supabase.from("promo_codes").select("id", { count: "exact" }),
         supabase.from("promo_codes").select("id", { count: "exact" }).eq("is_active", true),
       ]);
-      const totalUses = promoCodes?.reduce((sum, p) => sum + (p.current_uses || 0), 0) || 0;
+      const totalUses = promoCodes?.reduce((sum, p) => sum + (p.current_uses ?? 0), 0) || 0;
       return {
         total: totalRes.count || 0,
         active: activeRes.count || 0,
@@ -173,7 +173,7 @@ export default function AdminPromoCodes() {
 
   const isMaxedOut = (code: PromoCode) => {
     if (!code.max_uses) return false;
-    return code.current_uses >= code.max_uses;
+    return (code.current_uses ?? 0) >= code.max_uses;
   };
 
   return (
