@@ -51,6 +51,50 @@ const AdminBlog = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isSeeding, setIsSeeding] = useState(false);
   const [togglingPublish, setTogglingPublish] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>('created_at');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+  const sortedPosts = useMemo(() => {
+    const sorted = [...posts];
+    sorted.sort((a, b) => {
+      let comparison = 0;
+      switch (sortKey) {
+        case 'title':
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case 'category':
+          comparison = a.category.localeCompare(b.category);
+          break;
+        case 'language':
+          comparison = a.language.localeCompare(b.language);
+          break;
+        case 'views_count':
+          comparison = a.views_count - b.views_count;
+          break;
+        case 'created_at':
+          comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          break;
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+    return sorted;
+  }, [posts, sortKey, sortDirection]);
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortIcon = ({ column }: { column: SortKey }) => {
+    if (sortKey !== column) return <ArrowUpDown className="ml-1 h-3 w-3 text-muted-foreground/70" />;
+    return sortDirection === 'asc'
+      ? <ArrowUp className="ml-1 h-3 w-3 text-primary" />
+      : <ArrowDown className="ml-1 h-3 w-3 text-primary" />;
+  };
 
   useEffect(() => {
     const allowedRoles = ['admin', 'editor'];
