@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,10 +14,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Eye, Calendar, Loader2, RefreshCw } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, Calendar, Loader2, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { EditPostDialog } from "@/components/EditPostDialog";
+
+type SortKey = 'title' | 'category' | 'language' | 'views_count' | 'created_at';
+type SortDirection = 'asc' | 'desc';
 
 interface Post {
   id: string;
