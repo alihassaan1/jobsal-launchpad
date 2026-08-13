@@ -85,6 +85,17 @@ const CandidateDashboard = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">My Applications</h1>
           <p className="text-muted-foreground">Track and manage your job applications</p>
+          <div className="flex gap-2 mt-4">
+            <Link to="/my-documents">
+              <Button variant="outline" size="sm">
+                <FileText className="h-4 w-4 mr-2" />
+                My Documents
+              </Button>
+            </Link>
+            <Link to="/my-resumes">
+              <Button variant="outline" size="sm">My Resumes</Button>
+            </Link>
+          </div>
         </div>
 
         {/* Talent Pool opt-in promo */}

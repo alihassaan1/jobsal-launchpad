@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText } from "lucide-react";
+import AttachDocumentsSection from "@/components/documents/AttachDocumentsSection";
 
 interface ApplyToJobDialogProps {
   job: any;
@@ -29,6 +30,7 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
   const [coverLetter, setCoverLetter] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [selectedDocumentIds, setSelectedDocumentIds] = useState<string[]>([]);
 
   const sendNewApplicantNotification = async () => {
     try {
@@ -86,15 +88,30 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
         throw new Error("You have already applied to this job");
       }
 
-      const { error } = await supabase.from("applications").insert({
-        job_id: job.id,
-        applicant_id: user!.id,
-        cover_letter: coverLetter,
-        resume_url: resumeUrl,
-        status: "applied",
-      });
+      const { data: created, error } = await supabase
+        .from("applications")
+        .insert({
+          job_id: job.id,
+          applicant_id: user!.id,
+          cover_letter: coverLetter,
+          resume_url: resumeUrl,
+          status: "applied",
+        })
+        .select("id")
+        .single();
 
       if (error) throw error;
+
+      // Link selected documents to this application only
+      if (selectedDocumentIds.length > 0 && created?.id) {
+        const { error: linkError } = await supabase.from("application_documents").insert(
+          selectedDocumentIds.map((documentId) => ({
+            application_id: created.id,
+            document_id: documentId,
+          }))
+        );
+        if (linkError) throw linkError;
+      }
     },
     onSuccess: () => {
       toast({ title: "Application submitted successfully!" });
@@ -106,6 +123,7 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
       onClose();
       setCoverLetter("");
       setResumeFile(null);
+      setSelectedDocumentIds([]);
     },
     onError: (error: any) => {
       toast({
@@ -226,6 +244,9 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
               Briefly explain your interest and qualifications for this role
             </p>
           </div>
+
+          {/* Additional Documents */}
+          <AttachDocumentsSection selectedIds={selectedDocumentIds} onChange={setSelectedDocumentIds} />
 
           {/* Job Details Summary */}
           <div className="bg-muted p-4 rounded-lg">

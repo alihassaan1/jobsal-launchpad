@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Briefcase, ArrowLeft, FileText, Mail, Phone, MapPin, Calendar, Download, Sparkles, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
+import ApplicationDocuments from "@/components/documents/ApplicationDocuments";
 
 const ATSJobApplications = () => {
   const { jobId } = useParams();
@@ -90,7 +91,20 @@ const ATSJobApplications = () => {
         })
       );
 
-      return applicationsWithResumes;
+      // Attached document counts (bulk)
+      const ids = applicationsWithResumes.map((a: any) => a.id);
+      const counts: Record<string, number> = {};
+      if (ids.length) {
+        const { data: links } = await supabase
+          .from("application_documents")
+          .select("application_id")
+          .in("application_id", ids);
+        (links || []).forEach((l: any) => {
+          counts[l.application_id] = (counts[l.application_id] || 0) + 1;
+        });
+      }
+
+      return applicationsWithResumes.map((a: any) => ({ ...a, documents_count: counts[a.id] || 0 }));
     },
   });
 
@@ -326,6 +340,11 @@ const ATSJobApplications = () => {
                                   <Calendar className="h-3 w-3" />
                                   {new Date(application.created_at).toLocaleDateString()}
                                 </span>
+                                {application.documents_count > 0 && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    {application.documents_count} document{application.documents_count === 1 ? "" : "s"} attached
+                                  </Badge>
+                                )}
                                 {application.ai_match_score && (
                                   <span className="font-medium text-primary">
                                     Match: {application.ai_match_score}%
@@ -455,6 +474,9 @@ const ATSJobApplications = () => {
                       Download Application Resume
                     </Button>
                   )}
+
+                  {/* Attached Documents */}
+                  <ApplicationDocuments applicationId={selectedApplication.id} />
 
                   {/* Cover Letter */}
                   {selectedApplication.cover_letter && (

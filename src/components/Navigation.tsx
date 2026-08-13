@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User, Sparkles, Bookmark } from "lucide-react";
+import { LogOut, User, Sparkles, Bookmark, FileText } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navigation() {
@@ -101,6 +101,11 @@ export default function Navigation() {
                       <DropdownMenuItem onClick={() => navigate('/my-resumes')}>
                         {t('nav.myResumes')}
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/my-documents')}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        My Documents
+                      </DropdownMenuItem>
+
                     </>
                   )}
                   <DropdownMenuSeparator />
