@@ -19,6 +19,7 @@ import ATSJobApplications from "./pages/ATSJobApplications";
 import ResumeTemplates from "./pages/ResumeTemplates";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import MyResumes from "./pages/MyResumes";
+import MyDocuments from "./pages/MyDocuments";
 import SavedJobs from "./pages/SavedJobs";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSubscriptions from "./pages/AdminSubscriptions";
@@ -45,6 +46,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/AdminBlog";
 import AdminEmails from "./pages/AdminEmails";
+import AdminDocuments from "./pages/AdminDocuments";
 
 import Companies from "./pages/Companies";
 import CompanyProfile from "./pages/CompanyProfile";
@@ -88,6 +90,7 @@ const App = () => (
             <Route path="/resume-templates" element={<ResumeTemplates />} />
             <Route path="/resume-builder" element={<ResumeBuilder />} />
             <Route path="/my-resumes" element={<MyResumes />} />
+            <Route path="/my-documents" element={<MyDocuments />} />
             <Route path="/saved-jobs" element={<SavedJobs />} />
             
             {/* Admin Routes */}
@@ -107,6 +110,7 @@ const App = () => (
               <Route path="ai-agent/analytics" element={<AdminAIAgentAnalytics />} />
               <Route path="blog" element={<AdminBlog />} />
               <Route path="emails" element={<AdminEmails />} />
+              <Route path="documents" element={<AdminDocuments />} />
               <Route path="templates" element={<AdminTemplates />} />
               <Route path="resume-builder" element={<AdminResumeBuilder />} />
               <Route path="ads" element={<AdminAds />} />

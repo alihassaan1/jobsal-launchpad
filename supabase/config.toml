@@ -68,3 +68,9 @@ verify_jwt = false
 
 [functions.employer-signup]
 verify_jwt = false
+
+[functions.validate-document]
+verify_jwt = false
+
+[functions.document-access]
+verify_jwt = false

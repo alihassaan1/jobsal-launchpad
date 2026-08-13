@@ -153,6 +153,7 @@ const adminMenuItems: MenuGroup[] = [
     color: "text-slate-500",
     items: [
       { title: "AI Resume Builder", url: "/admin/resume-builder", icon: FileText },
+      { title: "Documents", url: "/admin/documents", icon: FileText },
       { title: "Templates", url: "/admin/templates", icon: Palette },
       { title: "System Settings", url: "/admin/settings", icon: Settings },
     ]
