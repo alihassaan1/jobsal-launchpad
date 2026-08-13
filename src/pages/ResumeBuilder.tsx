@@ -359,7 +359,7 @@ export default function ResumeBuilder() {
     }));
   };
 
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     const element = document.getElementById('resume-preview');
     if (!element) {
       toast({
@@ -370,75 +370,80 @@ export default function ResumeBuilder() {
       return;
     }
 
-    // Create a wrapper to ensure proper sizing
+    if (!resumeData.personal_info.full_name.trim()) {
+      toast({
+        title: "Add your name first",
+        description: "Please enter your full name before exporting the PDF",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // The on-screen preview is scaled down (transform: scale) — render an
+    // off-screen, unscaled clone so the PDF is captured at full A4 size.
     const wrapper = document.createElement('div');
+    wrapper.style.position = 'fixed';
+    wrapper.style.top = '0';
+    wrapper.style.left = '-10000px';
     wrapper.style.width = '210mm';
-    wrapper.style.minHeight = '297mm';
     wrapper.style.backgroundColor = '#ffffff';
-    wrapper.style.margin = '0';
-    wrapper.style.padding = '0';
-    wrapper.style.position = 'relative';
-    wrapper.appendChild(element.cloneNode(true));
+
+    const clone = element.cloneNode(true) as HTMLElement;
+    clone.removeAttribute('id');
+    clone.style.transform = 'none';
+    clone.style.marginBottom = '0';
+    clone.style.width = '210mm';
+    clone.style.minHeight = '297mm';
+    clone.style.maxWidth = '210mm';
+    clone.style.display = 'block';
+    clone.style.boxSizing = 'border-box';
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
 
     const opt = {
       margin: 0,
       filename: `${resumeData.personal_info.full_name || 'Resume'}.pdf`,
-      image: { type: 'jpeg' as const, quality: 1.0 },
-      html2canvas: { 
-        scale: 3,
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: {
+        scale: 2,
         useCORS: true,
         letterRendering: true,
         logging: false,
-        dpi: 300,
         backgroundColor: '#ffffff',
-        width: 794, // A4 width in pixels at 96 DPI
-        height: 1123, // A4 height in pixels at 96 DPI
-        scrollY: -window.scrollY,
-        scrollX: -window.scrollX,
-        allowTaint: false,
-        removeContainer: true,
         imageTimeout: 0,
-        onclone: (clonedDoc: Document) => {
-          const clonedElement = clonedDoc.getElementById('resume-preview');
-          if (clonedElement) {
-            // Force exact dimensions
-            clonedElement.style.width = '210mm';
-            clonedElement.style.minHeight = '297mm';
-            clonedElement.style.maxWidth = '210mm';
-            clonedElement.style.margin = '0 auto';
-            clonedElement.style.display = 'block';
-            clonedElement.style.boxSizing = 'border-box';
-          }
-        }
       },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
+      jsPDF: {
+        unit: 'mm' as const,
+        format: 'a4' as const,
         orientation: 'portrait' as const,
-        compress: false,
-        precision: 16
+        compress: true,
       },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      pagebreak: { mode: ['css', 'legacy'] }
     };
 
+    setExporting(true);
     toast({
       title: "Generating PDF",
       description: "Please wait while we create your high-quality resume...",
     });
 
-    html2pdf().set(opt).from(element).save().then(() => {
+    try {
+      await html2pdf().set(opt).from(wrapper).save();
       toast({
         title: "PDF Export Complete",
         description: "Your resume has been downloaded successfully",
       });
-    }).catch((error) => {
+    } catch (error) {
       console.error('PDF Export Error:', error);
       toast({
         title: "Export Failed",
         description: "There was an error generating your PDF. Please try again.",
         variant: "destructive",
       });
-    });
+    } finally {
+      wrapper.remove();
+      setExporting(false);
+    }
   };
 
   const renderTemplate = () => {
