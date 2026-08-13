@@ -72,7 +72,7 @@ const BlogSection = () => {
           </div>
           <button
             onClick={() => navigate('/blog')}
-            className="hidden md:inline-flex items-center text-sm font-medium text-primary hover:underline shrink-0"
+            className="hidden md:inline-flex items-center text-sm font-medium text-primary hover:font-bold shrink-0"
           >
             View all articles
             <ArrowRight className="ml-1 h-4 w-4" />
@@ -100,7 +100,7 @@ const BlogSection = () => {
                 <div className="absolute inset-0 bg-gradient-primary" />
               )}
               <h3
-                className="absolute bottom-4 left-4 right-4 text-primary-foreground text-[17px] font-medium line-clamp-2 opacity-85 transition-all duration-200 group-hover:opacity-100 group-hover:underline"
+                className="absolute bottom-4 left-4 right-4 text-primary-foreground text-[17px] font-semibold line-clamp-2 opacity-85 transition-all duration-200 group-hover:opacity-100 group-hover:font-bold"
                 style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
               >
                 {post.title}
