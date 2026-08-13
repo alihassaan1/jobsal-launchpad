@@ -250,7 +250,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "deepseek-chat",
+          model: configuredModel.startsWith('deepseek') ? configuredModel : 'deepseek-chat',
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt }
@@ -268,7 +268,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: configuredModel.startsWith('google/') ? configuredModel : 'google/gemini-2.5-flash',
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt }
