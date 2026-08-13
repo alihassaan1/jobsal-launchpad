@@ -101,6 +101,11 @@ export default function Navigation() {
                       <DropdownMenuItem onClick={() => navigate('/my-resumes')}>
                         {t('nav.myResumes')}
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/my-documents')}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        My Documents
+                      </DropdownMenuItem>
+
                     </>
                   )}
                   <DropdownMenuSeparator />
