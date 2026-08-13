@@ -160,7 +160,7 @@ const adminMenuItems: MenuGroup[] = [
 ];
 
 function AdminSidebar() {
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
