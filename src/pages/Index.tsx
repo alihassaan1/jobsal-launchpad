@@ -31,7 +31,6 @@ import Navigation from "@/components/Navigation";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import heroBg from "@/assets/hero-bg.jpg";
-import patternBg from "@/assets/pattern-bg.jpg";
 import FeaturedCompanies from "./FeaturedCompanies";
 import { TopEmployers } from "@/components/TopEmployers";
 import Footer from "@/components/Footer";
