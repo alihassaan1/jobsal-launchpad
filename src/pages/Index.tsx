@@ -246,7 +246,7 @@ const Index = () => {
         </div>
         
         <div className="container mx-auto px-4 text-center relative z-10">
-          <div className="animate-fade-up">
+          <div>
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
               Find Your Dream Job in 
               <span className="block bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
