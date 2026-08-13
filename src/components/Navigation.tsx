@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User, Sparkles, Bookmark } from "lucide-react";
+import { LogOut, User, Sparkles, Bookmark, FileText } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navigation() {
