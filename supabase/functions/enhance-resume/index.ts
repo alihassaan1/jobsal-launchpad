@@ -112,6 +112,7 @@ async function logAPICall(params: {
       error_message: params.errorMessage,
       request_preview: params.requestPreview?.substring(0, 500),
       response_preview: params.responsePreview?.substring(0, 500),
+      user_id: params.userId ?? null,
     });
   } catch (error) {
     console.error('Failed to log API call:', error);
