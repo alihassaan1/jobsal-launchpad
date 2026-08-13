@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -815,10 +815,10 @@ export default function ResumeBuilder() {
             <div>
               <h3 className="font-semibold mb-4">For Job Seekers</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/jobs" className="hover:text-primary">Browse Jobs</a></li>
+                <li><Link to="/jobs" className="hover:text-primary">Browse Jobs</Link></li>
                 <li><a href="#" className="hover:text-primary">Career Advice</a></li>
-                <li><a href="/resume-templates" className="hover:text-primary">Resume Templates</a></li>
-                <li><a href="/resume-builder" className="hover:text-primary">Resume Builder</a></li>
+                <li><Link to="/resume-templates" className="hover:text-primary">Resume Templates</Link></li>
+                <li><Link to="/resume-builder" className="hover:text-primary">Resume Builder</Link></li>
               </ul>
             </div>
             <div>
@@ -826,7 +826,7 @@ export default function ResumeBuilder() {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="#" className="hover:text-primary">Post a Job</a></li>
                 <li><a href="#" className="hover:text-primary">Browse Resumes</a></li>
-                <li><a href="/pricing" className="hover:text-primary">Pricing Plans</a></li>
+                <li><Link to="/pricing" className="hover:text-primary">Pricing Plans</Link></li>
                 <li><a href="#" className="hover:text-primary">ATS Integration</a></li>
               </ul>
             </div>

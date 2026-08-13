@@ -93,7 +93,7 @@ const CandidateDashboard = () => {
             <h3 className="font-semibold text-lg">Let employers find you</h3>
             <p className="text-sm text-muted-foreground">Opt in to the Talent Pool and get discovered for roles that aren't even posted yet. You stay anonymous until you respond.</p>
           </div>
-          <a href="/candidate/visibility" className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 whitespace-nowrap">Manage visibility</a>
+          <Link to="/candidate/visibility" className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 whitespace-nowrap">Manage visibility</Link>
         </div>
 
         {/* Stats */}

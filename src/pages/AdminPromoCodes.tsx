@@ -16,6 +16,17 @@ import { format } from "date-fns";
 
 type DiscountType = "percentage" | "fixed";
 
+const toDateInput = (value?: string | null) => (value ? value.split("T")[0] : "");
+const formatDate = (value?: string | null) => {
+  if (!value) return "—";
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? "—" : format(d, "MMM d, yyyy");
+};
+const toInt = (value: string, fallback = 0) => {
+  const n = parseInt(value, 10);
+  return isNaN(n) ? fallback : n;
+};
+
 type PromoCode = {
   id: string;
   code: string;
@@ -23,9 +34,9 @@ type PromoCode = {
   discount_type: DiscountType;
   discount_value: number;
   max_uses: number | null;
-  current_uses: number;
-  min_purchase_amount: number;
-  valid_from: string;
+  current_uses: number | null;
+  min_purchase_amount: number | null;
+  valid_from: string | null;
   valid_until: string | null;
   is_active: boolean;
   created_at: string;
@@ -60,13 +71,13 @@ export default function AdminPromoCodes() {
   });
 
   const { data: stats } = useQuery({
-    queryKey: ["promo-code-stats"],
+    queryKey: ["promo-code-stats", promoCodes?.length ?? 0],
     queryFn: async () => {
       const [totalRes, activeRes] = await Promise.all([
         supabase.from("promo_codes").select("id", { count: "exact" }),
         supabase.from("promo_codes").select("id", { count: "exact" }).eq("is_active", true),
       ]);
-      const totalUses = promoCodes?.reduce((sum, p) => sum + (p.current_uses || 0), 0) || 0;
+      const totalUses = promoCodes?.reduce((sum, p) => sum + (p.current_uses ?? 0), 0) || 0;
       return {
         total: totalRes.count || 0,
         active: activeRes.count || 0,
@@ -82,9 +93,9 @@ export default function AdminPromoCodes() {
         description: data.description || null,
         discount_type: data.discount_type as DiscountType,
         discount_value: data.discount_value,
-        max_uses: data.max_uses ? parseInt(data.max_uses) : null,
+        max_uses: data.max_uses ? toInt(data.max_uses, 0) || null : null,
         min_purchase_amount: data.min_purchase_amount,
-        valid_from: data.valid_from,
+        valid_from: data.valid_from || new Date().toISOString(),
         valid_until: data.valid_until || null,
         is_active: data.is_active,
       };
@@ -120,6 +131,9 @@ export default function AdminPromoCodes() {
       queryClient.invalidateQueries({ queryKey: ["promo-code-stats"] });
       toast.success("Promo code deleted");
     },
+    onError: (error: Error) => {
+      toast.error("Could not delete promo code: " + error.message);
+    },
   });
 
   const resetForm = () => {
@@ -142,11 +156,11 @@ export default function AdminPromoCodes() {
       code: code.code,
       description: code.description || "",
       discount_type: code.discount_type as DiscountType,
-      discount_value: code.discount_value,
+      discount_value: code.discount_value ?? 0,
       max_uses: code.max_uses?.toString() || "",
-      min_purchase_amount: code.min_purchase_amount,
-      valid_from: code.valid_from.split("T")[0],
-      valid_until: code.valid_until?.split("T")[0] || "",
+      min_purchase_amount: code.min_purchase_amount ?? 0,
+      valid_from: toDateInput(code.valid_from) || new Date().toISOString().split("T")[0],
+      valid_until: toDateInput(code.valid_until),
       is_active: code.is_active,
     });
     setIsDialogOpen(true);
@@ -159,7 +173,7 @@ export default function AdminPromoCodes() {
 
   const isMaxedOut = (code: PromoCode) => {
     if (!code.max_uses) return false;
-    return code.current_uses >= code.max_uses;
+    return (code.current_uses ?? 0) >= code.max_uses;
   };
 
   return (
@@ -258,7 +272,7 @@ export default function AdminPromoCodes() {
                     <Input
                       type="number"
                       value={form.discount_value}
-                      onChange={(e) => setForm({ ...form, discount_value: parseInt(e.target.value) })}
+                      onChange={(e) => setForm({ ...form, discount_value: toInt(e.target.value) })}
                       required
                     />
                   </div>
@@ -296,7 +310,7 @@ export default function AdminPromoCodes() {
                   <Input
                     type="number"
                     value={form.min_purchase_amount}
-                    onChange={(e) => setForm({ ...form, min_purchase_amount: parseInt(e.target.value) })}
+                    onChange={(e) => setForm({ ...form, min_purchase_amount: toInt(e.target.value) })}
                   />
                 </div>
                 <div className="flex items-center space-x-2">
@@ -337,7 +351,7 @@ export default function AdminPromoCodes() {
                 <TableRow>
                   <TableCell colSpan={6} className="text-center">Loading...</TableCell>
                 </TableRow>
-              ) : promoCodes?.length === 0 ? (
+              ) : !promoCodes || promoCodes.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center">No promo codes found</TableCell>
                 </TableRow>
@@ -351,11 +365,11 @@ export default function AdminPromoCodes() {
                         : `€${(code.discount_value / 100).toFixed(2)}`}
                     </TableCell>
                     <TableCell>
-                      {code.current_uses}{code.max_uses ? ` / ${code.max_uses}` : ""}
+                      {code.current_uses ?? 0}{code.max_uses ? ` / ${code.max_uses}` : ""}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {format(new Date(code.valid_from), "MMM d, yyyy")}
-                      {code.valid_until && ` - ${format(new Date(code.valid_until), "MMM d, yyyy")}`}
+                      {formatDate(code.valid_from)}
+                      {code.valid_until ? ` - ${formatDate(code.valid_until)}` : ""}
                     </TableCell>
                     <TableCell>
                       {isExpired(code) ? (

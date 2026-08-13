@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -177,16 +177,16 @@ export default function MyResumes() {
             <div>
               <h3 className="font-semibold mb-4">For Job Seekers</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/jobs" className="hover:text-primary">Browse Jobs</a></li>
-                <li><a href="/resume-templates" className="hover:text-primary">Resume Templates</a></li>
-                <li><a href="/resume-builder" className="hover:text-primary">Resume Builder</a></li>
+                <li><Link to="/jobs" className="hover:text-primary">Browse Jobs</Link></li>
+                <li><Link to="/resume-templates" className="hover:text-primary">Resume Templates</Link></li>
+                <li><Link to="/resume-builder" className="hover:text-primary">Resume Builder</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-4">For Employers</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="#" className="hover:text-primary">Post a Job</a></li>
-                <li><a href="/pricing" className="hover:text-primary">Pricing Plans</a></li>
+                <li><Link to="/pricing" className="hover:text-primary">Pricing Plans</Link></li>
               </ul>
             </div>
             <div>
