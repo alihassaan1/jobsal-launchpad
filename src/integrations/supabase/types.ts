@@ -434,6 +434,42 @@ export type Database = {
           },
         ]
       }
+      application_documents: {
+        Row: {
+          application_id: string
+          created_at: string
+          document_id: string
+          id: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          document_id: string
+          id?: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_documents_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "application_documents_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "user_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       applications: {
         Row: {
           ai_match_score: number | null
@@ -2329,6 +2365,7 @@ export type Database = {
           currency: string | null
           description: string | null
           display_order: number | null
+          document_access: string
           featured_jobs_limit: number
           id: string
           is_active: boolean | null
@@ -2358,6 +2395,7 @@ export type Database = {
           currency?: string | null
           description?: string | null
           display_order?: number | null
+          document_access?: string
           featured_jobs_limit?: number
           id?: string
           is_active?: boolean | null
@@ -2387,6 +2425,7 @@ export type Database = {
           currency?: string | null
           description?: string | null
           display_order?: number | null
+          document_access?: string
           featured_jobs_limit?: number
           id?: string
           is_active?: boolean | null
@@ -2471,6 +2510,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_documents: {
+        Row: {
+          created_at: string
+          doc_type: Database["public"]["Enums"]["user_document_type"]
+          file_name: string
+          file_path: string
+          file_size: number
+          gated_access: boolean
+          id: string
+          is_deleted: boolean
+          is_verified: boolean
+          mime_type: string
+          thumbnail_path: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+          verification_error: string | null
+        }
+        Insert: {
+          created_at?: string
+          doc_type: Database["public"]["Enums"]["user_document_type"]
+          file_name: string
+          file_path: string
+          file_size: number
+          gated_access?: boolean
+          id?: string
+          is_deleted?: boolean
+          is_verified?: boolean
+          mime_type: string
+          thumbnail_path?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          verification_error?: string | null
+        }
+        Update: {
+          created_at?: string
+          doc_type?: Database["public"]["Enums"]["user_document_type"]
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          gated_access?: boolean
+          id?: string
+          is_deleted?: boolean
+          is_verified?: boolean
+          mime_type?: string
+          thumbnail_path?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          verification_error?: string | null
+        }
+        Relationships: []
       }
       user_email_preferences: {
         Row: {
@@ -2988,6 +3081,7 @@ export type Database = {
       payment_status: "pending" | "completed" | "failed" | "refunded"
       subscription_status: "active" | "expired" | "cancelled" | "trial"
       subscription_tier: "free" | "basic" | "pro" | "premium"
+      user_document_type: "certification" | "cover_letter" | "experience_letter"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3152,6 +3246,11 @@ export const Constants = {
       payment_status: ["pending", "completed", "failed", "refunded"],
       subscription_status: ["active", "expired", "cancelled", "trial"],
       subscription_tier: ["free", "basic", "pro", "premium"],
+      user_document_type: [
+        "certification",
+        "cover_letter",
+        "experience_letter",
+      ],
     },
   },
 } as const
