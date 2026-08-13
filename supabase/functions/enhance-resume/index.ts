@@ -16,6 +16,72 @@ function getSupabaseClient() {
   return null;
 }
 
+// Admin-controlled settings for the AI resume builder
+const SETTING_DEFAULTS: Record<string, string> = {
+  resume_ai_enabled: 'true',
+  resume_ai_summary_enabled: 'true',
+  resume_ai_skills_enabled: 'true',
+  resume_ai_experience_enabled: 'true',
+  resume_ai_cover_letter_enabled: 'true',
+  resume_ai_model: 'deepseek-chat',
+  resume_ai_daily_limit: '20',
+};
+
+async function getResumeAISettings(): Promise<Record<string, string>> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return { ...SETTING_DEFAULTS };
+  try {
+    const { data } = await supabase
+      .from('admin_settings')
+      .select('key, value')
+      .like('key', 'resume_ai_%');
+    const merged = { ...SETTING_DEFAULTS };
+    (data || []).forEach((row: { key: string; value: string | null }) => {
+      if (row.value) merged[row.key] = row.value;
+    });
+    return merged;
+  } catch (_error) {
+    return { ...SETTING_DEFAULTS };
+  }
+}
+
+function settingKeyForType(type: string): string | null {
+  switch (type) {
+    case 'summary': return 'resume_ai_summary_enabled';
+    case 'skills': return 'resume_ai_skills_enabled';
+    case 'work_experience': return 'resume_ai_experience_enabled';
+    case 'cover_letter': return 'resume_ai_cover_letter_enabled';
+    default: return null;
+  }
+}
+
+async function getUserId(req: Request): Promise<string | null> {
+  const supabase = getSupabaseClient();
+  const authHeader = req.headers.get('Authorization');
+  if (!supabase || !authHeader) return null;
+  try {
+    const { data } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    return data.user?.id ?? null;
+  } catch (_error) {
+    return null;
+  }
+}
+
+async function countTodayUsage(userId: string): Promise<number> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return 0;
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+  const { count } = await supabase
+    .from('ai_agent_logs')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('status', 'success')
+    .like('content_type', 'resume_%')
+    .gte('created_at', startOfDay.toISOString());
+  return count || 0;
+}
+
 // Log API call to database
 async function logAPICall(params: {
   agentType: string;
@@ -28,6 +94,7 @@ async function logAPICall(params: {
   errorMessage?: string;
   requestPreview?: string;
   responsePreview?: string;
+  userId?: string | null;
 }) {
   const supabase = getSupabaseClient();
   if (!supabase) return;
