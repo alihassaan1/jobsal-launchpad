@@ -19,7 +19,7 @@ export default function Navigation() {
   const navigate = useNavigate();
 
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 shadow-sm">
+    <header className="border-b bg-background sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-8">
