@@ -29,6 +29,7 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminSettings from "./pages/AdminSettings";
 import AdminJobs from "./pages/AdminJobs";
 import AdminTemplates from "./pages/AdminTemplates";
+import AdminResumeBuilder from "./pages/AdminResumeBuilder";
 import AdminMarketingAgent from "./pages/AdminMarketingAgent";
 import AdminContentGenerator from "./pages/AdminContentGenerator";
 import AdminAIAgent from "./pages/AdminAIAgent";
@@ -107,6 +108,7 @@ const App = () => (
               <Route path="blog" element={<AdminBlog />} />
               <Route path="emails" element={<AdminEmails />} />
               <Route path="templates" element={<AdminTemplates />} />
+              <Route path="resume-builder" element={<AdminResumeBuilder />} />
               <Route path="ads" element={<AdminAds />} />
               <Route path="ad-analytics" element={<AdminAdAnalytics />} />
               <Route path="promo-codes" element={<AdminPromoCodes />} />

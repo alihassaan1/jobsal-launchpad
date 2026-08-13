@@ -16,6 +16,72 @@ function getSupabaseClient() {
   return null;
 }
 
+// Admin-controlled settings for the AI resume builder
+const SETTING_DEFAULTS: Record<string, string> = {
+  resume_ai_enabled: 'true',
+  resume_ai_summary_enabled: 'true',
+  resume_ai_skills_enabled: 'true',
+  resume_ai_experience_enabled: 'true',
+  resume_ai_cover_letter_enabled: 'true',
+  resume_ai_model: 'deepseek-chat',
+  resume_ai_daily_limit: '20',
+};
+
+async function getResumeAISettings(): Promise<Record<string, string>> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return { ...SETTING_DEFAULTS };
+  try {
+    const { data } = await supabase
+      .from('admin_settings')
+      .select('key, value')
+      .like('key', 'resume_ai_%');
+    const merged = { ...SETTING_DEFAULTS };
+    (data || []).forEach((row: { key: string; value: string | null }) => {
+      if (row.value) merged[row.key] = row.value;
+    });
+    return merged;
+  } catch (_error) {
+    return { ...SETTING_DEFAULTS };
+  }
+}
+
+function settingKeyForType(type: string): string | null {
+  switch (type) {
+    case 'summary': return 'resume_ai_summary_enabled';
+    case 'skills': return 'resume_ai_skills_enabled';
+    case 'work_experience': return 'resume_ai_experience_enabled';
+    case 'cover_letter': return 'resume_ai_cover_letter_enabled';
+    default: return null;
+  }
+}
+
+async function getUserId(req: Request): Promise<string | null> {
+  const supabase = getSupabaseClient();
+  const authHeader = req.headers.get('Authorization');
+  if (!supabase || !authHeader) return null;
+  try {
+    const { data } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
+    return data.user?.id ?? null;
+  } catch (_error) {
+    return null;
+  }
+}
+
+async function countTodayUsage(userId: string): Promise<number> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return 0;
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+  const { count } = await supabase
+    .from('ai_agent_logs')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('status', 'success')
+    .like('content_type', 'resume_%')
+    .gte('created_at', startOfDay.toISOString());
+  return count || 0;
+}
+
 // Log API call to database
 async function logAPICall(params: {
   agentType: string;
@@ -28,6 +94,7 @@ async function logAPICall(params: {
   errorMessage?: string;
   requestPreview?: string;
   responsePreview?: string;
+  userId?: string | null;
 }) {
   const supabase = getSupabaseClient();
   if (!supabase) return;
@@ -45,6 +112,7 @@ async function logAPICall(params: {
       error_message: params.errorMessage,
       request_preview: params.requestPreview?.substring(0, 500),
       response_preview: params.responsePreview?.substring(0, 500),
+      user_id: params.userId ?? null,
     });
   } catch (error) {
     console.error('Failed to log API call:', error);
@@ -68,12 +136,46 @@ serve(async (req) => {
 
   try {
     const { text, type, targetRole, industry } = await req.json();
-    
-    // Try DeepSeek first, fall back to Lovable AI
+
+    const settings = await getResumeAISettings();
+    const userId = await getUserId(req);
+
+    if (settings.resume_ai_enabled !== 'true') {
+      return new Response(
+        JSON.stringify({ error: "AI resume features are currently disabled by the administrator." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const featureKey = settingKeyForType(type);
+    if (featureKey && settings[featureKey] !== 'true') {
+      return new Response(
+        JSON.stringify({ error: "This AI feature is currently disabled by the administrator." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const dailyLimit = parseInt(settings.resume_ai_daily_limit || '0', 10);
+    if (userId && dailyLimit > 0) {
+      const used = await countTodayUsage(userId);
+      if (used >= dailyLimit) {
+        return new Response(
+          JSON.stringify({
+            error: `You have reached your daily limit of ${dailyLimit} AI generations. Please try again tomorrow.`,
+          }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     const DEEPSEEK_API_KEY = Deno.env.get("DEEPSEEK_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
-    const useDeepSeek = !!DEEPSEEK_API_KEY;
+
+    const configuredModel = settings.resume_ai_model || 'deepseek-chat';
+    // Honour the admin-selected model, falling back to whichever key exists
+    const useDeepSeek = configuredModel.startsWith('deepseek')
+      ? !!DEEPSEEK_API_KEY
+      : !LOVABLE_API_KEY && !!DEEPSEEK_API_KEY;
 
     if (!DEEPSEEK_API_KEY && !LOVABLE_API_KEY) {
       throw new Error("No AI API key is configured");
@@ -148,7 +250,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "deepseek-chat",
+          model: configuredModel.startsWith('deepseek') ? configuredModel : 'deepseek-chat',
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt }
@@ -166,7 +268,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: configuredModel.startsWith('google/') ? configuredModel : 'google/gemini-2.5-flash',
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt }
@@ -189,6 +291,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
           status: 'failed',
           errorMessage: 'Rate limit exceeded',
           requestPreview: userPrompt,
+          userId,
         });
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
@@ -206,6 +309,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
           status: 'failed',
           errorMessage: 'AI credits exhausted',
           requestPreview: userPrompt,
+          userId,
         });
         return new Response(
           JSON.stringify({ error: "AI credits exhausted. Please add credits to your workspace." }),
@@ -225,6 +329,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
         status: 'failed',
         errorMessage: errorText,
         requestPreview: userPrompt,
+        userId,
       });
       
       throw new Error("Failed to enhance resume content");
@@ -247,6 +352,7 @@ Create a complete resume with Summary, Experience, Skills, and Education section
       durationMs,
       status: 'success',
       requestPreview: userPrompt,
+      userId,
       responsePreview: enhancedText,
     });
 
