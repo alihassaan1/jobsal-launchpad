@@ -29,7 +29,7 @@ const formatDate = (dateString: string | null) =>
     : "";
 
 const BlogCardMedia = ({ post, className }: { post: any; className?: string }) => (
-  <div className={`relative overflow-hidden rounded-2xl bg-muted ${className || ""}`}>
+  <div className={`overflow-hidden rounded-2xl bg-muted ${className || "relative h-full w-full"}`}>
     {post.featured_image ? (
       <img
         src={post.featured_image}
