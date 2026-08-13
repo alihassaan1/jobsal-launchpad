@@ -375,8 +375,6 @@ export default function AdminLayout() {
         <AdminSidebar />
         <SidebarInset className="flex-1">
           <header className="h-14 border-b flex items-center px-4 bg-card/50 backdrop-blur-sm gap-4 sticky top-0 z-10">
-            <SidebarTrigger className="hover:bg-accent rounded-lg transition-colors" />
-            <Separator orientation="vertical" className="h-6" />
             <div className="flex-1">
               <h1 className="text-lg font-semibold">Jobs.al Admin</h1>
             </div>
