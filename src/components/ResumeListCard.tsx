@@ -5,6 +5,7 @@ import { FileText, Download, Trash2, Eye, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -76,7 +77,7 @@ export function ResumeListCard({ resume, onDelete, showActions = true }: ResumeL
       openUploadedFile("view");
     } else {
       // Open the builder loaded with this resume's data
-      window.location.href = `/resume-builder?id=${resume.id}`;
+      navigate(`/resume-builder?id=${resume.id}`);
     }
   };
 
@@ -85,7 +86,7 @@ export function ResumeListCard({ resume, onDelete, showActions = true }: ResumeL
       openUploadedFile("download");
     } else {
       // For builder resumes, send them to the builder where they can export PDF
-      window.location.href = `/resume-builder?id=${resume.id}&export=1`;
+      navigate(`/resume-builder?id=${resume.id}&export=1`);
     }
   };
 

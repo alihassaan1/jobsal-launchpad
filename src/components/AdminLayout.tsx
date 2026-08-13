@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Outlet, NavLink, useLocation } from "react-router-dom";
+import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
@@ -384,7 +385,9 @@ export default function AdminLayout() {
             </div>
           </header>
           <main className="flex-1 overflow-auto bg-muted/30">
-            <Outlet />
+            <ErrorBoundary key={location.pathname}>
+              <Outlet />
+            </ErrorBoundary>
           </main>
         </SidebarInset>
       </div>
