@@ -88,6 +88,7 @@ export default function ResumeBuilder() {
   const [selectedTemplate, setSelectedTemplate] = useState("modern");
   const [templateSelectorOpen, setTemplateSelectorOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   // Require sign-in: saving is impossible for anonymous visitors
   useEffect(() => {
