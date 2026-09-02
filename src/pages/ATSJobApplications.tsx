@@ -155,7 +155,12 @@ const ATSJobApplications = () => {
     },
   });
 
+  if (authLoading || (!!user && !userRole)) return <div className="min-h-screen bg-background" />;
+  if (!user) return <Navigate to="/auth" replace />;
+  if (userRole !== "employer" && userRole !== "admin") return <Navigate to="/" replace />;
+
   const getStatusColor = (status: string) => {
+
     const colors: Record<string, string> = {
       applied: "bg-blue-100 text-blue-800",
       viewed: "bg-purple-100 text-purple-800",
