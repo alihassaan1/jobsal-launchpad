@@ -32,9 +32,6 @@ const ATSJobApplications = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [rankedCandidates, setRankedCandidates] = useState<any[]>([]);
 
-  if (authLoading || (!!user && !userRole)) return <div className="min-h-screen bg-background" />;
-  if (!user) return <Navigate to="/auth" replace />;
-  if (userRole !== "employer" && userRole !== "admin") return <Navigate to="/" replace />;
 
   // Fetch job details
   const { data: job } = useQuery({
