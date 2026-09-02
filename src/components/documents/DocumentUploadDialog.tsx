@@ -86,7 +86,21 @@ const DocumentUploadDialog = ({ open, onClose, maxSizeMb, replacing }: Props) =>
       };
 
       let documentId = replacing?.id as string | undefined;
+      const isReplace = !!documentId;
       const oldPaths: string[] = [];
+      const restorePayload = isReplace
+        ? {
+            doc_type: replacing.doc_type,
+            title: replacing.title,
+            file_path: replacing.file_path,
+            file_name: replacing.file_name,
+            mime_type: replacing.mime_type,
+            file_size: replacing.file_size,
+            thumbnail_path: replacing.thumbnail_path,
+            is_verified: replacing.is_verified,
+            verification_error: replacing.verification_error,
+          }
+        : null;
 
       if (documentId) {
         if (replacing.file_path) oldPaths.push(replacing.file_path);
@@ -101,10 +115,22 @@ const DocumentUploadDialog = ({ open, onClose, maxSizeMb, replacing }: Props) =>
 
       // Server-side validation (real file type + not corrupted)
       const { data: validation, error: validationError } = await supabase.functions.invoke("validate-document", {
-        body: { documentId },
+        body: { documentId, keepRecord: isReplace },
       });
-      if (validationError) throw validationError;
+
+      const rollback = async () => {
+        if (!isReplace || !restorePayload) return;
+        // Restore the original document row and drop the rejected upload.
+        await supabase.from("user_documents").update(restorePayload).eq("id", documentId!);
+        await supabase.storage.from(DOCUMENTS_BUCKET).remove([path, thumbnailPath].filter(Boolean) as string[]);
+      };
+
+      if (validationError) {
+        await rollback();
+        throw validationError;
+      }
       if (validation?.valid === false) {
+        await rollback();
         throw new Error(validation.error || "This file could not be validated");
       }
 
@@ -112,6 +138,7 @@ const DocumentUploadDialog = ({ open, onClose, maxSizeMb, replacing }: Props) =>
         await supabase.storage.from(DOCUMENTS_BUCKET).remove(oldPaths);
       }
       return documentId;
+
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-documents"] });

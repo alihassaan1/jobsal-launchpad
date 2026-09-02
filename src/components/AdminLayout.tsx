@@ -41,6 +41,8 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
   SidebarFooter,
+  SidebarTrigger,
+
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
@@ -373,10 +375,12 @@ export default function AdminLayout() {
         <AdminSidebar />
         <SidebarInset className="flex-1">
           <header className="h-14 border-b flex items-center px-4 bg-card/50 backdrop-blur-sm gap-4 sticky top-0 z-10">
+            <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
               <h1 className="text-lg font-semibold">Jobs.al Admin</h1>
             </div>
           </header>
+
           <main className="flex-1 overflow-auto bg-muted/30">
             <ErrorBoundary key={location.pathname}>
               <Outlet />

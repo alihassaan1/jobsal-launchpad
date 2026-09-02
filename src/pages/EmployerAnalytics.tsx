@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 type DateRange = "7d" | "30d" | "all";
 
 export default function EmployerAnalytics() {
-  const { user, userRole } = useAuth();
+  const { user, userRole, loading: authLoading } = useAuth();
   const [dateRange, setDateRange] = useState<DateRange>("30d");
 
   // Fetch company info
@@ -77,9 +77,18 @@ export default function EmployerAnalytics() {
     enabled: !!company?.id,
   });
 
-  if (userRole !== "employer") {
+  if (authLoading || (!!user && !userRole)) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth?type=employer" replace />;
+  }
+
+  if (userRole !== "employer" && userRole !== "admin") {
     return <Navigate to="/" replace />;
   }
+
 
   if (!company) {
     return (

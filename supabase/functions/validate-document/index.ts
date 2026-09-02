@@ -50,7 +50,11 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const documentId = typeof body?.documentId === "string" ? body.documentId : null;
+    // When replacing an existing document the caller keeps ownership of the row and
+    // restores the previous metadata itself, so we must not delete it here.
+    const keepRecord = body?.keepRecord === true;
     if (!documentId) return json({ error: "documentId is required" }, 400);
+
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
@@ -77,9 +81,14 @@ Deno.serve(async (req) => {
 
     const fail = async (message: string) => {
       await admin.storage.from(BUCKET).remove([doc.file_path, doc.thumbnail_path].filter(Boolean) as string[]);
-      await admin.from("user_documents").delete().eq("id", documentId);
+      if (!keepRecord) {
+        await admin.from("user_documents").delete().eq("id", documentId);
+      } else {
+        await admin.from("user_documents").update({ is_verified: false, verification_error: message }).eq("id", documentId);
+      }
       return json({ valid: false, error: message }, 200);
     };
+
 
     if (!enabled) return await fail("Document uploads are currently disabled");
 
