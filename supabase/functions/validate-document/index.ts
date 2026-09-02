@@ -81,9 +81,14 @@ Deno.serve(async (req) => {
 
     const fail = async (message: string) => {
       await admin.storage.from(BUCKET).remove([doc.file_path, doc.thumbnail_path].filter(Boolean) as string[]);
-      await admin.from("user_documents").delete().eq("id", documentId);
+      if (!keepRecord) {
+        await admin.from("user_documents").delete().eq("id", documentId);
+      } else {
+        await admin.from("user_documents").update({ is_verified: false, verification_error: message }).eq("id", documentId);
+      }
       return json({ valid: false, error: message }, 200);
     };
+
 
     if (!enabled) return await fail("Document uploads are currently disabled");
 
