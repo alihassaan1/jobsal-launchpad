@@ -50,7 +50,11 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const documentId = typeof body?.documentId === "string" ? body.documentId : null;
+    // When replacing an existing document the caller keeps ownership of the row and
+    // restores the previous metadata itself, so we must not delete it here.
+    const keepRecord = body?.keepRecord === true;
     if (!documentId) return json({ error: "documentId is required" }, 400);
+
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
