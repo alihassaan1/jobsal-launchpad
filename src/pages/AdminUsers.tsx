@@ -72,20 +72,45 @@ export default function AdminUsers() {
         return;
       }
 
-      // 2) Fetch roles, subscriptions, applications and resumes in bulk (no N+1)
-      const [rolesRes, subsRes, appsRes, resumesRes] = await Promise.all([
-        supabase.from('user_roles').select('user_id, role'),
-        supabase.from('subscriptions').select('user_id, tier, status'),
-        supabase.from('applications').select('applicant_id'),
-        supabase
-          .from('resumes')
-          .select('id, user_id, title, resume_file_url, is_uploaded, created_at')
-          .eq('is_active', true)
-          .order('created_at', { ascending: false }),
-      ]);
+      // 2) Fetch roles, subscriptions, applications and resumes in bulk (no N+1),
+      //    paging past PostgREST's default 1000-row cap.
+      const PAGE = 1000;
+      const fetchAllPages = async (build: (from: number, to: number) => any) => {
+        const rows: any[] = [];
+        for (let page = 0; ; page++) {
+          const from = page * PAGE;
+          const { data, error } = await build(from, from + PAGE - 1);
+          if (error) throw error;
+          const batch = data || [];
+          rows.push(...batch);
+          if (batch.length < PAGE) break;
+        }
+        return rows;
+      };
 
-      const roles = rolesRes.data || [];
-      const subs = subsRes.data || [];
+      const [roles, subs, appRows, resumeRows] = await Promise.all([
+        fetchAllPages((from, to) =>
+          supabase.from('user_roles').select('user_id, role').in('user_id', userIds).range(from, to)
+        ),
+        fetchAllPages((from, to) =>
+          supabase.from('subscriptions').select('user_id, tier, status').in('user_id', userIds).range(from, to)
+        ),
+        fetchAllPages((from, to) =>
+          supabase.from('applications').select('applicant_id').in('applicant_id', userIds).range(from, to)
+        ),
+        fetchAllPages((from, to) =>
+          supabase
+            .from('resumes')
+            .select('id, user_id, title, resume_file_url, is_uploaded, created_at')
+            .eq('is_active', true)
+            .in('user_id', userIds)
+            .order('created_at', { ascending: false })
+            .range(from, to)
+        ),
+      ]);
+      const appsRes = { data: appRows };
+      const resumesRes = { data: resumeRows };
+
 
       const roleMap = new Map<string, any[]>();
       roles.forEach((r: any) => {
