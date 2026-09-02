@@ -16,7 +16,7 @@ import {
 import Navigation from "@/components/Navigation";
 
 export default function RecommendedJobs() {
-  const { user, userRole } = useAuth();
+  const { user, userRole, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

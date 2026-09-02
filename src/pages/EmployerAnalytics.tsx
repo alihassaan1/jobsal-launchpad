@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 type DateRange = "7d" | "30d" | "all";
 
 export default function EmployerAnalytics() {
-  const { user, userRole } = useAuth();
+  const { user, userRole, loading: authLoading } = useAuth();
   const [dateRange, setDateRange] = useState<DateRange>("30d");
 
   // Fetch company info

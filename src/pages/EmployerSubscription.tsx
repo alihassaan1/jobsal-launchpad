@@ -25,7 +25,7 @@ interface SubscriptionPlan {
 }
 
 export default function EmployerSubscription() {
-  const { user, userRole } = useAuth();
+  const { user, userRole, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
