@@ -79,9 +79,18 @@ export default function RecommendedJobs() {
     });
   };
 
-  if (userRole !== "job_seeker") {
+  if (authLoading || (!!user && !userRole)) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (userRole !== "job_seeker" && userRole !== "admin") {
     return <Navigate to="/" replace />;
   }
+
 
   const getMatchLevel = (score: number) => {
     if (score >= 0.85) return { label: "Excellent Match", color: "bg-green-500" };

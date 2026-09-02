@@ -77,9 +77,18 @@ export default function EmployerAnalytics() {
     enabled: !!company?.id,
   });
 
-  if (userRole !== "employer") {
+  if (authLoading || (!!user && !userRole)) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth?type=employer" replace />;
+  }
+
+  if (userRole !== "employer" && userRole !== "admin") {
     return <Navigate to="/" replace />;
   }
+
 
   if (!company) {
     return (
