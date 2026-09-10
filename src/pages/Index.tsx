@@ -84,14 +84,14 @@ const BlogSection = () => {
             <button
               key={post.id}
               onClick={() => navigate(`/blog/${post.slug}`)}
-                className="group relative block w-full aspect-[3/2] overflow-hidden rounded-lg cursor-pointer text-left"
+              className="group relative block aspect-[3/2] w-full cursor-pointer overflow-hidden rounded-lg border border-border text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               {post.featured_image ? (
                 <img
                   src={post.featured_image}
                   alt={post.title}
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.04]"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
@@ -104,12 +104,20 @@ const BlogSection = () => {
                   <span className="text-white/40 text-sm font-medium">jobs.al blog</span>
                 </div>
               )}
-              <h3
-                className="absolute bottom-3 left-3 right-3 text-sm font-semibold text-primary-foreground line-clamp-2 opacity-85 transition-all duration-200 group-hover:opacity-100 group-hover:font-bold min-[360px]:bottom-4 min-[360px]:left-4 min-[360px]:right-4 min-[360px]:text-base"
-                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
-              >
-                {post.title}
-              </h3>
+              <div className="absolute inset-x-3 bottom-3 rounded-md border border-border/60 bg-background/95 p-3 text-foreground transition-transform duration-300 motion-reduce:transition-none group-hover:-translate-y-1 min-[360px]:inset-x-4 min-[360px]:bottom-4 min-[360px]:p-4">
+                <div className="mb-1.5 flex items-center justify-between gap-3">
+                  <span className="truncate text-[11px] font-bold uppercase text-primary">
+                    {post.category || 'Career insights'}
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground transition-colors group-hover:text-primary">
+                    Read
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-0.5" />
+                  </span>
+                </div>
+                <h3 className="line-clamp-2 text-base font-bold leading-snug sm:text-lg">
+                  {post.title}
+                </h3>
+              </div>
             </button>
           ))}
         </div>
