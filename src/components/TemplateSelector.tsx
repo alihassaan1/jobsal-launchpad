@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { Crown } from "lucide-react";
 import ResumeThumbnail from "./resume-templates/ResumeThumbnail";
 import {
   RESUME_TEMPLATES,
@@ -52,7 +54,14 @@ export default function TemplateSelector({
                   >
                     <ResumeThumbnail slug={template.slug} data={previewData} />
                   </button>
-                  <h3 className="font-semibold mb-1">{template.label}</h3>
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <h3 className="font-semibold">{template.label}</h3>
+                    {template.isPremium && (
+                      <Badge variant="secondary" className="gap-1">
+                        <Crown className="h-3 w-3 text-primary" /> Premium · Free now
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground mb-3">{template.description}</p>
                   <div className="flex gap-2">
                     <Button

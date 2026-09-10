@@ -35,22 +35,6 @@ export default function ResumeTemplates() {
     },
   });
 
-  const { data: userSubscription } = useQuery({
-    queryKey: ["user-subscription", user?.id],
-    queryFn: async () => {
-      if (!user) return null;
-      const { data, error } = await supabase
-        .from("subscriptions")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
-      
-      if (error) return null;
-      return data;
-    },
-    enabled: !!user,
-  });
-
   const filteredTemplates = templates?.filter(template => {
     const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          template.description?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -179,7 +163,7 @@ export default function ResumeTemplates() {
                   >
                     Use Template
                     {template.is_premium && (
-                      <Badge variant="secondary" className="ml-2">Free Preview</Badge>
+                      <Badge variant="secondary" className="ml-2">Premium · Free now</Badge>
                     )}
                   </Button>
                 </CardFooter>
