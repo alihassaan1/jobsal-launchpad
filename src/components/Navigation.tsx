@@ -42,17 +42,17 @@ export default function Navigation() {
     <header className="border-b bg-background sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-3 py-3 min-[360px]:px-4 lg:py-4">
         <div className="flex min-w-0 items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center lg:gap-5 xl:gap-8">
+          <div className="flex min-w-0 items-center xl:gap-8">
             <Link to="/" className="relative shrink-0 bg-gradient-hero bg-clip-text text-xl font-bold text-transparent min-[360px]:text-2xl">
               jobs.al
               <div className="absolute inset-0 bg-gradient-hero bg-clip-text text-transparent opacity-50 animate-shine"></div>
             </Link>
-            <nav className="hidden items-center gap-3 lg:flex xl:gap-6" aria-label="Primary navigation">
+            <nav className="hidden items-center gap-6 xl:flex" aria-label="Primary navigation">
               {primaryLinks.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="group relative whitespace-nowrap text-xs text-foreground transition-colors duration-300 hover:text-primary xl:text-sm"
+                  className="group relative whitespace-nowrap text-sm text-foreground transition-colors duration-300 hover:text-primary"
                 >
                   {item.label}
                   <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full"></span>
@@ -60,8 +60,8 @@ export default function Navigation() {
               ))}
             </nav>
           </div>
-          <div className="hidden shrink-0 items-center gap-1 lg:flex xl:gap-3">
-            <div className="hidden xl:block"><LanguageSwitcher /></div>
+          <div className="hidden shrink-0 items-center gap-3 xl:flex">
+            <LanguageSwitcher />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -133,7 +133,7 @@ export default function Navigation() {
             )}
           </div>
 
-          <div className="flex shrink-0 items-center gap-0.5 lg:hidden">
+          <div className="flex shrink-0 items-center gap-0.5 xl:hidden">
             <LanguageSwitcher />
             <Sheet>
               <SheetTrigger asChild>

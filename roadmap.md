@@ -15,6 +15,6 @@
 
 # Responsive navigation and adaptive layouts
 
-- [ ] Add accessible navigation for foldables, phones, and tablets
-- [ ] Tune homepage typography, controls, cards, and grids for narrow screens
+- [x] Add accessible navigation for foldables, phones, and tablets
+- [x] Tune homepage typography, controls, cards, and grids for narrow screens
 - [ ] Verify representative foldable, phone, tablet, iPad, and desktop widths
