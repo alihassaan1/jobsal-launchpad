@@ -17,4 +17,4 @@
 
 - [x] Add accessible navigation for foldables, phones, and tablets
 - [x] Tune homepage typography, controls, cards, and grids for narrow screens
-- [ ] Verify representative foldable, phone, tablet, iPad, and desktop widths
+- [x] Verify representative foldable, phone, tablet, iPad, and desktop widths
