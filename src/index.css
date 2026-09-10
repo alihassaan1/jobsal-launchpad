@@ -196,3 +196,16 @@ All colors MUST be HSL.
   @apply text-primary underline;
 }
 
+
+/* Keep resume sections from splitting awkwardly across PDF pages */
+.resume-pdf-root section,
+.resume-pdf-root li,
+.resume-pdf-root h2,
+.resume-pdf-root h3 {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.resume-pdf-root h2 {
+  break-after: avoid;
+  page-break-after: avoid;
+}

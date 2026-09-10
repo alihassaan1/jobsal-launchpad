@@ -39,14 +39,14 @@ interface TemplateProps {
 
 export default function CreativeTemplate({ data }: TemplateProps) {
   return (
-    <div className="bg-white text-gray-900 shadow-2xl min-h-[297mm] w-[210mm] flex mx-auto">
+    <div className="bg-white text-gray-900 min-h-[297mm] w-[210mm] flex mx-auto">
       {/* Left Sidebar - Fixed width to prevent layout shifts */}
-      <div className="w-[70mm] bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 text-white p-6 relative overflow-hidden flex-shrink-0">
+      <div className="w-[70mm] bg-purple-900 text-white p-6 relative overflow-hidden flex-shrink-0">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full -ml-12 -mb-12"></div>
         <div className="mb-10 relative z-10">
-          <div className="w-28 h-28 bg-gradient-to-br from-purple-300 to-pink-300 rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl border-4 border-white">
-            <span className="text-5xl font-bold bg-gradient-to-br from-purple-900 to-indigo-900 bg-clip-text text-transparent">
+          <div className="w-28 h-28 bg-purple-200 rounded-full mx-auto mb-6 flex items-center justify-center border-4 border-white">
+            <span className="text-5xl font-bold text-purple-900">
               {data.personal_info.full_name?.charAt(0) || "?"}
             </span>
           </div>
@@ -98,8 +98,8 @@ export default function CreativeTemplate({ data }: TemplateProps) {
               {data.skills.map((skill, idx) => (
                 <div key={idx} className="text-sm">
                   <p className="mb-2 font-semibold">{skill}</p>
-                  <div className="h-1.5 bg-purple-300/30 rounded-full overflow-hidden shadow-inner">
-                    <div className="h-full bg-gradient-to-r from-purple-300 to-pink-300 rounded-full w-4/5 shadow-md"></div>
+                  <div className="h-1.5 bg-purple-300/30 rounded-full overflow-hidden ">
+                    <div className="h-full bg-purple-300 rounded-full w-4/5 "></div>
                   </div>
                 </div>
               ))}
@@ -126,11 +126,11 @@ export default function CreativeTemplate({ data }: TemplateProps) {
       </div>
 
       {/* Right Content - Fixed width to prevent layout shifts */}
-      <div className="w-[140mm] p-8 bg-gradient-to-br from-gray-50 to-white flex-shrink-0">
+      <div className="w-[140mm] p-8 bg-white flex-shrink-0">
         {/* Summary */}
         {data.summary && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-900 to-indigo-900 bg-clip-text text-transparent mb-4 border-b-2 border-purple-900 pb-2">
+            <h2 className="text-2xl font-bold text-purple-900 mb-4 border-b-2 border-purple-900 pb-2">
               About Me
             </h2>
             <p className="text-gray-700 leading-loose text-justify">{data.summary}</p>
@@ -140,15 +140,15 @@ export default function CreativeTemplate({ data }: TemplateProps) {
         {/* Experience */}
         {data.experience.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-900 to-indigo-900 bg-clip-text text-transparent mb-4 border-b-2 border-purple-900 pb-2">
+            <h2 className="text-2xl font-bold text-purple-900 mb-4 border-b-2 border-purple-900 pb-2">
               Experience
             </h2>
             {data.experience.map((exp, idx) => (
               <div key={idx} className="mb-6 relative pl-6 border-l-4 border-purple-200">
-                <div className="absolute -left-[13px] top-0 w-6 h-6 bg-gradient-to-br from-purple-900 to-indigo-900 rounded-full shadow-lg"></div>
+                <div className="absolute -left-[13px] top-0 w-6 h-6 bg-purple-900 rounded-full "></div>
                 <div className="mb-2">
                   <h3 className="font-bold text-gray-900 text-lg">{exp.position}</h3>
-                  <p className="text-sm bg-gradient-to-r from-purple-900 to-indigo-900 bg-clip-text text-transparent font-bold">{exp.company}</p>
+                  <p className="text-sm text-purple-900 font-bold">{exp.company}</p>
                   <p className="text-xs text-gray-600 mt-1">
                     {exp.start_date} – {exp.end_date || "Present"}
                   </p>
@@ -174,11 +174,11 @@ export default function CreativeTemplate({ data }: TemplateProps) {
         {/* Education */}
         {data.education.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-900 to-indigo-900 bg-clip-text text-transparent mb-4 border-b-2 border-purple-900 pb-2">
+            <h2 className="text-2xl font-bold text-purple-900 mb-4 border-b-2 border-purple-900 pb-2">
               Education
             </h2>
             {data.education.map((edu, idx) => (
-              <div key={idx} className="mb-4 bg-gradient-to-r from-purple-50 to-indigo-50 p-4 rounded-lg shadow-md">
+              <div key={idx} className="mb-4 bg-purple-50 p-4 rounded-lg ">
                 <h3 className="font-bold text-gray-900 text-lg">
                   {edu.degree} {edu.field && `in ${edu.field}`}
                 </h3>
@@ -195,12 +195,12 @@ export default function CreativeTemplate({ data }: TemplateProps) {
         {/* Certifications */}
         {data.certifications.length > 0 && (
           <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-900 to-indigo-900 bg-clip-text text-transparent mb-4 border-b-2 border-purple-900 pb-2">
+            <h2 className="text-2xl font-bold text-purple-900 mb-4 border-b-2 border-purple-900 pb-2">
               Certifications
             </h2>
             {data.certifications.map((cert, idx) => (
               <div key={idx} className="mb-4 flex items-start gap-3">
-                <div className="w-3 h-3 bg-gradient-to-br from-purple-900 to-indigo-900 rounded-full mt-1 flex-shrink-0"></div>
+                <div className="w-3 h-3 bg-purple-900 rounded-full mt-1 flex-shrink-0"></div>
                 <div>
                   <h3 className="font-bold text-gray-900">{cert.name}</h3>
                   <p className="text-sm text-gray-600">

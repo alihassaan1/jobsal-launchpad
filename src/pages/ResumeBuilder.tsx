@@ -13,10 +13,12 @@ import { toast } from "@/hooks/use-toast";
 import { Loader2, Sparkles, Download, Save, Palette, Trash2, Plus } from "lucide-react";
 import html2pdf from "html2pdf.js";
 import TemplateSelector from "@/components/TemplateSelector";
-import ModernTemplate from "@/components/resume-templates/ModernTemplate";
-import ClassicTemplate from "@/components/resume-templates/ClassicTemplate";
-import CreativeTemplate from "@/components/resume-templates/CreativeTemplate";
-import ExecutiveTemplate from "@/components/resume-templates/ExecutiveTemplate";
+import {
+  renderResumeTemplate,
+  resolveTemplateSlug,
+  getTemplate,
+} from "@/components/resume-templates/registry";
+
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useResumeAISettings, isOn } from "@/hooks/useResumeAISettings";
@@ -128,6 +130,14 @@ export default function ResumeBuilder() {
     },
     enabled: !!templateId,
   });
+
+  // Apply the design chosen on the templates gallery (only for new resumes)
+  useEffect(() => {
+    if (!template || resumeId) return;
+    setSelectedTemplate(resolveTemplateSlug((template as any).slug || (template as any).category));
+  }, [template, resumeId]);
+
+
 
   // Load existing resume if editing
   const { data: existingResume, isLoading: resumeLoading } = useQuery({
@@ -382,37 +392,46 @@ export default function ResumeBuilder() {
     }
 
     // The on-screen preview is scaled down (transform: scale) — render an
-    // off-screen, unscaled clone so the PDF is captured at full A4 size.
+    // off-screen, unscaled clone at exact A4 pixel width so the PDF is sharp.
+    const A4_WIDTH_PX = 794; // 210mm at 96dpi
     const wrapper = document.createElement('div');
     wrapper.style.position = 'fixed';
     wrapper.style.top = '0';
     wrapper.style.left = '-10000px';
-    wrapper.style.width = '210mm';
+    wrapper.style.width = `${A4_WIDTH_PX}px`;
     wrapper.style.backgroundColor = '#ffffff';
+    wrapper.className = 'resume-pdf-root';
 
     const clone = element.cloneNode(true) as HTMLElement;
     clone.removeAttribute('id');
     clone.style.transform = 'none';
     clone.style.marginBottom = '0';
-    clone.style.width = '210mm';
-    clone.style.minHeight = '297mm';
-    clone.style.maxWidth = '210mm';
+    clone.style.width = `${A4_WIDTH_PX}px`;
+    clone.style.maxWidth = `${A4_WIDTH_PX}px`;
+    clone.style.minHeight = '1123px';
+    clone.style.boxShadow = 'none';
     clone.style.display = 'block';
     clone.style.boxSizing = 'border-box';
+    // Make inner template roots match the exact A4 pixel width too
+    clone.querySelectorAll<HTMLElement>('div').forEach((node) => {
+      if (node.style.width === '210mm') node.style.width = `${A4_WIDTH_PX}px`;
+    });
     wrapper.appendChild(clone);
     document.body.appendChild(wrapper);
 
     const opt = {
       margin: 0,
       filename: `${resumeData.personal_info.full_name || 'Resume'}.pdf`,
-      image: { type: 'jpeg' as const, quality: 0.98 },
+      image: { type: 'jpeg' as const, quality: 1 },
       html2canvas: {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         letterRendering: true,
         logging: false,
         backgroundColor: '#ffffff',
         imageTimeout: 0,
+        windowWidth: A4_WIDTH_PX,
+        width: A4_WIDTH_PX,
       },
       jsPDF: {
         unit: 'mm' as const,
@@ -420,7 +439,7 @@ export default function ResumeBuilder() {
         orientation: 'portrait' as const,
         compress: true,
       },
-      pagebreak: { mode: ['css', 'legacy'] }
+      pagebreak: { mode: ['css', 'legacy'], avoid: ['section', 'li', 'h2', 'h3'] },
     };
 
     setExporting(true);
@@ -448,22 +467,8 @@ export default function ResumeBuilder() {
     }
   };
 
-  const renderTemplate = () => {
-    const templateProps = { data: resumeData };
-    
-    switch (selectedTemplate) {
-      case "modern":
-        return <ModernTemplate {...templateProps} />;
-      case "classic":
-        return <ClassicTemplate {...templateProps} />;
-      case "creative":
-        return <CreativeTemplate {...templateProps} />;
-      case "executive":
-        return <ExecutiveTemplate {...templateProps} />;
-      default:
-        return <ModernTemplate {...templateProps} />;
-    }
-  };
+  const renderTemplate = () => renderResumeTemplate(selectedTemplate, resumeData);
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -967,7 +972,7 @@ export default function ResumeBuilder() {
             <Card className="sticky top-4">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-base sm:text-lg">
-                  Live Preview - {selectedTemplate.charAt(0).toUpperCase() + selectedTemplate.slice(1)} Template
+                  Live Preview - {getTemplate(selectedTemplate).label} Template
                 </CardTitle>
                 <Button variant="outline" size="sm" onClick={() => setTemplateSelectorOpen(true)}>
                   <Palette className="w-4 h-4 mr-2" />
@@ -1007,7 +1012,7 @@ export default function ResumeBuilder() {
           setTemplateSelectorOpen(false);
           toast({
             title: "Template Changed",
-            description: `Switched to ${template.charAt(0).toUpperCase() + template.slice(1)} template. Save to keep it.`,
+            description: `Switched to ${getTemplate(template).label} template. Save to keep it.`,
           });
         }}
         currentTemplate={selectedTemplate}
