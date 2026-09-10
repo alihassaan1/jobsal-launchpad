@@ -14,7 +14,7 @@ export default function NordicTemplate({ data }: TemplateProps) {
   );
 
   return (
-    <div className="mx-auto min-h-[297mm] w-[210mm] bg-[#fbfcfc] px-14 py-12 font-sans text-slate-800">
+    <div className="mx-auto min-h-[297mm] w-[210mm] bg-slate-50 px-14 py-12 font-sans text-slate-800">
       <header className="mb-10 grid grid-cols-[1fr_230px] gap-10">
         <div>
           <div className="mb-5 h-2 w-16 bg-teal-600" />

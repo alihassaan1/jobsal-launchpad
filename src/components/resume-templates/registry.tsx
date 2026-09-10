@@ -3,6 +3,10 @@ import ClassicTemplate from "./ClassicTemplate";
 import CreativeTemplate from "./CreativeTemplate";
 import ExecutiveTemplate from "./ExecutiveTemplate";
 import TechTemplate from "./TechTemplate";
+import SignatureTemplate from "./SignatureTemplate";
+import NordicTemplate from "./NordicTemplate";
+import VanguardTemplate from "./VanguardTemplate";
+import LedgerTemplate from "./LedgerTemplate";
 import type { ResumeTemplateData } from "./types";
 
 export type { ResumeTemplateData };
@@ -12,6 +16,7 @@ export interface ResumeTemplateDefinition {
   label: string;
   description: string;
   aliases: string[];
+  isPremium?: boolean;
   Component: (props: { data: ResumeTemplateData }) => JSX.Element;
 }
 
@@ -50,6 +55,38 @@ export const RESUME_TEMPLATES: ResumeTemplateDefinition[] = [
     description: "Minimal monospaced accents built for engineering roles",
     aliases: ["tech-minimal", "minimal"],
     Component: TechTemplate,
+  },
+  {
+    slug: "signature",
+    label: "Signature",
+    description: "Refined editorial styling for leadership and consulting profiles",
+    aliases: ["signature-premium"],
+    isPremium: true,
+    Component: SignatureTemplate,
+  },
+  {
+    slug: "nordic",
+    label: "Nordic",
+    description: "Airy Scandinavian structure for modern professional careers",
+    aliases: ["nordic-premium"],
+    isPremium: true,
+    Component: NordicTemplate,
+  },
+  {
+    slug: "vanguard",
+    label: "Vanguard",
+    description: "Bold two-column presentation for product and commercial leaders",
+    aliases: ["vanguard-premium"],
+    isPremium: true,
+    Component: VanguardTemplate,
+  },
+  {
+    slug: "ledger",
+    label: "Ledger",
+    description: "Precise, structured format for finance, legal, and operations roles",
+    aliases: ["ledger-premium"],
+    isPremium: true,
+    Component: LedgerTemplate,
   },
 ];
 
