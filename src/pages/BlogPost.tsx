@@ -98,6 +98,12 @@ const BlogPost = () => {
     return '/blog/personal-branding-albania.jpg';
   };
 
+  const getRelatedPostImage = (relatedPost: any) => {
+    const image = relatedPost.featured_image?.trim();
+    const isGenericImage = !image || image.endsWith('/og-image.jpg') || image === '/og-image.jpg';
+    return isGenericImage ? getRelatedPostFallback(relatedPost) : image;
+  };
+
   const siteOrigin = 'https://jobs.al';
   const shareUrl = `${siteOrigin}/blog/${slug}`;
   const shareTitle = post?.title || '';
@@ -358,7 +364,7 @@ const BlogPost = () => {
                     >
                       <div className="aspect-[3/2] overflow-hidden bg-muted">
                         <img
-                          src={relatedPost.featured_image || getRelatedPostFallback(relatedPost)}
+                          src={getRelatedPostImage(relatedPost)}
                           alt={`Featured image for ${relatedPost.title}`}
                           loading="lazy"
                           className="h-full w-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-105"
