@@ -1,38 +1,34 @@
-# Lock down analytics columns at the database layer
+# Add a premium resume template collection
 
-## Why
-Right now Postgres RLS lets anyone (logged out included) call the `jobs`, `companies`, and `posts` tables directly and read `views_count`, `applications_count`, and `followers_count` for every active row — even though the UI hides them. Row-level policies can't filter columns, so we need public-safe views and tighter base-table policies.
+## What will be added
 
-## Approach
+Four brand-new, high-end resume designs, each built as real A4 HTML rather than a preview image:
 
-Create one read-only public view per affected table that excludes the analytics columns. Restrict the base table's SELECT policy to owners and admins. Point every public-facing frontend query at the view. Internal employer/admin pages keep using the base table (they're already gated by ownership/admin in RLS).
+1. **Signature** — refined editorial layout for leadership and consulting roles.
+2. **Nordic** — minimal, airy layout for modern professional roles.
+3. **Vanguard** — structured two-column layout for product, design, and commercial roles.
+4. **Ledger** — precise, compact layout for finance, legal, and operations roles.
 
-## Migration
+All four will carry a **Premium** label but remain selectable and downloadable for free during the promotional period.
 
-1. `jobs_public` view with `security_invoker=on` — all columns except `views_count`, `applications_count`.
-2. `companies_public` view — all columns except `views_count`, `followers_count`.
-3. `posts_public` view — all columns except `views_count` (still filtered to `is_published = true`).
-4. Replace the existing public SELECT policies on the base tables:
-   - `jobs`: SELECT only for `posted_by = auth.uid()`, company owner, or admin.
-   - `companies`: SELECT only for `owner_id = auth.uid()`, company members, or admin.
-   - `posts`: SELECT only for author/admin/editor (drop "Anyone can view published posts").
-5. Grant SELECT on the three new views to `anon` and `authenticated`.
+## Experience
 
-## Frontend updates
+- Add the designs to the public template gallery and the builder's “Change Template” window.
+- Clearly label premium templates and show that they are currently free.
+- Keep existing resumes and all five current templates working unchanged.
+- Use the exact same template renderer for gallery thumbnails, full previews, the live builder, and PDF export.
 
-Switch read queries that don't need the hidden columns to the public views:
+## Technical details
 
-- `src/pages/Jobs.tsx`, `JobsByCategory.tsx`, `JobsByLocation.tsx`, `JobDetail.tsx`, `Index.tsx`, `TopEmployers.tsx` → `jobs_public`
-- `src/pages/Companies.tsx`, `CompanyProfile.tsx`, `FeaturedCompanies.tsx`, `Index.tsx`, `TopEmployers.tsx` → `companies_public`
-- `src/pages/Blog.tsx`, `BlogPost.tsx`, `Index.tsx` → `posts_public`
+- Create four A4-safe React template renderers with solid colours, print-safe typography, stable spacing, and section break protection.
+- Extend the shared template registry with premium metadata and database slug aliases.
+- Add the four active `resume_templates` records through a safe, repeatable database migration (`is_premium = true`), without introducing payment enforcement yet.
+- Resolve saved and gallery-selected templates to canonical slugs so premium selections persist correctly.
+- Improve the selector's premium/free-now labels without changing access rules.
 
-Employer/admin pages (`EmployerDashboard`, `EmployerAnalytics`, `AdminJobs`, `AdminDashboard`, `AdminAnalytics`, `AdminCompanies`, `AdminBlog`, `EmployerCompanyProfile`, `ATSJobApplications`, `EmployerAds*`, `EmployerSubscription`) keep querying the base tables — RLS already permits this for owners/admins.
+## Quality checks
 
-The `increment_job_views` / `increment_post_views` / `increment_company_views` RPCs already run as `SECURITY DEFINER`, so view-tracking still works for anonymous visitors.
-
-## Verification
-
-- Run the Supabase linter after the migration.
-- Hit `jobs_public` and `jobs` as an anonymous user via `supabase--curl_edge_functions` (or the SQL editor) — `jobs_public` returns rows, `jobs` returns none.
-- Load `/`, `/jobs`, `/jobs/:slug`, `/companies`, `/blog` in the preview to confirm no regressions.
-- Load `/dashboard` and `/employer/analytics` as an employer to confirm counts still display.
+- Check TypeScript and the current build diagnostics.
+- Render every new gallery thumbnail and full A4 preview in the running app.
+- Generate sample PDFs for all four templates, convert them to images, and visually inspect them for clipping, overlaps, broken fonts, poor contrast, and thumbnail/PDF differences.
+- Verify the existing five templates still open and render.
