@@ -61,11 +61,11 @@ const BlogSection = () => {
   if (latestPosts.length === 0) return null;
 
   return (
-    <section className="py-16 bg-muted/30">
-      <div className="container mx-auto px-4">
+    <section className="py-10 sm:py-14 lg:py-16 bg-muted/30">
+      <div className="container mx-auto px-3 min-[360px]:px-4">
         <div className="flex items-end justify-between gap-4 mb-8">
           <div>
-            <h2 className="text-3xl font-bold">
+            <h2 className="text-2xl font-bold sm:text-3xl">
               Latest from <span className="text-primary">our blog</span>
             </h2>
             <p className="text-muted-foreground mt-2">Expert career advice and job market insights</p>
@@ -84,7 +84,7 @@ const BlogSection = () => {
             <button
               key={post.id}
               onClick={() => navigate(`/blog/${post.slug}`)}
-              className="group relative block w-full aspect-[3/2] overflow-hidden rounded-2xl cursor-pointer text-left"
+                className="group relative block w-full aspect-[3/2] overflow-hidden rounded-lg cursor-pointer text-left"
             >
               {post.featured_image ? (
                 <img
@@ -105,7 +105,7 @@ const BlogSection = () => {
                 </div>
               )}
               <h3
-                className="absolute bottom-4 left-4 right-4 text-primary-foreground text-[17px] font-semibold line-clamp-2 opacity-85 transition-all duration-200 group-hover:opacity-100 group-hover:font-bold"
+                className="absolute bottom-3 left-3 right-3 text-sm font-semibold text-primary-foreground line-clamp-2 opacity-85 transition-all duration-200 group-hover:opacity-100 group-hover:font-bold min-[360px]:bottom-4 min-[360px]:left-4 min-[360px]:right-4 min-[360px]:text-base"
                 style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
               >
                 {post.title}
@@ -233,11 +233,11 @@ const Index = () => {
           })}
         </script>
       </Helmet>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen overflow-x-hidden bg-background">
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative py-20 bg-primary overflow-hidden">
+      <section className="relative overflow-hidden bg-primary py-12 sm:py-16 lg:py-20">
         {/* Subtle geometric pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -245,22 +245,22 @@ const Index = () => {
           }}></div>
         </div>
         
-        <div className="container mx-auto px-4 text-center relative z-10">
+        <div className="container relative z-10 mx-auto px-3 text-center min-[360px]:px-4">
           <div>
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            <h1 className="mb-4 text-3xl font-bold leading-tight text-white min-[360px]:text-4xl sm:mb-6 sm:text-5xl lg:text-6xl">
               Find Your Dream Job in 
               <span className="block bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
                 Albania
               </span>
             </h1>
-            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="mx-auto mb-6 max-w-2xl text-base leading-relaxed text-white/90 sm:mb-8 sm:text-lg lg:text-xl">
               Discover thousands of job opportunities from top companies across Albania. Your career journey starts here.
             </p>
           </div>
           
           {/* Enhanced Search Bar */}
-          <div className="max-w-4xl mx-auto bg-white/95 backdrop-blur p-6 rounded-2xl shadow-2xl border border-white/20">
-            <div className="grid md:grid-cols-3 gap-4">
+          <div className="mx-auto max-w-4xl rounded-lg border border-white/20 bg-white/95 p-3 shadow-2xl backdrop-blur min-[360px]:p-4 sm:p-6">
+            <div className="grid gap-3 md:grid-cols-3 md:gap-4">
               <div className="relative group">
                 <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors z-10" />
                 <Input 
@@ -286,7 +286,7 @@ const Index = () => {
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[280px] p-0 bg-white z-50" align="start">
+                <PopoverContent className="z-50 w-[calc(100vw-2rem)] max-w-[280px] bg-white p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Search city..." className="h-10" />
                     <CommandList>
@@ -333,32 +333,32 @@ const Index = () => {
           </div>
 
           {/* Enhanced Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 text-white">
+          <div className="mt-10 grid grid-cols-2 gap-x-3 gap-y-6 text-white sm:mt-14 sm:gap-8 md:grid-cols-4 lg:mt-16">
             <div className="animate-fade-up hover:scale-105 transition-transform duration-300" style={{animationDelay: '0.2s'}}>
-              <div className="text-4xl font-bold">1,200+</div>
-              <div className="text-white/80">Active Jobs</div>
+              <div className="text-2xl font-bold min-[360px]:text-3xl lg:text-4xl">1,200+</div>
+              <div className="text-xs text-white/80 min-[360px]:text-sm sm:text-base">Active Jobs</div>
             </div>
             <div className="animate-fade-up hover:scale-105 transition-transform duration-300" style={{animationDelay: '0.4s'}}>
-              <div className="text-4xl font-bold">500+</div>
-              <div className="text-white/80">Companies</div>
+              <div className="text-2xl font-bold min-[360px]:text-3xl lg:text-4xl">500+</div>
+              <div className="text-xs text-white/80 min-[360px]:text-sm sm:text-base">Companies</div>
             </div>
             <div className="animate-fade-up hover:scale-105 transition-transform duration-300" style={{animationDelay: '0.6s'}}>
-              <div className="text-4xl font-bold">10,000+</div>
-              <div className="text-white/80">Job Seekers</div>
+              <div className="text-2xl font-bold min-[360px]:text-3xl lg:text-4xl">10,000+</div>
+              <div className="text-xs text-white/80 min-[360px]:text-sm sm:text-base">Job Seekers</div>
             </div>
             <div className="animate-fade-up hover:scale-105 transition-transform duration-300" style={{animationDelay: '0.8s'}}>
-              <div className="text-4xl font-bold">95%</div>
-              <div className="text-white/80">Success Rate</div>
+              <div className="text-2xl font-bold min-[360px]:text-3xl lg:text-4xl">95%</div>
+              <div className="text-xs text-white/80 min-[360px]:text-sm sm:text-base">Success Rate</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Featured Jobs */}
-      <section className="py-16 bg-background">
-        <div className="container mx-auto px-4">
+      <section className="bg-background py-10 sm:py-14 lg:py-16">
+        <div className="container mx-auto px-3 min-[360px]:px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 text-foreground">
+            <h2 className="mb-4 text-3xl font-bold text-foreground sm:text-4xl">
               Featured Jobs
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
@@ -384,16 +384,16 @@ const Index = () => {
                   onClick={() => navigate(`/jobs/${job.slug}`)}
                 >
                   <CardHeader className="space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
+                    <div className="flex flex-col items-start gap-3 min-[360px]:flex-row min-[360px]:justify-between">
+                      <div className="flex min-w-0 items-center gap-3">
                         <Avatar className="h-12 w-12 border-2 border-primary/20">
                           <AvatarImage src={job.companies?.logo_url} alt={job.companies?.name} />
                           <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                             {job.companies?.name?.charAt(0) || 'J'}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <h3 className="font-semibold text-foreground">{job.companies?.name}</h3>
+                        <div className="min-w-0">
+                          <h3 className="truncate font-semibold text-foreground">{job.companies?.name}</h3>
                           <div className="flex items-center text-sm text-muted-foreground">
                             <MapPin className="h-3 w-3 mr-1" />
                             {job.location}
@@ -452,14 +452,14 @@ const Index = () => {
       </section>
 
       {/* Job Categories */}
-      <section className="py-16 md:py-20 relative overflow-hidden bg-primary/[0.04]">
+      <section className="relative overflow-hidden bg-primary/[0.04] py-10 sm:py-14 md:py-20">
         {/* Abstract glow mesh background elements */}
         <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container relative z-10 mx-auto px-3 min-[360px]:px-4">
           <div className="text-center mb-12 animate-fade-up">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-foreground">
+            <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
               Browse by <span className="text-primary">Category</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -467,17 +467,17 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
             {jobCategories.map((category, index) => (
               <Card
                 key={category.name}
-                className="text-center cursor-pointer group bg-card border border-border/50 shadow-lg hover:shadow-xl hover:shadow-primary/10 hover:border-primary/20 hover:-translate-y-1 transition-all duration-300 rounded-2xl animate-fade-up"
+                className="group cursor-pointer rounded-lg border border-border/50 bg-card text-center shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-xl hover:shadow-primary/10 animate-fade-up"
                 style={{animationDelay: `${index * 0.1}s`}}
                 onClick={() => navigate(`/jobs?category=${encodeURIComponent(category.name)}`)}
               >
-                <CardContent className="p-6 flex flex-col items-center">
-                  <div className="w-16 h-16 mb-4 flex items-center justify-center bg-muted rounded-xl group-hover:scale-110 transition-transform duration-300">
-                    <span className="text-4xl" role="img" aria-label={category.name}>
+                <CardContent className="flex flex-col items-center p-4 sm:p-5 lg:p-6">
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-muted transition-transform duration-300 group-hover:scale-110 sm:mb-4 sm:h-16 sm:w-16">
+                    <span className="text-3xl sm:text-4xl" role="img" aria-label={category.name}>
                       {category.icon}
                     </span>
                   </div>

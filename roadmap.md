@@ -12,3 +12,9 @@
 - [x] Publish an SEO-optimized blog post with screenshots
 - [x] Add a clear call to action to browse templates and build a resume
 - [x] Verify the published article and links
+
+# Responsive navigation and adaptive layouts
+
+- [x] Add accessible navigation for foldables, phones, and tablets
+- [x] Tune homepage typography, controls, cards, and grids for narrow screens
+- [x] Verify representative foldable, phone, tablet, iPad, and desktop widths
