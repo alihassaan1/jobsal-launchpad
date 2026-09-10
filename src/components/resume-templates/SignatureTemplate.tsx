@@ -21,9 +21,9 @@ export default function SignatureTemplate({ data }: TemplateProps) {
   );
 
   return (
-    <div className="mx-auto min-h-[297mm] w-[210mm] bg-white px-14 py-12 font-sans text-neutral-900">
-      <header className="mb-9 border-b border-neutral-300 pb-8">
-        <div className="mb-5 text-[11px] font-bold uppercase tracking-[0.24em] text-red-700">
+    <div className="mx-auto min-h-[297mm] w-[210mm] bg-white px-14 py-10 font-sans text-neutral-900">
+      <header className="mb-7 border-b border-neutral-300 pb-6">
+        <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.24em] text-red-700">
           Curriculum Vitae
         </div>
         <h1 className="max-w-[650px] font-serif text-[48px] font-bold leading-[1.02] text-neutral-950">
@@ -35,7 +35,7 @@ export default function SignatureTemplate({ data }: TemplateProps) {
           </p>
         )}
         {contact.length > 0 && (
-          <div className="mt-6 flex flex-wrap gap-x-5 gap-y-1.5 text-[11.5px] text-neutral-600">
+          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1.5 text-[11.5px] text-neutral-600">
             {contact.map((item, index) => (
               <span key={index}>{item}</span>
             ))}
@@ -44,7 +44,7 @@ export default function SignatureTemplate({ data }: TemplateProps) {
       </header>
 
       {data.summary && (
-        <section className="mb-8 break-inside-avoid">
+        <section className="mb-6 break-inside-avoid">
           <div className="grid grid-cols-[130px_1fr] gap-8">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-700">Profile</p>
             <p className="font-serif text-[16px] leading-[1.65] text-neutral-700">{data.summary}</p>
@@ -53,9 +53,9 @@ export default function SignatureTemplate({ data }: TemplateProps) {
       )}
 
       {data.experience.length > 0 && (
-        <section className="mb-8">
+        <section className="mb-6">
           <Heading>Selected Experience</Heading>
-          <div className="space-y-6">
+          <div className="space-y-5">
             {data.experience.map((exp, index) => (
               <article key={index} className="grid break-inside-avoid grid-cols-[130px_1fr] gap-8">
                 <div className="pt-0.5 text-[11px] font-semibold leading-relaxed text-neutral-500">
@@ -86,7 +86,7 @@ export default function SignatureTemplate({ data }: TemplateProps) {
       <div className="grid grid-cols-[1.45fr_1fr] gap-10">
         <div>
           {data.education.length > 0 && (
-            <section className="mb-8">
+            <section className="mb-6">
               <Heading>Education</Heading>
               <div className="space-y-4">
                 {data.education.map((edu, index) => (
