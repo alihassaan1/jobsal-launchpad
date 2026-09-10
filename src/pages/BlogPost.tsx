@@ -86,6 +86,24 @@ const BlogPost = () => {
     });
   };
 
+  const getRelatedPostFallback = (relatedPost: any) => {
+    const searchableText = `${relatedPost.slug || ''} ${relatedPost.title || ''}`.toLowerCase();
+
+    if (searchableText.includes('freelanc')) return '/blog/freelancing-guide-albania.jpg';
+    if (searchableText.includes('remote') || searchableText.includes('hybrid')) return '/blog/hybrid-work-albania.jpg';
+    if (searchableText.includes('salary')) return '/blog/salary-guide-albania-2026.jpg';
+    if (searchableText.includes('interview')) return '/blog/interview-mistakes-2026.jpg';
+    if (searchableText.includes('graduate')) return '/blog/graduate-jobs-albania.jpg';
+    if (searchableText.includes('tech') || searchableText.includes('digital')) return '/blog/albania-tech-boom-2026.jpg';
+    return '/blog/personal-branding-albania.jpg';
+  };
+
+  const getRelatedPostImage = (relatedPost: any) => {
+    const image = relatedPost.featured_image?.trim();
+    const isGenericImage = !image || image.endsWith('/og-image.jpg') || image === '/og-image.jpg';
+    return isGenericImage ? getRelatedPostFallback(relatedPost) : image;
+  };
+
   const siteOrigin = 'https://jobs.al';
   const shareUrl = `${siteOrigin}/blog/${slug}`;
   const shareTitle = post?.title || '';
@@ -341,22 +359,23 @@ const BlogPost = () => {
                   {relatedPosts.map(relatedPost => (
                     <Card
                       key={relatedPost.id}
-                      className="cursor-pointer hover:shadow-lg transition-shadow"
+                      className="group cursor-pointer overflow-hidden transition-shadow hover:shadow-lg"
                       onClick={() => navigate(`/blog/${relatedPost.slug}`)}
                     >
-                      {relatedPost.featured_image && (
-                        <div className="h-48 overflow-hidden bg-muted">
-                          <img
-                            src={relatedPost.featured_image}
-                            alt={relatedPost.title}
-                            loading="lazy"
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
-                          />
-                        </div>
-                      )}
+                      <div className="aspect-[3/2] overflow-hidden bg-muted">
+                        <img
+                          src={getRelatedPostImage(relatedPost)}
+                          alt={`Featured image for ${relatedPost.title}`}
+                          loading="lazy"
+                          className="h-full w-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-105"
+                          onError={(e) => {
+                            const fallbackImage = getRelatedPostFallback(relatedPost);
+                            if (!e.currentTarget.src.endsWith(fallbackImage)) {
+                              e.currentTarget.src = fallbackImage;
+                            }
+                          }}
+                        />
+                      </div>
                       <CardContent className="p-6">
                         <Badge variant="secondary" className="mb-2">
                           {relatedPost.category}
