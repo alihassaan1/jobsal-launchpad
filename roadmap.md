@@ -8,7 +8,7 @@
 
 # Premium resume templates announcement
 
-- [ ] Capture real screenshots of the new templates
-- [ ] Publish an SEO-optimized blog post with screenshots
-- [ ] Add a clear call to action to browse templates and build a resume
-- [ ] Verify the published article and links
+- [x] Capture real screenshots of the new templates
+- [x] Publish an SEO-optimized blog post with screenshots
+- [x] Add a clear call to action to browse templates and build a resume
+- [x] Verify the published article and links
