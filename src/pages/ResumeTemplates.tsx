@@ -11,11 +11,9 @@ import { Crown, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { Helmet } from "react-helmet";
-import resumeModern from "@/assets/resume-modern.jpg";
-import resumeClassic from "@/assets/resume-classic.jpg";
-import resumeCreative from "@/assets/resume-creative.jpg";
-import resumeExecutive from "@/assets/resume-executive.jpg";
-import resumeTech from "@/assets/resume-tech.jpg";
+import ResumeThumbnail from "@/components/resume-templates/ResumeThumbnail";
+import { SAMPLE_RESUME, resolveTemplateSlug } from "@/components/resume-templates/registry";
+
 
 export default function ResumeTemplates() {
   const { user } = useAuth();
@@ -75,17 +73,10 @@ export default function ResumeTemplates() {
     navigate(`/resume-builder?template=${template.id}`);
   };
 
-  // Map template categories to preview images
-  const getPreviewImage = (category: string) => {
-    const categoryMap: Record<string, string> = {
-      professional: resumeModern,
-      creative: resumeCreative,
-      executive: resumeExecutive,
-      tech: resumeTech,
-      academic: resumeClassic,
-    };
-    return categoryMap[category?.toLowerCase()] || resumeModern;
-  };
+  // Real template design used for both the thumbnail and the generated PDF
+  const getTemplateSlug = (template: any) =>
+    resolveTemplateSlug(template.slug || template.category);
+
 
   const categories = Array.from(new Set(templates?.map(t => t.category).filter(Boolean)));
 
@@ -173,14 +164,14 @@ export default function ResumeTemplates() {
                   )}
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-[3/4] bg-muted rounded overflow-hidden">
-                    <img 
-                      src={getPreviewImage(template.category)} 
-                      alt={template.name}
-                      className="w-full h-full object-cover"
+                  <div className="rounded border overflow-hidden bg-muted">
+                    <ResumeThumbnail
+                      slug={getTemplateSlug(template)}
+                      data={SAMPLE_RESUME}
                     />
                   </div>
                 </CardContent>
+
                 <CardFooter>
                   <Button 
                     className="w-full" 

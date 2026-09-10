@@ -39,7 +39,7 @@ interface TemplateProps {
 
 export default function ExecutiveTemplate({ data }: TemplateProps) {
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-white text-gray-900 p-12 shadow-2xl min-h-[297mm] w-[210mm] mx-auto">
+    <div className="bg-white text-gray-900 p-12 min-h-[297mm] w-[210mm] mx-auto">
       {/* Header - Executive Style */}
       <div className="mb-10 pb-8 border-b-2 border-gray-900">
         <h1 className="text-6xl font-light text-gray-900 mb-4 tracking-tight">
@@ -79,7 +79,7 @@ export default function ExecutiveTemplate({ data }: TemplateProps) {
           <h2 className="text-3xl font-light text-gray-900 mb-5 tracking-wide uppercase border-l-4 border-gray-900 pl-4">
             Executive Summary
           </h2>
-          <p className="text-gray-700 leading-loose text-justify text-base bg-gray-100 p-6 rounded-lg shadow-inner">{data.summary}</p>
+          <p className="text-gray-700 leading-loose text-justify text-base bg-gray-100 p-6 rounded-lg ">{data.summary}</p>
         </div>
       )}
 
@@ -90,7 +90,7 @@ export default function ExecutiveTemplate({ data }: TemplateProps) {
             Professional Experience
           </h2>
           {data.experience.map((exp, idx) => (
-            <div key={idx} className="mb-8 bg-white p-6 rounded-lg shadow-lg border-l-4 border-gray-900">
+            <div key={idx} className="mb-8 bg-white p-6 rounded-lg border-l-4 border-gray-900">
               <div className="mb-3">
                 <div className="flex justify-between items-start">
                   <div>
@@ -130,7 +130,7 @@ export default function ExecutiveTemplate({ data }: TemplateProps) {
             Education
           </h2>
           {data.education.map((edu, idx) => (
-            <div key={idx} className="mb-5 bg-white p-5 rounded-lg shadow-lg">
+            <div key={idx} className="mb-5 bg-white p-5 rounded-lg ">
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900">
@@ -157,7 +157,7 @@ export default function ExecutiveTemplate({ data }: TemplateProps) {
             <h2 className="text-2xl font-light text-gray-900 mb-5 tracking-wide uppercase border-l-4 border-gray-900 pl-4">
               Core Competencies
             </h2>
-            <div className="grid grid-cols-1 gap-3 bg-white p-5 rounded-lg shadow-lg">
+            <div className="grid grid-cols-1 gap-3 bg-white p-5 rounded-lg ">
               {data.skills.map((skill, idx) => (
                 <div key={idx} className="flex items-center gap-3">
                   <span className="w-3 h-3 bg-gray-900 rounded-full flex-shrink-0"></span>
@@ -174,7 +174,7 @@ export default function ExecutiveTemplate({ data }: TemplateProps) {
             <h2 className="text-2xl font-light text-gray-900 mb-5 tracking-wide uppercase border-l-4 border-gray-900 pl-4">
               Languages
             </h2>
-            <div className="space-y-3 bg-white p-5 rounded-lg shadow-lg">
+            <div className="space-y-3 bg-white p-5 rounded-lg ">
               {data.languages.map((lang, idx) => (
                 <div key={idx} className="flex items-center gap-3">
                   <span className="w-3 h-3 bg-gray-900 rounded-full flex-shrink-0"></span>
@@ -193,7 +193,7 @@ export default function ExecutiveTemplate({ data }: TemplateProps) {
             Professional Certifications
           </h2>
           {data.certifications.map((cert, idx) => (
-            <div key={idx} className="mb-4 bg-white p-5 rounded-lg shadow-lg flex items-start gap-4">
+            <div key={idx} className="mb-4 bg-white p-5 rounded-lg flex items-start gap-4">
               <div className="w-4 h-4 bg-gray-900 rounded-full flex-shrink-0 mt-1"></div>
               <div>
                 <h3 className="font-bold text-gray-900 text-lg">{cert.name}</h3>
