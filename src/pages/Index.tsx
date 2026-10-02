@@ -163,24 +163,28 @@ const Index = () => {
     fetchLatestJobs();
   }, []);
 
+  const attachCompanies = async (jobsData: any[]) => {
+    const companyIds = Array.from(new Set(jobsData.map(j => j.company_id).filter(Boolean)));
+    if (companyIds.length === 0) return jobsData;
+    const { data: companiesData } = await supabase
+      .from('companies_public')
+      .select('id, name, logo_url, location')
+      .in('id', companyIds);
+    const byId = new Map((companiesData || []).map((c: any) => [c.id, c]));
+    return jobsData.map(j => ({ ...j, companies: byId.get(j.company_id) || null }));
+  };
+
   const fetchLatestJobs = async () => {
     try {
       const { data, error } = await supabase
         .from('jobs_public')
-        .select(`
-          *,
-          companies:company_id (
-            name,
-            logo_url,
-            location
-          )
-        `)
+        .select('*')
         .eq('is_active', true)
         .order('created_at', { ascending: false })
         .limit(8);
 
       if (error) throw error;
-      setLatestJobs(data || []);
+      setLatestJobs(await attachCompanies(data || []));
     } catch (error) {
       console.error('Error fetching latest jobs:', error);
     } finally {
@@ -192,21 +196,14 @@ const Index = () => {
     try {
       const { data, error } = await supabase
         .from('jobs_public')
-        .select(`
-          *,
-          companies:company_id (
-            name,
-            logo_url,
-            location
-          )
-        `)
+        .select('*')
         .eq('is_active', true)
         .eq('is_featured', true)
         .order('created_at', { ascending: false })
         .limit(6);
 
       if (error) throw error;
-      setFeaturedJobs(data || []);
+      setFeaturedJobs(await attachCompanies(data || []));
     } catch (error) {
       console.error('Error fetching featured jobs:', error);
     } finally {
