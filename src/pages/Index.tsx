@@ -138,7 +138,9 @@ const Index = () => {
   const { user, signOut, userRole } = useAuth();
   const navigate = useNavigate();
   const [featuredJobs, setFeaturedJobs] = useState<any[]>([]);
+  const [latestJobs, setLatestJobs] = useState<any[]>([]);
   const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+  const [isLoadingLatest, setIsLoadingLatest] = useState(true);
   const [heroSearchTerm, setHeroSearchTerm] = useState("");
   const [heroLocation, setHeroLocation] = useState("");
   const [locationOpen, setLocationOpen] = useState(false);
