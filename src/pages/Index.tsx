@@ -160,7 +160,33 @@ const Index = () => {
 
   useEffect(() => {
     fetchFeaturedJobs();
+    fetchLatestJobs();
   }, []);
+
+  const fetchLatestJobs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('jobs_public')
+        .select(`
+          *,
+          companies:company_id (
+            name,
+            logo_url,
+            location
+          )
+        `)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(8);
+
+      if (error) throw error;
+      setLatestJobs(data || []);
+    } catch (error) {
+      console.error('Error fetching latest jobs:', error);
+    } finally {
+      setIsLoadingLatest(false);
+    }
+  };
 
   const fetchFeaturedJobs = async () => {
     try {
