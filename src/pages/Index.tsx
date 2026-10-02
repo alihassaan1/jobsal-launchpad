@@ -487,6 +487,87 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Latest Jobs */}
+      <section className="bg-muted/30 py-10 sm:py-14 lg:py-16">
+        <div className="container mx-auto px-3 min-[360px]:px-4">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+            <div>
+              <h2 className="mb-2 text-3xl font-bold text-foreground sm:text-4xl">
+                Latest Jobs
+              </h2>
+              <p className="text-muted-foreground text-lg">
+                Fresh opportunities posted by employers on jobs.al
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              className="shadow-sm hover:bg-accent self-start sm:self-auto"
+              onClick={() => navigate('/jobs')}
+            >
+              View All Jobs
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+
+          {isLoadingLatest ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="mt-4 text-muted-foreground">Loading latest jobs...</p>
+            </div>
+          ) : latestJobs.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No jobs posted yet. Check back soon!</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-4">
+              {latestJobs.map((job) => (
+                <Card
+                  key={job.id}
+                  className="hover:shadow-lg hover:border-primary/30 transition-all duration-300 border border-border/50 bg-card cursor-pointer"
+                  onClick={() => navigate(`/jobs/${job.slug}`)}
+                >
+                  <CardContent className="flex items-center gap-4 p-4 min-[360px]:p-5">
+                    <Avatar className="h-12 w-12 shrink-0 border-2 border-primary/20">
+                      <AvatarImage src={job.companies?.logo_url} alt={job.companies?.name} />
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                        {job.companies?.name?.charAt(0) || 'J'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate font-semibold text-foreground">{job.title}</h3>
+                      <p className="truncate text-sm text-muted-foreground">{job.companies?.name}</p>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                        <span className="flex items-center">
+                          <MapPin className="h-3 w-3 mr-1" />
+                          {job.location}
+                        </span>
+                        <span className="flex items-center">
+                          <Briefcase className="h-3 w-3 mr-1" />
+                          {job.job_type?.replace('_', ' ')}
+                        </span>
+                        {job.is_salary_visible && job.salary_min && (
+                          <span className="flex items-center">
+                            <DollarSign className="h-3 w-3 mr-1" />
+                            {job.salary_min}-{job.salary_max} {job.salary_currency}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="hidden sm:flex flex-col items-end gap-2 shrink-0">
+                      <Badge variant="secondary" className="text-xs">
+                        <Clock className="h-3 w-3 mr-1" />
+                        {new Date(job.created_at).toLocaleDateString()}
+                      </Badge>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Job Categories */}
       <section className="relative overflow-hidden bg-primary/[0.04] py-10 sm:py-14 md:py-20">
         {/* Abstract glow mesh background elements */}
