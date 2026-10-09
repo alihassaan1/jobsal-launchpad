@@ -159,46 +159,6 @@ export default function MyResumes() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Footer */}
-      <footer className="bg-secondary py-12 mt-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent mb-4">
-                jobs.al
-              </div>
-              <p className="text-muted-foreground mb-4">
-                Albania's leading job portal connecting talents with opportunities.
-              </p>
-              <div className="text-sm text-muted-foreground">
-                © 2024 jobs.al. All rights reserved.
-              </div>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">For Job Seekers</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/jobs" className="hover:text-primary">Browse Jobs</Link></li>
-                <li><Link to="/resume-templates" className="hover:text-primary">Resume Templates</Link></li>
-                <li><Link to="/resume-builder" className="hover:text-primary">Resume Builder</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">For Employers</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary">Post a Job</a></li>
-                <li><Link to="/pricing" className="hover:text-primary">Pricing Plans</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary">About Us</a></li>
-                <li><a href="#" className="hover:text-primary">Contact</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

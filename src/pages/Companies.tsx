@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Helmet } from "react-helmet";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -234,7 +233,6 @@ const Companies = () => {
         </div>
       </div>
 
-      <Footer />
     </>
   );
 };

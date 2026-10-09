@@ -20,7 +20,6 @@ import {
 } from "@/components/resume-templates/registry";
 
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { useResumeAISettings, isOn } from "@/hooks/useResumeAISettings";
 
 interface ResumeData {
@@ -1019,7 +1018,6 @@ export default function ResumeBuilder() {
         resumeData={resumeData}
       />
 
-      <Footer />
     </div>
   );
 }

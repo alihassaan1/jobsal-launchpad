@@ -4,7 +4,6 @@ import { Navigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -221,7 +220,6 @@ const MyDocuments = () => {
           </CardContent>
         </Card>
       </main>
-      <Footer />
 
       <DocumentUploadDialog
         open={uploadOpen}
