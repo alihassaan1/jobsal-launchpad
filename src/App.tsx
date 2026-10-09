@@ -2,7 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import Footer from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { AuthProvider } from "@/contexts/AuthContext";
 import AdminLayout from "@/components/AdminLayout";
@@ -66,6 +67,12 @@ import EmployerTalentPool from "./pages/EmployerTalentPool";
 import ImpersonationBanner from "./components/ImpersonationBanner";
 
 const queryClient = new QueryClient();
+
+const SiteFooter = () => {
+  const { pathname } = useLocation();
+  if (pathname.startsWith("/admin")) return null;
+  return <Footer />;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -141,6 +148,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <SiteFooter />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

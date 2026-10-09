@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 
 type PaymentMethod = "stripe" | "paypal" | "bank_transfer";
 type AdPurchaseStatus = "pending" | "active" | "expired" | "cancelled";
@@ -240,7 +239,6 @@ export default function EmployerAdCheckout() {
             </CardContent>
           </Card>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -420,7 +418,6 @@ export default function EmployerAdCheckout() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

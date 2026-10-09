@@ -33,7 +33,6 @@ import { supabase } from "@/integrations/supabase/client";
 import heroBg from "@/assets/hero-bg.jpg";
 import FeaturedCompanies from "./FeaturedCompanies";
 import { TopEmployers } from "@/components/TopEmployers";
-import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet";
 import { ALBANIAN_CITIES } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -266,7 +265,7 @@ const Index = () => {
           })}
         </script>
       </Helmet>
-      <div className="min-h-screen overflow-x-hidden bg-background">
+      <div className="min-h-screen overflow-x-clip bg-background">
       <Navigation />
 
       {/* Hero Section */}
@@ -719,8 +718,6 @@ const Index = () => {
       {/* Latest Blog Posts */}
       <BlogSection />
 
-      {/* Footer */}
-      <Footer />
     </div>
     </>
   );
