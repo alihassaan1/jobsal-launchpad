@@ -3034,6 +3034,7 @@ export type Database = {
       }
       increment_job_views: { Args: { job_id: string }; Returns: undefined }
       increment_post_views: { Args: { post_slug: string }; Returns: undefined }
+      indexnow_ping: { Args: { _path: string }; Returns: undefined }
       is_company_member: {
         Args: {
           _company_id: string

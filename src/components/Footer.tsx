@@ -75,8 +75,8 @@ export default function Footer() {
               <li><Link to="/companies" className="hover:text-primary transition-colors">{t('footer.topCompanies')}</Link></li>
               <li><Link to="/blog" className="hover:text-primary transition-colors">{t('nav.blog')}</Link></li>
               <li><a href="mailto:info@jobs.al" className="hover:text-primary transition-colors">{t('footer.contactUs')}</a></li>
-              <li><span className="text-muted-foreground/70">{t('footer.privacyPolicy')}</span></li>
-              <li><span className="text-muted-foreground/70">{t('footer.termsOfService')}</span></li>
+              <li><Link to="/privacy" className="hover:text-primary transition-colors">{t('footer.privacyPolicy')}</Link></li>
+              <li><Link to="/terms" className="hover:text-primary transition-colors">{t('footer.termsOfService')}</Link></li>
             </ul>
           </div>
         </div>

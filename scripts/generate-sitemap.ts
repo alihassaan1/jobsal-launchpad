@@ -29,6 +29,8 @@ const staticRoutes: Entry[] = [
   { loc: "/resume-templates", changefreq: "weekly", priority: "0.75" },
   { loc: "/pricing", changefreq: "monthly", priority: "0.7" },
   { loc: "/recommended-jobs", changefreq: "daily", priority: "0.65" },
+  { loc: "/privacy", changefreq: "yearly", priority: "0.3" },
+  { loc: "/terms", changefreq: "yearly", priority: "0.3" },
 ];
 
 async function fetchAll(table: string, select: string, filter?: { col: string; val: any }) {
