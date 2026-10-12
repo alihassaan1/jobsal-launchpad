@@ -18,3 +18,9 @@
 - [x] Add accessible navigation for foldables, phones, and tablets
 - [x] Tune homepage typography, controls, cards, and grids for narrow screens
 - [x] Verify representative foldable, phone, tablet, iPad, and desktop widths
+
+# Legal pages and IndexNow
+
+- [x] Add bilingual Privacy Policy and Terms of Service pages, link them in the footer and sitemap
+- [x] Automatically submit every new job, blog post and company page to IndexNow
+- [ ] Fix duplicate SEO titles and duplicate AI blog posts (waiting on user's choice for the 6 duplicates)
