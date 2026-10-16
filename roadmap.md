@@ -39,8 +39,6 @@
 ## PayPal auto-renewal (done 2026-10-16)
 - [x] Monthly packages are PayPal subscriptions (auto-created billing plans, stored in paypal_plans)
 - [x] subscriptions table extended with paypal_subscription_id, period start/end, last payment
-- [x] paypal-webhook function handles renewals/cancellations (needs PAYPAL_WEBHOOK_ID secret + webhook registered in PayPal dashboard)
-- [x] Daily pg_cron sync (03:15) as webhook fallback
+- [x] API-credentials-only setup: no webhook; renewals sync via daily pg_cron (03:15) + on-return activation
 - [x] EmployerPayPal page: subscribe/cancel UI, active package card
-- [ ] User: register webhook URL https://vbnrmpudzcxjfdytlgks.supabase.co/functions/v1/paypal-webhook in PayPal Developer (events: BILLING.SUBSCRIPTION.*, PAYMENT.SALE.COMPLETED) and provide webhook ID as PAYPAL_WEBHOOK_ID secret
 - [ ] Yearly prices still needed before yearly billing
