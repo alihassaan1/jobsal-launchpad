@@ -1867,6 +1867,51 @@ export type Database = {
           },
         ]
       }
+      paypal_orders: {
+        Row: {
+          amount_cents: number
+          captured_at: string | null
+          created_at: string
+          currency: string
+          environment: string
+          featured_days: number
+          id: string
+          listing_credits: number
+          paypal_order_id: string
+          product_key: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          captured_at?: string | null
+          created_at?: string
+          currency?: string
+          environment?: string
+          featured_days?: number
+          id?: string
+          listing_credits?: number
+          paypal_order_id: string
+          product_key: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          captured_at?: string | null
+          created_at?: string
+          currency?: string
+          environment?: string
+          featured_days?: number
+          id?: string
+          listing_credits?: number
+          paypal_order_id?: string
+          product_key?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           author_id: string
