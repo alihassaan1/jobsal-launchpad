@@ -121,11 +121,13 @@ async function syncSubscription(
 }
 
 const Body = z.discriminatedUnion("action", [
-  z.object({ action: z.literal("create"), product_key: z.string().max(50), return_url: z.string().url().max(500) }),
+  z.object({ action: z.literal("config") }),
+  z.object({ action: z.literal("create"), product_key: z.string().max(50), return_url: z.string().url().max(500), job_id: z.string().uuid().optional() }),
   z.object({ action: z.literal("capture"), order_id: z.string().min(5).max(64) }),
   z.object({ action: z.literal("subscribe"), product_key: z.string().max(50), return_url: z.string().url().max(500) }),
   z.object({ action: z.literal("activate"), subscription_id: z.string().min(5).max(64) }),
   z.object({ action: z.literal("cancel"), subscription_id: z.string().min(5).max(64) }),
+  z.object({ action: z.literal("publish_free"), job_id: z.string().uuid() }),
 ]);
 
 Deno.serve(async (req) => {
