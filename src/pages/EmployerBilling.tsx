@@ -129,6 +129,54 @@ export default function EmployerBilling() {
     enabled: !!company?.id,
   });
 
+  // Current PayPal package
+  const { data: subscription, refetch: refetchSub } = useQuery({
+    queryKey: ["billing-subscription", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await (supabase as any).from("subscriptions").select("*")
+        .not("paypal_subscription_id", "is", null)
+        .in("status", ["active", "pending", "past_due"])
+        .order("created_at", { ascending: false }).limit(1).maybeSingle();
+      return data as any | null;
+    },
+  });
+
+  // Usage: listings consumed in the current package period
+  const { data: packageUsage } = useQuery({
+    queryKey: ["billing-usage", user?.id, subscription?.id],
+    enabled: !!user?.id && !!subscription,
+    queryFn: async () => {
+      const periodStart = subscription.current_period_start ?? subscription.created_at;
+      const { count } = await (supabase as any).from("job_listings")
+        .select("id", { count: "exact", head: true })
+        .eq("employer_user_id", user!.id)
+        .eq("product_key", `package:${subscription.plan_slug}`)
+        .gte("created_at", periodStart);
+      return count ?? 0;
+    },
+  });
+
+  // PayPal receipts
+  const { data: receipts } = useQuery({
+    queryKey: ["billing-receipts", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await (supabase as any).from("paypal_orders").select("*")
+        .order("created_at", { ascending: false }).limit(20);
+      return (data ?? []) as any[];
+    },
+  });
+
+  const cancelSubscription = async () => {
+    if (!subscription?.paypal_subscription_id) return;
+    const { data, error } = await supabase.functions.invoke("paypal-checkout", {
+      body: { action: "cancel", subscription_id: subscription.paypal_subscription_id },
+    });
+    if (error || data?.error) toast.error("Could not cancel the package");
+    else { toast.success("Package cancelled — it stays active until the period ends"); refetchSub(); }
+  };
+
   // Billing profile form state
   const [profileForm, setProfileForm] = useState<Partial<BillingProfile>>({});
 
