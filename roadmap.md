@@ -35,3 +35,12 @@
 - [ ] Update employer pricing and purchase controls without breaking existing client access
 - [ ] Add concrete pricing/allowance tests and verify checkout, cancellation and payment readback
 - [ ] Confirm yearly rates before enabling yearly package billing (not supplied)
+
+## PayPal auto-renewal (done 2026-10-16)
+- [x] Monthly packages are PayPal subscriptions (auto-created billing plans, stored in paypal_plans)
+- [x] subscriptions table extended with paypal_subscription_id, period start/end, last payment
+- [x] paypal-webhook function handles renewals/cancellations (needs PAYPAL_WEBHOOK_ID secret + webhook registered in PayPal dashboard)
+- [x] Daily pg_cron sync (03:15) as webhook fallback
+- [x] EmployerPayPal page: subscribe/cancel UI, active package card
+- [ ] User: register webhook URL https://vbnrmpudzcxjfdytlgks.supabase.co/functions/v1/paypal-webhook in PayPal Developer (events: BILLING.SUBSCRIPTION.*, PAYMENT.SALE.COMPLETED) and provide webhook ID as PAYPAL_WEBHOOK_ID secret
+- [ ] Yearly prices still needed before yearly billing
