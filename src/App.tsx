@@ -62,6 +62,7 @@ import AdminPromoCodes from "./pages/AdminPromoCodes";
 import AdminInvoices from "./pages/AdminInvoices";
 import AdminBillingSettings from "./pages/AdminBillingSettings";
 import EmployerAds from "./pages/EmployerAds";
+import EmployerPayPal from "./pages/EmployerPayPal";
 import EmployerAdCheckout from "./pages/EmployerAdCheckout";
 import EmployerBilling from "./pages/EmployerBilling";
 import CandidateVisibility from "./pages/CandidateVisibility";
@@ -132,6 +133,7 @@ const App = () => (
             <Route path="/employer/analytics" element={<EmployerAnalytics />} />
             <Route path="/employer/subscription" element={<EmployerSubscription />} />
             <Route path="/employer/ads" element={<EmployerAds />} />
+            <Route path="/employer/paypal" element={<EmployerPayPal />} />
             <Route path="/employer/ads/checkout" element={<EmployerAdCheckout />} />
             <Route path="/employer/billing" element={<EmployerBilling />} />
             <Route path="/employer/talent" element={<EmployerTalentPool />} />
