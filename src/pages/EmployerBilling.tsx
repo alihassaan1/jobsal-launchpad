@@ -18,6 +18,9 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
+import { RefreshCw, ArrowUpRight } from "lucide-react";
+import { PAYPAL_PRODUCTS, formatEur } from "../../supabase/functions/paypal-checkout/products";
 
 type Invoice = {
   id: string;
