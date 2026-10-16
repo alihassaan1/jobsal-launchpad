@@ -5,7 +5,8 @@ export type PaypalProduct = {
   amount_cents: number;
   listing_credits: number;
   featured_days: number;
-  kind: "listing" | "package";
+  kind: "listing" | "subscription";
+  plan_slug?: string;
 };
 
 export const PAYPAL_PRODUCTS: Record<string, PaypalProduct> = {
@@ -14,10 +15,10 @@ export const PAYPAL_PRODUCTS: Record<string, PaypalProduct> = {
   premium_job: { key: "premium_job", name: "Premium job (30 days featured)", amount_cents: 5900, listing_credits: 1, featured_days: 30, kind: "listing" },
   urgent_hiring: { key: "urgent_hiring", name: "Urgent hiring promotion", amount_cents: 7900, listing_credits: 1, featured_days: 30, kind: "listing" },
   extra_promotion: { key: "extra_promotion", name: "Extra promotion", amount_cents: 1500, listing_credits: 0, featured_days: 0, kind: "listing" },
-  starter_monthly: { key: "starter_monthly", name: "Starter package (1 month)", amount_cents: 4900, listing_credits: 5, featured_days: 0, kind: "package" },
-  business_monthly: { key: "business_monthly", name: "Business package (1 month)", amount_cents: 8900, listing_credits: 10, featured_days: 0, kind: "package" },
-  corporate_monthly: { key: "corporate_monthly", name: "Corporate package (1 month)", amount_cents: 14900, listing_credits: 20, featured_days: 0, kind: "package" },
-  enterprise_monthly: { key: "enterprise_monthly", name: "Enterprise package (1 month, from)", amount_cents: 24900, listing_credits: 40, featured_days: 0, kind: "package" },
+  starter_monthly: { key: "starter_monthly", name: "Starter package (monthly)", amount_cents: 4900, listing_credits: 5, featured_days: 0, kind: "subscription", plan_slug: "starter" },
+  business_monthly: { key: "business_monthly", name: "Business package (monthly)", amount_cents: 8900, listing_credits: 10, featured_days: 0, kind: "subscription", plan_slug: "business" },
+  corporate_monthly: { key: "corporate_monthly", name: "Corporate package (monthly)", amount_cents: 14900, listing_credits: 20, featured_days: 0, kind: "subscription", plan_slug: "corporate" },
+  enterprise_monthly: { key: "enterprise_monthly", name: "Enterprise package (monthly, from)", amount_cents: 24900, listing_credits: 40, featured_days: 0, kind: "subscription", plan_slug: "enterprise" },
 };
 
 export const formatEur = (cents: number) => (cents / 100).toFixed(2);
