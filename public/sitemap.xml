@@ -45,4 +45,14 @@
     <changefreq>daily</changefreq>
     <priority>0.65</priority>
   </url>
+  <url>
+    <loc>https://jobs.al/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
 </urlset>
