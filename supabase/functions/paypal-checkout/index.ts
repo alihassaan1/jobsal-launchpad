@@ -244,12 +244,20 @@ Deno.serve(async (req) => {
         const ends = new Date(); ends.setDate(ends.getDate() + 30);
         const featuredUntil = product.featured_days > 0 ? new Date(Date.now() + product.featured_days * 86400000) : null;
         await admin.from("job_listings").insert({
-          employer_user_id: user.id, product_key: product.key, listing_tier: product.key,
+          employer_user_id: user.id, job_id: row.job_id ?? null, product_key: product.key, listing_tier: product.key,
           price_eur: product.amount_cents / 100, ends_at: ends.toISOString(),
           featured_until: featuredUntil?.toISOString() ?? null, paypal_order_id: row.id,
         });
+        // Publish the job this order paid for.
+        if (row.job_id) {
+          await admin.from("jobs").update({
+            is_active: true, payment_status: "paid",
+            is_featured: product.featured_days > 0,
+            updated_at: new Date().toISOString(),
+          }).eq("id", row.job_id).eq("posted_by", user.id);
+        }
       }
-      return json({ status: "completed", product_key: row.product_key });
+      return json({ status: "completed", product_key: row.product_key, job_id: row.job_id ?? null });
     }
 
     if (body.action === "subscribe") {
