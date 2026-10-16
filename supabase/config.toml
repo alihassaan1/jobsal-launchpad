@@ -74,3 +74,6 @@ verify_jwt = false
 
 [functions.document-access]
 verify_jwt = false
+
+[functions.paypal-checkout]
+verify_jwt = false
