@@ -1480,6 +1480,76 @@ export type Database = {
           },
         ]
       }
+      job_listings: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          employer_user_id: string
+          ends_at: string
+          featured_until: string | null
+          id: string
+          job_id: string | null
+          listing_tier: string
+          paypal_order_id: string | null
+          price_eur: number
+          product_key: string
+          starts_at: string
+          status: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          employer_user_id: string
+          ends_at: string
+          featured_until?: string | null
+          id?: string
+          job_id?: string | null
+          listing_tier: string
+          paypal_order_id?: string | null
+          price_eur: number
+          product_key: string
+          starts_at?: string
+          status?: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          employer_user_id?: string
+          ends_at?: string
+          featured_until?: string | null
+          id?: string
+          job_id?: string | null
+          listing_tier?: string
+          paypal_order_id?: string | null
+          price_eur?: number
+          product_key?: string
+          starts_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_listings_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_listings_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_listings_paypal_order_id_fkey"
+            columns: ["paypal_order_id"]
+            isOneToOne: false
+            referencedRelation: "paypal_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_recommendations: {
         Row: {
           ai_match_score: number | null
@@ -2493,14 +2563,22 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          amount_eur: number | null
           ats_access: boolean | null
+          cancelled_at: string | null
           created_at: string
+          currency: string | null
           current_period_end: string | null
           current_period_start: string | null
           featured_jobs_limit: number | null
           id: string
           job_posts_limit: number | null
+          last_payment_amount: number | null
+          last_payment_at: string | null
+          paypal_plan_id: string | null
+          paypal_subscription_id: string | null
           plan_id: string | null
+          plan_slug: string | null
           priority_support: boolean | null
           resume_views_limit: number | null
           status: Database["public"]["Enums"]["subscription_status"]
@@ -2511,14 +2589,22 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          amount_eur?: number | null
           ats_access?: boolean | null
+          cancelled_at?: string | null
           created_at?: string
+          currency?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
           featured_jobs_limit?: number | null
           id?: string
           job_posts_limit?: number | null
+          last_payment_amount?: number | null
+          last_payment_at?: string | null
+          paypal_plan_id?: string | null
+          paypal_subscription_id?: string | null
           plan_id?: string | null
+          plan_slug?: string | null
           priority_support?: boolean | null
           resume_views_limit?: number | null
           status?: Database["public"]["Enums"]["subscription_status"]
@@ -2529,14 +2615,22 @@ export type Database = {
           user_id: string
         }
         Update: {
+          amount_eur?: number | null
           ats_access?: boolean | null
+          cancelled_at?: string | null
           created_at?: string
+          currency?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
           featured_jobs_limit?: number | null
           id?: string
           job_posts_limit?: number | null
+          last_payment_amount?: number | null
+          last_payment_at?: string | null
+          paypal_plan_id?: string | null
+          paypal_subscription_id?: string | null
           plan_id?: string | null
+          plan_slug?: string | null
           priority_support?: boolean | null
           resume_views_limit?: number | null
           status?: Database["public"]["Enums"]["subscription_status"]
