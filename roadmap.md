@@ -42,3 +42,13 @@
 - [x] API-credentials-only setup: no webhook; renewals sync via daily pg_cron (03:15) + on-return activation
 - [x] EmployerPayPal page: subscribe/cancel UI, active package card
 - [ ] Yearly prices still needed before yearly billing
+
+## Employer payment UX redesign (in progress)
+- [ ] Central pricing config (src/lib/pricingConfig.ts) — single source, lek approx, VAT note
+- [ ] Rewrite /pricing: Per job | Monthly toggle, Recommended badges, Enterprise quote row, lek + VAT + PayPal notes
+- [ ] New /post-job/:jobId/checkout: visibility cards, urgent checkbox, free/slot pre-select, review + PayPal SDK buttons, success + FB share
+- [ ] EmployerDashboard: save new jobs as awaiting_payment, "Awaiting payment" section with Pay now
+- [ ] /employer/billing: current package, usage, receipts, upgrade
+- [ ] /employer/paypal → redirect to /employer/billing; remove old page
+- [ ] Bilingual via language toggle (no double labels); test-mode badge admin-only
+- [ ] PayPal client-id exposure for JS SDK (public config action in paypal-checkout)
