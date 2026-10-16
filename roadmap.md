@@ -24,3 +24,13 @@
 - [x] Add bilingual Privacy Policy and Terms of Service pages, link them in the footer and sitemap
 - [x] Automatically submit every new job, blog post and company page to IndexNow
 - [ ] Fix duplicate SEO titles and duplicate AI blog posts (waiting on user's choice for the 6 duplicates)
+
+# Employer PayPal payments
+
+- [x] Confirm listing prices, monthly package allowances, and test-first preference
+- [ ] Securely connect PayPal sandbox credentials (waiting on setup confirmation and credentials)
+- [ ] Implement verified PayPal checkout, recurring billing and webhook reconciliation
+- [ ] Enforce one free 30-day listing per employer per calendar month and paid listing/package allowances
+- [ ] Update employer pricing and purchase controls without breaking existing client access
+- [ ] Add concrete pricing/allowance tests and verify checkout, cancellation and payment readback
+- [ ] Confirm yearly rates before enabling yearly package billing (not supplied)
