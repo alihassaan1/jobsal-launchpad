@@ -28,8 +28,9 @@
 # Employer PayPal payments
 
 - [x] Confirm listing prices, monthly package allowances, and test-first preference
-- [ ] Securely connect PayPal sandbox credentials (waiting on setup confirmation and credentials)
-- [ ] Implement verified PayPal checkout, recurring billing and webhook reconciliation
+- [x] Securely connect PayPal sandbox credentials
+- [x] Implement verified PayPal one-time checkout (test mode)
+- [ ] Recurring auto-renew billing and webhook reconciliation
 - [ ] Enforce one free 30-day listing per employer per calendar month and paid listing/package allowances
 - [ ] Update employer pricing and purchase controls without breaking existing client access
 - [ ] Add concrete pricing/allowance tests and verify checkout, cancellation and payment readback
