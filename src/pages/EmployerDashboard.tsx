@@ -294,6 +294,9 @@ const EmployerDashboard = () => {
                             <Badge variant={job.is_active ? "default" : "secondary"}>
                               {job.is_active ? "Active" : "Inactive"}
                             </Badge>
+                            {job.payment_status === "awaiting_payment" && (
+                              <Badge variant="destructive">Awaiting payment</Badge>
+                            )}
                             {job.is_featured && <Badge variant="secondary">Featured</Badge>}
                           </div>
                           <CardDescription className="flex flex-wrap gap-4">
@@ -385,7 +388,8 @@ const JobForm = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
+  const navigate = useNavigate();
+
   // Check subscription limits
   const { data: canPost } = useQuery({
     queryKey: ["can-post-job", user?.id],
