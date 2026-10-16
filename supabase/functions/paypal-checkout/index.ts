@@ -143,11 +143,64 @@ Deno.serve(async (req) => {
     const parsed = Body.safeParse(await req.json());
     if (!parsed.success) return json({ error: parsed.error.flatten().fieldErrors }, 400);
     const body = parsed.data;
+
+    // Public client config so the PayPal JS SDK buttons can load (client id is publishable).
+    if (body.action === "config") {
+      return json({ client_id: Deno.env.get("PAYPAL_CLIENT_ID"), env: ENV, currency: "EUR" });
+    }
+
     const token = await paypalToken();
+
+    if (body.action === "publish_free") {
+      const { data: job } = await admin.from("jobs").select("id, posted_by, is_active, payment_status, title")
+        .eq("id", body.job_id).maybeSingle();
+      if (!job || job.posted_by !== user.id) return json({ error: "Job not found" }, 404);
+      if (job.is_active) return json({ status: "already_live" });
+
+      const monthStart = new Date(); monthStart.setUTCDate(1); monthStart.setUTCHours(0, 0, 0, 0);
+
+      // (a) One free standard listing per employer per calendar month.
+      const { count: freeUsed } = await admin.from("job_listings").select("id", { count: "exact", head: true })
+        .eq("employer_user_id", user.id).eq("product_key", "free_monthly")
+        .gte("created_at", monthStart.toISOString());
+
+      // (b) Or a monthly package with remaining listing slots in the current period.
+      const { data: sub } = await admin.from("subscriptions").select("*")
+        .eq("user_id", user.id).eq("status", "active")
+        .not("paypal_subscription_id", "is", null)
+        .order("created_at", { ascending: false }).limit(1).maybeSingle();
+      let packageSlot = false;
+      if (sub) {
+        const periodStart = sub.current_period_start ?? sub.created_at;
+        const { count: used } = await admin.from("job_listings").select("id", { count: "exact", head: true })
+          .eq("employer_user_id", user.id).eq("product_key", `package:${sub.plan_slug}`)
+          .gte("created_at", periodStart);
+        packageSlot = (used ?? 0) < (sub.job_posts_limit ?? 0);
+      }
+
+      if ((freeUsed ?? 0) === 0 || packageSlot) {
+        const productKey = packageSlot ? `package:${sub!.plan_slug}` : "free_monthly";
+        const ends = new Date(); ends.setDate(ends.getDate() + 30);
+        await admin.from("jobs").update({ is_active: true, payment_status: "free", updated_at: new Date().toISOString() })
+          .eq("id", job.id);
+        await admin.from("job_listings").insert({
+          employer_user_id: user.id, job_id: job.id, product_key: productKey, listing_tier: "standard",
+          price_eur: 0, ends_at: ends.toISOString(),
+        });
+        return json({ status: "published", via: productKey });
+      }
+      return json({ error: "No free listing or package slot available this month" }, 403);
+    }
 
     if (body.action === "create") {
       const product = PAYPAL_PRODUCTS[body.product_key];
       if (!product || product.kind !== "listing") return json({ error: "Unknown product" }, 400);
+      let jobId: string | null = null;
+      if (body.job_id) {
+        const { data: job } = await admin.from("jobs").select("id, posted_by").eq("id", body.job_id).maybeSingle();
+        if (!job || job.posted_by !== user.id) return json({ error: "Job not found" }, 404);
+        jobId = job.id;
+      }
       const ret = new URL(body.return_url);
       const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
         method: "POST",
