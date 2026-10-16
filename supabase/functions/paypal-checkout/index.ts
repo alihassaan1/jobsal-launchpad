@@ -218,6 +218,7 @@ Deno.serve(async (req) => {
       await admin.from("paypal_orders").insert({
         user_id: user.id, paypal_order_id: order.id, product_key: product.key, amount_cents: product.amount_cents,
         listing_credits: product.listing_credits, featured_days: product.featured_days, environment: ENV,
+        job_id: jobId,
       });
       const approve = order.links?.find((l: { rel: string }) => l.rel === "approve")?.href;
       return json({ order_id: order.id, approve_url: approve });
