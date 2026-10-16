@@ -437,14 +437,21 @@ const JobForm = ({
       if (job?.id) {
         const { error } = await supabase.from("jobs").update(jobData).eq("id", job.id);
         if (error) throw error;
+        return null;
       } else {
-        const { error } = await supabase.from("jobs").insert([jobData]);
+        // New jobs are saved hidden ("awaiting payment") until the employer
+        // picks a visibility option on the checkout page.
+        const { data: created, error } = await supabase.from("jobs")
+          .insert([{ ...jobData, is_active: false, payment_status: "awaiting_payment" }])
+          .select("id").single();
         if (error) throw error;
+        return created?.id as string;
       }
     },
-    onSuccess: () => {
-      toast({ title: job?.id ? "Job updated successfully" : "Job posted successfully" });
+    onSuccess: (newJobId) => {
+      toast({ title: job?.id ? "Job updated successfully" : "Job saved — choose visibility to publish" });
       onSuccess();
+      if (newJobId) navigate(`/post-job/${newJobId}/checkout`);
     },
     onError: (error: any) => {
       toast({
