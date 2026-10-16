@@ -315,6 +315,11 @@ const EmployerDashboard = () => {
                           </CardDescription>
                         </div>
                         <div className="flex gap-2">
+                          {job.payment_status === "awaiting_payment" && (
+                            <Button size="sm" onClick={() => navigate(`/post-job/${job.id}/checkout`)}>
+                              Pay now
+                            </Button>
+                          )}
                           <Button
                             variant="outline"
                             size="sm"
