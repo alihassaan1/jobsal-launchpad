@@ -1982,6 +1982,30 @@ export type Database = {
         }
         Relationships: []
       }
+      paypal_plans: {
+        Row: {
+          created_at: string
+          environment: string
+          paypal_plan_id: string
+          paypal_product_id: string
+          product_key: string
+        }
+        Insert: {
+          created_at?: string
+          environment?: string
+          paypal_plan_id: string
+          paypal_product_id: string
+          product_key: string
+        }
+        Update: {
+          created_at?: string
+          environment?: string
+          paypal_plan_id?: string
+          paypal_product_id?: string
+          product_key?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           author_id: string
