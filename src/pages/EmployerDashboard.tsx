@@ -294,6 +294,9 @@ const EmployerDashboard = () => {
                             <Badge variant={job.is_active ? "default" : "secondary"}>
                               {job.is_active ? "Active" : "Inactive"}
                             </Badge>
+                            {job.payment_status === "awaiting_payment" && (
+                              <Badge variant="destructive">Awaiting payment</Badge>
+                            )}
                             {job.is_featured && <Badge variant="secondary">Featured</Badge>}
                           </div>
                           <CardDescription className="flex flex-wrap gap-4">
@@ -312,6 +315,11 @@ const EmployerDashboard = () => {
                           </CardDescription>
                         </div>
                         <div className="flex gap-2">
+                          {job.payment_status === "awaiting_payment" && (
+                            <Button size="sm" onClick={() => navigate(`/post-job/${job.id}/checkout`)}>
+                              Pay now
+                            </Button>
+                          )}
                           <Button
                             variant="outline"
                             size="sm"
@@ -385,7 +393,8 @@ const JobForm = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
+  const navigate = useNavigate();
+
   // Check subscription limits
   const { data: canPost } = useQuery({
     queryKey: ["can-post-job", user?.id],
@@ -437,14 +446,21 @@ const JobForm = ({
       if (job?.id) {
         const { error } = await supabase.from("jobs").update(jobData).eq("id", job.id);
         if (error) throw error;
+        return null;
       } else {
-        const { error } = await supabase.from("jobs").insert([jobData]);
+        // New jobs are saved hidden ("awaiting payment") until the employer
+        // picks a visibility option on the checkout page.
+        const { data: created, error } = await supabase.from("jobs")
+          .insert([{ ...jobData, is_active: false, payment_status: "awaiting_payment" }])
+          .select("id").single();
         if (error) throw error;
+        return created?.id as string;
       }
     },
-    onSuccess: () => {
-      toast({ title: job?.id ? "Job updated successfully" : "Job posted successfully" });
+    onSuccess: (newJobId) => {
+      toast({ title: job?.id ? "Job updated successfully" : "Job saved — choose visibility to publish" });
       onSuccess();
+      if (newJobId) navigate(`/post-job/${newJobId}/checkout`);
     },
     onError: (error: any) => {
       toast({

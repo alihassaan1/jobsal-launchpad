@@ -1,423 +1,181 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Briefcase, Check, Star, Users, BarChart, Building2, Headphones } from "lucide-react";
-import { useState } from "react";
+import { Check, Star, ShieldCheck } from "lucide-react";
 import { Helmet } from "react-helmet";
 import Navigation from "@/components/Navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LISTING_OPTIONS, MONTHLY_PACKAGES, ENTERPRISE_FROM_CENTS, eur, approxLek, VAT_NOTE, PAYPAL_NOTE } from "@/lib/pricingConfig";
+
+const copy = {
+  title: { sq: "Zgjidh planin e duhur për ty", en: "Choose the right plan for you" },
+  subtitle: {
+    sq: "Paguaj për çdo pune ose kurse me një paketë mujore. Pa kontrata afatgjata.",
+    en: "Pay per job or save with a monthly package. No long-term contracts.",
+  },
+  perJob: { sq: "Për punë", en: "Per job" },
+  monthly: { sq: "Paketa mujore", en: "Monthly packages" },
+  postJob: { sq: "Publiko një punë", en: "Post a job" },
+  subscribe: { sq: "Abonohu", en: "Subscribe" },
+  getStarted: { sq: "Fillo tani", en: "Get started" },
+  recommended: { sq: "Rekomandohet", en: "Recommended" },
+  daysLive: { sq: "30 ditë aktiv", en: "30 days live" },
+  daysFeatured: (d: number, sq: boolean) => (sq ? `${d} ditë i veçuar` : `${d} days featured`),
+  activeListings: (n: number, sq: boolean) => (sq ? `deri në ${n} njoftime aktive` : `up to ${n} active listings`),
+  renews: { sq: "Rinovohet automatikisht çdo muaj, anulo kur të duash", en: "Renews automatically every month, cancel anytime" },
+  perMonth: { sq: "/muaj", en: "/month" },
+  enterpriseTitle: { sq: "Enterprise", en: "Enterprise" },
+  enterpriseDesc: {
+    sq: "Për kompani me vëllime të mëdha rekrutimi: profile të shumta kompanish, koordinim i dedikuar dhe promovim i personalizuar.",
+    en: "For high-volume hiring: multiple company profiles, dedicated coordination and custom promotion.",
+  },
+  from: { sq: "nga", en: "from" },
+  requestQuote: { sq: "Kërko ofertë", en: "Request a quote" },
+  firstFree: { sq: "Njoftimi juaj i parë standard çdo muaj është falas.", en: "Your first standard listing each month is free." },
+};
 
 export default function Pricing() {
   const { user, userRole } = useAuth();
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const { language } = useLanguage();
+  const sq = language === "sq";
+  const [tab, setTab] = useState<"perjob" | "monthly">("perjob");
 
-  // Fetch pricing plans
-  const { data: plans = [], isLoading } = useQuery({
-    queryKey: ["pricing-plans"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("subscription_plans")
-        .select("*")
-        .eq("is_active", true)
-        .order("display_order");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // Fetch current subscription if user is logged in
-  const { data: currentSubscription } = useQuery({
-    queryKey: ["current-subscription", user?.id],
-    queryFn: async () => {
-      if (!user) return null;
-      const { data, error } = await supabase
-        .from("subscriptions")
-        .select("*, subscription_plans(*)")
-        .eq("user_id", user.id)
-        .eq("status", "active")
-        .single();
-      if (error && error.code !== "PGRST116") throw error;
-      return data;
-    },
-    enabled: !!user,
-  });
-
-  const getSupportIcon = (level: string) => {
-    switch (level) {
-      case "dedicated":
-        return <Headphones className="h-4 w-4" />;
-      case "chat_email":
-        return <Users className="h-4 w-4" />;
-      case "priority_email":
-        return <BarChart className="h-4 w-4" />;
-      default:
-        return <Check className="h-4 w-4" />;
-    }
-  };
-
-  const getSupportLabel = (level: string) => {
-    switch (level) {
-      case "dedicated":
-        return "Dedicated Support";
-      case "chat_email":
-        return "Chat + Email";
-      case "priority_email":
-        return "Priority Email";
-      default:
-        return "Email Only";
-    }
-  };
+  const postJobHref = user && userRole === "employer" ? "/dashboard" : "/auth?type=employer";
+  const quoteMailto = `mailto:info@jobs.al?subject=${encodeURIComponent("Enterprise plan inquiry / Kërkesë për planin Enterprise")}`;
 
   return (
     <>
       <Helmet>
-        <title>Employer Pricing Plans | Recruit on Jobs.al</title>
-        <meta name="description" content="Choose the perfect hiring plan for your business. From free job posts to enterprise recruitment solutions with ATS, AI matching, and unlimited job listings." />
-        <meta name="keywords" content="employer pricing, recruitment plans, job posting pricing albania, ATS system, hiring solutions" />
+        <title>{sq ? "Çmimet për punëdhënës | Jobs.al" : "Employer Pricing | Jobs.al"}</title>
+        <meta name="description" content={sq
+          ? "Publiko pune në Jobs.al: njoftimi i parë falas çdo muaj, opsione të veçuara dhe paketa mujore për rekrutim në Shqipëri."
+          : "Post jobs on Jobs.al: first listing free each month, featured options and monthly recruitment packages in Albania."} />
         <link rel="canonical" href="https://jobs.al/pricing" />
-        <meta property="og:title" content="Employer Pricing Plans | Jobs.al" />
-        <meta property="og:description" content="Affordable recruitment solutions for businesses of all sizes. Start hiring in Albania today." />
+        <meta property="og:title" content={sq ? "Çmimet për punëdhënës | Jobs.al" : "Employer Pricing | Jobs.al"} />
+        <meta property="og:description" content={sq ? "Zgjidh planin e duhur për rekrutimin tënd." : "Affordable recruitment solutions for businesses of all sizes."} />
       </Helmet>
       <div className="min-h-screen bg-background">
         <Navigation />
 
-      <div className="container mx-auto px-4 py-16">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Choose the Right Plan for You
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Whether you're hiring your first employee or building a team, we have a plan that fits your needs.
-          </p>
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{sq ? copy.title.sq : copy.title.en}</h1>
+            <p className="text-xl text-muted-foreground mb-3 max-w-2xl mx-auto">{sq ? copy.subtitle.sq : copy.subtitle.en}</p>
+            <p className="text-sm text-muted-foreground mb-8">{sq ? copy.firstFree.sq : copy.firstFree.en}</p>
 
-          {/* Billing Toggle */}
-          <div className="inline-flex items-center gap-2 p-1 bg-muted rounded-lg">
-            <button
-              onClick={() => setBillingCycle("monthly")}
-              className={`px-6 py-2 rounded-md transition-colors ${
-                billingCycle === "monthly"
-                  ? "bg-background shadow-sm"
-                  : "hover:bg-background/50"
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setBillingCycle("yearly")}
-              className={`px-6 py-2 rounded-md transition-colors ${
-                billingCycle === "yearly"
-                  ? "bg-background shadow-sm"
-                  : "hover:bg-background/50"
-              }`}
-            >
-              Yearly
-              <Badge variant="secondary" className="ml-2 text-xs">
-                Save 17%
-              </Badge>
-            </button>
+            <div className="inline-flex items-center gap-2 p-1 bg-muted rounded-lg">
+              <button
+                onClick={() => setTab("perjob")}
+                className={`px-6 py-2 rounded-md transition-colors ${tab === "perjob" ? "bg-background shadow-sm" : "hover:bg-background/50"}`}
+              >
+                {sq ? copy.perJob.sq : copy.perJob.en}
+              </button>
+              <button
+                onClick={() => setTab("monthly")}
+                className={`px-6 py-2 rounded-md transition-colors ${tab === "monthly" ? "bg-background shadow-sm" : "hover:bg-background/50"}`}
+              >
+                {sq ? copy.monthly.sq : copy.monthly.en}
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Pricing Cards */}
-        {isLoading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardHeader>
-                  <div className="h-8 bg-muted rounded w-3/4 mb-2" />
-                  <div className="h-4 bg-muted rounded w-full" />
-                </CardHeader>
-                <CardContent>
-                  <div className="h-32 bg-muted rounded" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {plans.map((plan: any) => {
-              const isCurrentPlan = currentSubscription?.subscription_plans?.id === plan.id;
-              const price = billingCycle === "monthly" ? plan.price_monthly : plan.price_yearly;
-              const displayPrice = price === 0 ? "Free" : `€${(price / 100).toFixed(2)}`;
-              const priceLabel = plan.slug === "enterprise" ? "Custom" : displayPrice;
-
-              return (
-                <Card
-                  key={plan.id}
-                  className={`relative ${
-                    plan.is_popular
-                      ? "border-primary shadow-lg scale-105"
-                      : ""
-                  } ${isCurrentPlan ? "ring-2 ring-primary" : ""}`}
-                >
-                  {plan.is_popular && (
+          {tab === "perjob" ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto items-stretch">
+              {LISTING_OPTIONS.map((o) => (
+                <Card key={o.key} className={`relative flex flex-col ${o.recommended ? "border-primary shadow-lg" : ""}`}>
+                  {o.recommended && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                       <Badge className="bg-primary text-primary-foreground shadow-md">
-                        <Star className="h-3 w-3 mr-1" />
-                        Most Popular
+                        <Star className="h-3 w-3 mr-1" />{sq ? copy.recommended.sq : copy.recommended.en}
                       </Badge>
                     </div>
                   )}
-
-                  {isCurrentPlan && (
-                    <div className="absolute -top-4 right-4">
-                      <Badge variant="secondary">Current Plan</Badge>
-                    </div>
-                  )}
-
                   <CardHeader>
-                    <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                    <CardDescription className="min-h-12">
-                      {plan.description}
-                    </CardDescription>
-                    <div className="mt-4">
-                      <div className="text-4xl font-bold">
-                        {priceLabel}
-                        {price > 0 && (
-                          <span className="text-base font-normal text-muted-foreground">
-                            /{billingCycle === "monthly" ? "mo" : "yr"}
-                          </span>
-                        )}
-                      </div>
-                      {billingCycle === "yearly" && price > 0 && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          €{((price / 100) / 12).toFixed(2)}/month billed annually
-                        </p>
-                      )}
+                    <CardTitle className="text-2xl">{o.name}</CardTitle>
+                    <div className="mt-2">
+                      <span className="text-4xl font-bold">{eur(o.amount_cents)}</span>
+                      <p className="text-sm text-muted-foreground mt-1">{approxLek(o.amount_cents)}</p>
                     </div>
                   </CardHeader>
-
-                  <CardContent className="space-y-4">
-                    <ul className="space-y-3 text-sm">
-                      <li className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span>
-                          <strong>
-                            {plan.job_posts_limit === -1
-                              ? "Unlimited"
-                              : plan.job_posts_limit}
-                          </strong>{" "}
-                          job posts
-                        </span>
-                      </li>
-                      {plan.talent_pool_access && (
-                        <li className="flex items-start gap-2">
-                          <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <span>
-                            <strong>
-                              {plan.talent_pool_views_limit === -1
-                                ? "Unlimited"
-                                : plan.talent_pool_views_limit}
-                            </strong>{" "}
-                            talent pool unlocks/mo
-                          </span>
-                        </li>
+                  <CardContent className="flex flex-col flex-1">
+                    <ul className="space-y-3 text-sm flex-1">
+                      <li className="flex items-start gap-2"><Check className="h-4 w-4 text-green-600 mt-0.5" /><span>{sq ? copy.daysLive.sq : copy.daysLive.en}</span></li>
+                      {o.featured_days > 0 && (
+                        <li className="flex items-start gap-2"><Check className="h-4 w-4 text-green-600 mt-0.5" /><span>{copy.daysFeatured(o.featured_days, sq)}</span></li>
                       )}
-                      {plan.seat_limit > 1 && (
-                        <li className="flex items-start gap-2">
-                          <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <span><strong>{plan.seat_limit}</strong> recruiter seats</span>
-                        </li>
-                      )}
-                      {plan.branded_page && (
-                        <li className="flex items-start gap-2">
-                          <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <span>Branded company page</span>
-                        </li>
-                      )}
-                      {plan.bulk_export && (
-                        <li className="flex items-start gap-2">
-                          <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <span>Bulk CV export (ZIP + CSV)</span>
-                        </li>
-                      )}
-                      <li className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span>
-                          <strong>
-                            {plan.resume_views_limit === -1
-                              ? "Unlimited"
-                              : plan.resume_views_limit}
-                          </strong>{" "}
-                          resume views (applicants)
-                        </span>
-                      </li>
-                      {plan.featured_jobs_limit > 0 && (
-                        <li className="flex items-start gap-2">
-                          <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <span>
-                            <strong>
-                              {plan.featured_jobs_limit === -1
-                                ? "Unlimited"
-                                : plan.featured_jobs_limit}
-                            </strong>{" "}
-                            featured job slots
-                          </span>
-                        </li>
-                      )}
-                      {plan.ai_access && (
-                        <li className="flex items-start gap-2">
-                          <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <span>AI-powered matching</span>
-                        </li>
-                      )}
-                      {plan.ats_access && (
-                        <li className="flex items-start gap-2">
-                          <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <span>ATS (Applicant Tracking)</span>
-                        </li>
-                      )}
-                      {plan.company_page && (
-                        <li className="flex items-start gap-2">
-                          <Building2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <span>Custom company page</span>
-                        </li>
-                      )}
-                      {plan.analytics_enabled && (
-                        <li className="flex items-start gap-2">
-                          <BarChart className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                          <span>Analytics dashboard</span>
-                        </li>
-                      )}
-                      <li className="flex items-start gap-2">
-                        {getSupportIcon(plan.support_level)}
-                        <span>{getSupportLabel(plan.support_level)}</span>
-                      </li>
                     </ul>
-
-                    {isCurrentPlan ? (
-                      <Button className="w-full" variant="outline" disabled>
-                        Current Plan
+                    <Link to={postJobHref} className="block mt-6">
+                      <Button className="w-full" variant={o.recommended ? "default" : "outline"}>
+                        {sq ? copy.postJob.sq : copy.postJob.en}
                       </Button>
-                    ) : plan.slug === "enterprise" || plan.slug === "corporate" || plan.is_corporate ? (
-                      <Button className="w-full" variant={plan.is_popular ? "default" : "outline"} onClick={() => window.location.href = "mailto:info@jobs.al?subject=Corporate plan inquiry"}>
-                        Contact Sales
-                      </Button>
-                    ) : user && userRole === "employer" ? (
-                      <Link to="/employer/subscription">
-                        <Button className="w-full" variant={plan.is_popular ? "default" : "outline"}>
-                          Subscribe Now
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Link to="/auth?type=employer">
-                        <Button className="w-full" variant={plan.is_popular ? "default" : "outline"}>
-                          Get Started
-                        </Button>
-                      </Link>
-                    )}
+                    </Link>
                   </CardContent>
                 </Card>
-              );
-            })}
-          </div>
-        )}
+              ))}
+            </div>
+          ) : (
+            <div className="max-w-5xl mx-auto space-y-6">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
+                {MONTHLY_PACKAGES.map((p) => (
+                  <Card key={p.key} className={`relative flex flex-col ${p.recommended ? "border-primary shadow-lg" : ""}`}>
+                    {p.recommended && (
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                        <Badge className="bg-primary text-primary-foreground shadow-md">
+                          <Star className="h-3 w-3 mr-1" />{sq ? copy.recommended.sq : copy.recommended.en}
+                        </Badge>
+                      </div>
+                    )}
+                    <CardHeader>
+                      <CardTitle className="text-2xl">{p.name}</CardTitle>
+                      <div className="mt-2">
+                        <span className="text-4xl font-bold">{eur(p.amount_cents)}</span>
+                        <span className="text-base font-normal text-muted-foreground">{sq ? copy.perMonth.sq : copy.perMonth.en}</span>
+                        <p className="text-sm text-muted-foreground mt-1">{approxLek(p.amount_cents)}{sq ? copy.perMonth.sq : copy.perMonth.en}</p>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex flex-col flex-1">
+                      <ul className="space-y-3 text-sm flex-1">
+                        <li className="flex items-start gap-2"><Check className="h-4 w-4 text-green-600 mt-0.5" /><span>{copy.activeListings(p.listing_credits, sq)}</span></li>
+                        <li className="flex items-start gap-2"><Check className="h-4 w-4 text-green-600 mt-0.5" /><span>{sq ? copy.daysLive.sq : copy.daysLive.en}</span></li>
+                        <li className="flex items-start gap-2"><Check className="h-4 w-4 text-green-600 mt-0.5" /><span>{sq ? copy.renews.sq : copy.renews.en}</span></li>
+                      </ul>
+                      <Link to={postJobHref} className="block mt-6">
+                        <Button className="w-full" variant={p.recommended ? "default" : "outline"}>
+                          {user && userRole === "employer" ? (sq ? copy.subscribe.sq : copy.subscribe.en) : (sq ? copy.getStarted.sq : copy.getStarted.en)}
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
-        {/* Comparison Section */}
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold text-center mb-8">Compare Plans</h2>
-          <Card>
-            <CardContent className="p-6 overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-4 px-4">Features</th>
-                    {plans.map((plan: any) => (
-                      <th key={plan.id} className="text-center py-4 px-4">
-                        {plan.name}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b">
-                    <td className="py-3 px-4">Job Posts</td>
-                    {plans.map((plan: any) => (
-                      <td key={plan.id} className="text-center py-3 px-4">
-                        {plan.job_posts_limit === -1 ? "Unlimited" : plan.job_posts_limit}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr className="border-b">
-                    <td className="py-3 px-4">Resume Views</td>
-                    {plans.map((plan: any) => (
-                      <td key={plan.id} className="text-center py-3 px-4">
-                        {plan.resume_views_limit === -1 ? "Unlimited" : plan.resume_views_limit}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr className="border-b">
-                    <td className="py-3 px-4">AI Matching</td>
-                    {plans.map((plan: any) => (
-                      <td key={plan.id} className="text-center py-3 px-4">
-                        {plan.ai_access ? <Check className="h-5 w-5 text-green-600 mx-auto" /> : "-"}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr className="border-b">
-                    <td className="py-3 px-4">ATS Access</td>
-                    {plans.map((plan: any) => (
-                      <td key={plan.id} className="text-center py-3 px-4">
-                        {plan.ats_access ? <Check className="h-5 w-5 text-green-600 mx-auto" /> : "-"}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr className="border-b">
-                    <td className="py-3 px-4">Analytics</td>
-                    {plans.map((plan: any) => (
-                      <td key={plan.id} className="text-center py-3 px-4">
-                        {plan.analytics_enabled ? <Check className="h-5 w-5 text-green-600 mx-auto" /> : "-"}
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </CardContent>
-          </Card>
-        </div>
+              <Card>
+                <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6">
+                  <div>
+                    <CardTitle className="text-xl">{sq ? copy.enterpriseTitle.sq : copy.enterpriseTitle.en}</CardTitle>
+                    <CardDescription className="mt-1 max-w-xl">{sq ? copy.enterpriseDesc.sq : copy.enterpriseDesc.en}</CardDescription>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {sq ? copy.from.sq : copy.from.en} {eur(ENTERPRISE_FROM_CENTS)}{sq ? copy.perMonth.sq : copy.perMonth.en} · {approxLek(ENTERPRISE_FROM_CENTS)}
+                    </p>
+                  </div>
+                  <Button variant="outline" asChild className="shrink-0">
+                    <a href={quoteMailto}>{sq ? copy.requestQuote.sq : copy.requestQuote.en}</a>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-        {/* FAQ Section */}
-        <div className="mt-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Can I change my plan later?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Yes! You can upgrade or downgrade your plan at any time from your dashboard.
-                  Changes take effect immediately.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">What payment methods do you accept?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  We accept all major credit cards and PayPal. Payment processing is secured through Stripe.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Is there a contract or commitment?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  No! All plans are month-to-month with no long-term contracts. Cancel anytime.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="text-center mt-12 space-y-2">
+            <p className="text-sm text-muted-foreground">{sq ? VAT_NOTE.sq : VAT_NOTE.en}</p>
+            <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+              <ShieldCheck className="h-4 w-4" />{sq ? PAYPAL_NOTE.sq : PAYPAL_NOTE.en}
+            </p>
           </div>
         </div>
-      </div>
       </div>
     </>
   );

@@ -121,11 +121,13 @@ async function syncSubscription(
 }
 
 const Body = z.discriminatedUnion("action", [
-  z.object({ action: z.literal("create"), product_key: z.string().max(50), return_url: z.string().url().max(500) }),
+  z.object({ action: z.literal("config") }),
+  z.object({ action: z.literal("create"), product_key: z.string().max(50), return_url: z.string().url().max(500), job_id: z.string().uuid().optional() }),
   z.object({ action: z.literal("capture"), order_id: z.string().min(5).max(64) }),
   z.object({ action: z.literal("subscribe"), product_key: z.string().max(50), return_url: z.string().url().max(500) }),
   z.object({ action: z.literal("activate"), subscription_id: z.string().min(5).max(64) }),
   z.object({ action: z.literal("cancel"), subscription_id: z.string().min(5).max(64) }),
+  z.object({ action: z.literal("publish_free"), job_id: z.string().uuid() }),
 ]);
 
 Deno.serve(async (req) => {
@@ -141,11 +143,64 @@ Deno.serve(async (req) => {
     const parsed = Body.safeParse(await req.json());
     if (!parsed.success) return json({ error: parsed.error.flatten().fieldErrors }, 400);
     const body = parsed.data;
+
+    // Public client config so the PayPal JS SDK buttons can load (client id is publishable).
+    if (body.action === "config") {
+      return json({ client_id: Deno.env.get("PAYPAL_CLIENT_ID"), env: ENV, currency: "EUR" });
+    }
+
     const token = await paypalToken();
+
+    if (body.action === "publish_free") {
+      const { data: job } = await admin.from("jobs").select("id, posted_by, is_active, payment_status, title")
+        .eq("id", body.job_id).maybeSingle();
+      if (!job || job.posted_by !== user.id) return json({ error: "Job not found" }, 404);
+      if (job.is_active) return json({ status: "already_live" });
+
+      const monthStart = new Date(); monthStart.setUTCDate(1); monthStart.setUTCHours(0, 0, 0, 0);
+
+      // (a) One free standard listing per employer per calendar month.
+      const { count: freeUsed } = await admin.from("job_listings").select("id", { count: "exact", head: true })
+        .eq("employer_user_id", user.id).eq("product_key", "free_monthly")
+        .gte("created_at", monthStart.toISOString());
+
+      // (b) Or a monthly package with remaining listing slots in the current period.
+      const { data: sub } = await admin.from("subscriptions").select("*")
+        .eq("user_id", user.id).eq("status", "active")
+        .not("paypal_subscription_id", "is", null)
+        .order("created_at", { ascending: false }).limit(1).maybeSingle();
+      let packageSlot = false;
+      if (sub) {
+        const periodStart = sub.current_period_start ?? sub.created_at;
+        const { count: used } = await admin.from("job_listings").select("id", { count: "exact", head: true })
+          .eq("employer_user_id", user.id).eq("product_key", `package:${sub.plan_slug}`)
+          .gte("created_at", periodStart);
+        packageSlot = (used ?? 0) < (sub.job_posts_limit ?? 0);
+      }
+
+      if ((freeUsed ?? 0) === 0 || packageSlot) {
+        const productKey = packageSlot ? `package:${sub!.plan_slug}` : "free_monthly";
+        const ends = new Date(); ends.setDate(ends.getDate() + 30);
+        await admin.from("jobs").update({ is_active: true, payment_status: "free", updated_at: new Date().toISOString() })
+          .eq("id", job.id);
+        await admin.from("job_listings").insert({
+          employer_user_id: user.id, job_id: job.id, product_key: productKey, listing_tier: "standard",
+          price_eur: 0, ends_at: ends.toISOString(),
+        });
+        return json({ status: "published", via: productKey });
+      }
+      return json({ error: "No free listing or package slot available this month" }, 403);
+    }
 
     if (body.action === "create") {
       const product = PAYPAL_PRODUCTS[body.product_key];
       if (!product || product.kind !== "listing") return json({ error: "Unknown product" }, 400);
+      let jobId: string | null = null;
+      if (body.job_id) {
+        const { data: job } = await admin.from("jobs").select("id, posted_by").eq("id", body.job_id).maybeSingle();
+        if (!job || job.posted_by !== user.id) return json({ error: "Job not found" }, 404);
+        jobId = job.id;
+      }
       const ret = new URL(body.return_url);
       const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
         method: "POST",
@@ -163,6 +218,7 @@ Deno.serve(async (req) => {
       await admin.from("paypal_orders").insert({
         user_id: user.id, paypal_order_id: order.id, product_key: product.key, amount_cents: product.amount_cents,
         listing_credits: product.listing_credits, featured_days: product.featured_days, environment: ENV,
+        job_id: jobId,
       });
       const approve = order.links?.find((l: { rel: string }) => l.rel === "approve")?.href;
       return json({ order_id: order.id, approve_url: approve });
@@ -188,12 +244,20 @@ Deno.serve(async (req) => {
         const ends = new Date(); ends.setDate(ends.getDate() + 30);
         const featuredUntil = product.featured_days > 0 ? new Date(Date.now() + product.featured_days * 86400000) : null;
         await admin.from("job_listings").insert({
-          employer_user_id: user.id, product_key: product.key, listing_tier: product.key,
+          employer_user_id: user.id, job_id: row.job_id ?? null, product_key: product.key, listing_tier: product.key,
           price_eur: product.amount_cents / 100, ends_at: ends.toISOString(),
           featured_until: featuredUntil?.toISOString() ?? null, paypal_order_id: row.id,
         });
+        // Publish the job this order paid for.
+        if (row.job_id) {
+          await admin.from("jobs").update({
+            is_active: true, payment_status: "paid",
+            is_featured: product.featured_days > 0,
+            updated_at: new Date().toISOString(),
+          }).eq("id", row.job_id).eq("posted_by", user.id);
+        }
       }
-      return json({ status: "completed", product_key: row.product_key });
+      return json({ status: "completed", product_key: row.product_key, job_id: row.job_id ?? null });
     }
 
     if (body.action === "subscribe") {

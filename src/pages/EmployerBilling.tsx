@@ -18,6 +18,9 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
+import { RefreshCw, ArrowUpRight } from "lucide-react";
+import { PAYPAL_PRODUCTS, formatEur } from "../../supabase/functions/paypal-checkout/products";
 
 type Invoice = {
   id: string;
@@ -128,6 +131,54 @@ export default function EmployerBilling() {
     },
     enabled: !!company?.id,
   });
+
+  // Current PayPal package
+  const { data: subscription, refetch: refetchSub } = useQuery({
+    queryKey: ["billing-subscription", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await (supabase as any).from("subscriptions").select("*")
+        .not("paypal_subscription_id", "is", null)
+        .in("status", ["active", "pending", "past_due"])
+        .order("created_at", { ascending: false }).limit(1).maybeSingle();
+      return data as any | null;
+    },
+  });
+
+  // Usage: listings consumed in the current package period
+  const { data: packageUsage } = useQuery({
+    queryKey: ["billing-usage", user?.id, subscription?.id],
+    enabled: !!user?.id && !!subscription,
+    queryFn: async () => {
+      const periodStart = subscription.current_period_start ?? subscription.created_at;
+      const { count } = await (supabase as any).from("job_listings")
+        .select("id", { count: "exact", head: true })
+        .eq("employer_user_id", user!.id)
+        .eq("product_key", `package:${subscription.plan_slug}`)
+        .gte("created_at", periodStart);
+      return count ?? 0;
+    },
+  });
+
+  // PayPal receipts
+  const { data: receipts } = useQuery({
+    queryKey: ["billing-receipts", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await (supabase as any).from("paypal_orders").select("*")
+        .order("created_at", { ascending: false }).limit(20);
+      return (data ?? []) as any[];
+    },
+  });
+
+  const cancelSubscription = async () => {
+    if (!subscription?.paypal_subscription_id) return;
+    const { data, error } = await supabase.functions.invoke("paypal-checkout", {
+      body: { action: "cancel", subscription_id: subscription.paypal_subscription_id },
+    });
+    if (error || data?.error) toast.error("Could not cancel the package");
+    else { toast.success("Package cancelled — it stays active until the period ends"); refetchSub(); }
+  };
 
   // Billing profile form state
   const [profileForm, setProfileForm] = useState<Partial<BillingProfile>>({});
@@ -249,8 +300,12 @@ export default function EmployerBilling() {
             </Card>
           </div>
 
-          <Tabs defaultValue="invoices" className="space-y-4">
+          <Tabs defaultValue="package" className="space-y-4">
             <TabsList>
+              <TabsTrigger value="package">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Package
+              </TabsTrigger>
               <TabsTrigger value="invoices">
                 <FileText className="h-4 w-4 mr-2" />
                 Invoices
@@ -259,11 +314,98 @@ export default function EmployerBilling() {
                 <CreditCard className="h-4 w-4 mr-2" />
                 Payment History
               </TabsTrigger>
+              <TabsTrigger value="receipts">
+                <Receipt className="h-4 w-4 mr-2" />
+                Receipts
+              </TabsTrigger>
               <TabsTrigger value="profile">
                 <Building className="h-4 w-4 mr-2" />
                 Billing Profile
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="package">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your package</CardTitle>
+                  <CardDescription>Your monthly package, usage and upgrade options</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {subscription ? (
+                    <>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="text-lg font-semibold capitalize">{subscription.plan_slug}</span>
+                        <Badge variant={subscription.status === "active" ? "default" : "secondary"}>{subscription.status}</Badge>
+                        <span className="text-muted-foreground">€{subscription.amount_eur}/month</span>
+                      </div>
+                      <div className="text-sm text-muted-foreground space-y-1">
+                        <p>
+                          Usage this period: <strong>{packageUsage ?? 0}</strong> of <strong>{subscription.job_posts_limit}</strong> listings
+                        </p>
+                        {subscription.current_period_end && (
+                          <p>Next renewal: {format(new Date(subscription.current_period_end), "MMM d, yyyy")}</p>
+                        )}
+                        {subscription.last_payment_at && (
+                          <p>Last payment: {format(new Date(subscription.last_payment_at), "MMM d, yyyy")} (€{subscription.last_payment_amount})</p>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" asChild>
+                          <Link to="/pricing"><ArrowUpRight className="h-4 w-4 mr-2" />Upgrade package</Link>
+                        </Button>
+                        <Button variant="ghost" onClick={cancelSubscription}>Cancel auto-renewal</Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-6 space-y-3">
+                      <p className="text-muted-foreground">
+                        No monthly package. Your first standard listing each month is free — upgrade for more listings and featured slots.
+                      </p>
+                      <Button asChild><Link to="/pricing">View packages</Link></Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="receipts">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Receipts</CardTitle>
+                  <CardDescription>Your PayPal payments</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {!receipts || receipts.length === 0 ? (
+                    <p className="text-center py-8 text-muted-foreground">No receipts yet</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Item</TableHead>
+                          <TableHead className="text-right">Amount</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {receipts.map((o) => (
+                          <TableRow key={o.id}>
+                            <TableCell>{format(new Date(o.created_at), "MMM d, yyyy")}</TableCell>
+                            <TableCell>{(PAYPAL_PRODUCTS as any)[o.product_key]?.name ?? o.product_key}</TableCell>
+                            <TableCell className="text-right font-medium">€{formatEur(o.amount_cents)}</TableCell>
+                            <TableCell>
+                              <Badge className={o.status === "completed" ? "bg-green-500/20 text-green-600" : "bg-yellow-500/20 text-yellow-600"}>
+                                {o.status}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
 
             <TabsContent value="invoices">
               <Card>

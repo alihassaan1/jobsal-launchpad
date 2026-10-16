@@ -1612,6 +1612,7 @@ export type Database = {
           is_salary_visible: boolean | null
           job_type: Database["public"]["Enums"]["job_type"]
           location: string
+          payment_status: string
           posted_by: string
           requirements: string | null
           responsibilities: string | null
@@ -1642,6 +1643,7 @@ export type Database = {
           is_salary_visible?: boolean | null
           job_type: Database["public"]["Enums"]["job_type"]
           location: string
+          payment_status?: string
           posted_by: string
           requirements?: string | null
           responsibilities?: string | null
@@ -1672,6 +1674,7 @@ export type Database = {
           is_salary_visible?: boolean | null
           job_type?: Database["public"]["Enums"]["job_type"]
           location?: string
+          payment_status?: string
           posted_by?: string
           requirements?: string | null
           responsibilities?: string | null
@@ -1946,6 +1949,7 @@ export type Database = {
           environment: string
           featured_days: number
           id: string
+          job_id: string | null
           listing_credits: number
           paypal_order_id: string
           product_key: string
@@ -1960,6 +1964,7 @@ export type Database = {
           environment?: string
           featured_days?: number
           id?: string
+          job_id?: string | null
           listing_credits?: number
           paypal_order_id: string
           product_key: string
@@ -1974,13 +1979,29 @@ export type Database = {
           environment?: string
           featured_days?: number
           id?: string
+          job_id?: string | null
           listing_credits?: number
           paypal_order_id?: string
           product_key?: string
           status?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "paypal_orders_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paypal_orders_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       paypal_plans: {
         Row: {
