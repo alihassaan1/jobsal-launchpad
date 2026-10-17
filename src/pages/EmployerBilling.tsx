@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ClientPackageOffers from "@/components/ClientPackageOffers";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -325,6 +326,7 @@ export default function EmployerBilling() {
             </TabsList>
 
             <TabsContent value="package">
+              <div className="mb-6"><ClientPackageOffers /></div>
               <Card>
                 <CardHeader>
                   <CardTitle>Your package</CardTitle>

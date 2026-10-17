@@ -1,4 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
+import ClientPackageOffers from "@/components/ClientPackageOffers";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigate } from "react-router-dom";
@@ -170,6 +171,8 @@ export default function AdminSubscriptions() {
         <h1 className="text-3xl font-bold">Subscription Management</h1>
         <p className="text-muted-foreground">Manage pricing plans and payment settings</p>
       </div>
+
+      <ClientPackageOffers admin />
 
       {/* Revenue Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

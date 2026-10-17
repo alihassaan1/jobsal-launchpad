@@ -5,7 +5,8 @@ export type PaypalProduct = {
   amount_cents: number;
   listing_credits: number;
   featured_days: number;
-  kind: "listing" | "subscription";
+  kind: "listing" | "subscription" | "client_package";
+  duration_months?: number;
   plan_slug?: string;
 };
 
@@ -19,6 +20,9 @@ export const PAYPAL_PRODUCTS: Record<string, PaypalProduct> = {
   business_monthly: { key: "business_monthly", name: "Business package (monthly)", amount_cents: 8900, listing_credits: 10, featured_days: 0, kind: "subscription", plan_slug: "business" },
   corporate_monthly: { key: "corporate_monthly", name: "Corporate package (monthly)", amount_cents: 14900, listing_credits: 20, featured_days: 0, kind: "subscription", plan_slug: "corporate" },
   enterprise_monthly: { key: "enterprise_monthly", name: "Enterprise package (monthly, from)", amount_cents: 24900, listing_credits: 40, featured_days: 0, kind: "subscription", plan_slug: "enterprise" },
+  tia_pilot: { key: "tia_pilot", name: "Pilot", amount_cents: 25000, listing_credits: 10, featured_days: 0, kind: "client_package", duration_months: 3 },
+  tia_standard: { key: "tia_standard", name: "Standard", amount_cents: 60000, listing_credits: 30, featured_days: 0, kind: "client_package", duration_months: 6 },
+  tia_annual: { key: "tia_annual", name: "Annual", amount_cents: 120000, listing_credits: 80, featured_days: 0, kind: "client_package", duration_months: 12 },
 };
 
 export const formatEur = (cents: number) => (cents / 100).toFixed(2);

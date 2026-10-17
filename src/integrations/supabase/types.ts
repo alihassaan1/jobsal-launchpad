@@ -772,6 +772,78 @@ export type Database = {
         }
         Relationships: []
       }
+      client_package_offers: {
+        Row: {
+          amount_cents: number
+          assigned_by: string
+          company_id: string
+          created_at: string
+          credit_limit: number
+          credits_used: number
+          duration_months: number
+          employer_user_id: string
+          expires_at: string
+          id: string
+          offer_expires_at: string
+          paid_at: string | null
+          product_key: string
+          starts_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          assigned_by: string
+          company_id: string
+          created_at?: string
+          credit_limit: number
+          credits_used?: number
+          duration_months: number
+          employer_user_id: string
+          expires_at: string
+          id?: string
+          offer_expires_at?: string
+          paid_at?: string | null
+          product_key: string
+          starts_at: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          assigned_by?: string
+          company_id?: string
+          created_at?: string
+          credit_limit?: number
+          credits_used?: number
+          duration_months?: number
+          employer_user_id?: string
+          expires_at?: string
+          id?: string
+          offer_expires_at?: string
+          paid_at?: string | null
+          product_key?: string
+          starts_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_package_offers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_package_offers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           banner_url: string | null
@@ -1482,6 +1554,7 @@ export type Database = {
       }
       job_listings: {
         Row: {
+          client_offer_id: string | null
           company_id: string | null
           created_at: string
           employer_user_id: string
@@ -1497,6 +1570,7 @@ export type Database = {
           status: string
         }
         Insert: {
+          client_offer_id?: string | null
           company_id?: string | null
           created_at?: string
           employer_user_id: string
@@ -1512,6 +1586,7 @@ export type Database = {
           status?: string
         }
         Update: {
+          client_offer_id?: string | null
           company_id?: string | null
           created_at?: string
           employer_user_id?: string
@@ -1527,6 +1602,13 @@ export type Database = {
           status?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "job_listings_client_offer_id_fkey"
+            columns: ["client_offer_id"]
+            isOneToOne: false
+            referencedRelation: "client_package_offers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "job_listings_job_id_fkey"
             columns: ["job_id"]
@@ -1944,6 +2026,7 @@ export type Database = {
         Row: {
           amount_cents: number
           captured_at: string | null
+          client_offer_id: string | null
           created_at: string
           currency: string
           environment: string
@@ -1959,6 +2042,7 @@ export type Database = {
         Insert: {
           amount_cents: number
           captured_at?: string | null
+          client_offer_id?: string | null
           created_at?: string
           currency?: string
           environment?: string
@@ -1974,6 +2058,7 @@ export type Database = {
         Update: {
           amount_cents?: number
           captured_at?: string | null
+          client_offer_id?: string | null
           created_at?: string
           currency?: string
           environment?: string
@@ -1987,6 +2072,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "paypal_orders_client_offer_id_fkey"
+            columns: ["client_offer_id"]
+            isOneToOne: false
+            referencedRelation: "client_package_offers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "paypal_orders_job_id_fkey"
             columns: ["job_id"]
@@ -3227,6 +3319,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      publish_client_package_job: {
+        Args: { _job_id: string; _offer_id: string; _user_id: string }
+        Returns: string
+      }
+      settle_client_package: { Args: { _order_id: string }; Returns: string }
       unlock_candidate: {
         Args: { _candidate_user_id: string; _company_id: string }
         Returns: Json
