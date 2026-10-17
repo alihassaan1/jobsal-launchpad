@@ -54,3 +54,9 @@
 - [x] PayPal client-id exposure for JS SDK (public config action in paypal-checkout)
 
 Note: authenticated checkout flow (PayPal SDK buttons, free-slot publish) not tested end-to-end — no managed session (external Supabase). User should test with a sandbox buyer account.
+
+# TIA client-only quotation
+- [ ] Add quoted fixed-term products without changing public prices
+- [ ] Add admin assignment, agreed activation date and private PayPal purchase controls
+- [ ] Grant expiring total credits only after verified payment and consume them atomically
+- [ ] Test prices, durations, limits, security and available payment flow
