@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Check, Loader2, Star, Facebook, ExternalLink, ShieldCheck } from "lucide-react";
 import { LISTING_OPTIONS, URGENT_ADDON, eur, approxLek, VAT_NOTE, PAYPAL_NOTE } from "@/lib/pricingConfig";
+import { canUseOffer } from "../../supabase/functions/paypal-checkout/clientOffers";
 
 declare global {
   interface Window { paypal?: any; }
@@ -78,7 +79,18 @@ export default function JobCheckout() {
     },
   });
 
-  const hasFreeOption = !!freeAvailable || !!packageSlot;
+  const { data: clientPackage } = useQuery({
+    queryKey: ["client-package-credit", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase.from("client_package_offers").select("*").eq("employer_user_id", user.id).eq("status", "paid").order("expires_at");
+      if (error) throw error;
+      return data?.find(offer => canUseOffer(offer)) ?? null;
+    },
+  });
+
+  const hasFreeOption = !!freeAvailable || !!packageSlot || !!clientPackage;
 
   // Pre-select the free option when available.
   useEffect(() => {
@@ -145,7 +157,7 @@ export default function JobCheckout() {
   const publishFree = async () => {
     setBusy(true);
     const { data, error } = await supabase.functions.invoke("paypal-checkout", {
-      body: { action: "publish_free", job_id: jobId },
+      body: { action: "publish_free", job_id: jobId, ...(clientPackage ? { offer_id: clientPackage.id } : {}) },
     });
     setBusy(false);
     if (error || data?.error) {
@@ -153,6 +165,8 @@ export default function JobCheckout() {
       return;
     }
     queryClient.invalidateQueries({ queryKey: ["employerJobs"] });
+    queryClient.invalidateQueries({ queryKey: ["client-package-offers"] });
+    queryClient.invalidateQueries({ queryKey: ["client-package-credit"] });
     setStep("success");
   };
 
@@ -183,11 +197,13 @@ export default function JobCheckout() {
                   onClick={() => setSelected("free")}
                 >
                   <CardHeader>
-                    <CardTitle className="text-lg">{sq ? "Falas këtë muaj" : "Free this month"}</CardTitle>
+                    <CardTitle className="text-lg">{clientPackage ? (sq ? "Kredit i paketës" : "Package credit") : (sq ? "Falas këtë muaj" : "Free this month")}</CardTitle>
                     <CardDescription>€0 · {approxLek(0)}</CardDescription>
                   </CardHeader>
                   <CardContent className="text-sm text-muted-foreground flex-1">
-                    {packageSlot
+                    {clientPackage
+                      ? (sq ? `${clientPackage.credit_limit - clientPackage.credits_used} kredite të mbetura deri më ${new Date(clientPackage.expires_at).toLocaleDateString("sq-AL")}` : `${clientPackage.credit_limit - clientPackage.credits_used} credits remaining until ${new Date(clientPackage.expires_at).toLocaleDateString("en-GB")}`)
+                      : packageSlot
                       ? (sq ? `Përfshihet në paketën tuaj ${packageSlot.plan_slug}` : `Included in your ${packageSlot.plan_slug} package`)
                       : (sq ? "Njoftimi juaj i parë standard çdo muaj është falas" : "Your first standard listing each month is free")}
                   </CardContent>
