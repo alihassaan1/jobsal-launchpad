@@ -19,12 +19,12 @@ import { Loader2, Upload } from "lucide-react";
 import {
   ACCEPTED_EXT,
   ACCEPTED_MIME,
-  DOCUMENTS_BUCKET,
   DOC_TYPES,
   DocType,
-  extensionFor,
   formatBytes,
   makeImageThumbnail,
+  removeDocumentFiles,
+  uploadDocumentToR2,
 } from "@/lib/documents";
 
 interface Props {
@@ -113,7 +113,7 @@ const DocumentUploadDialog = ({ open, onClose, maxSizeMb, replacing }: Props) =>
         if (!isReplace || !restorePayload) return;
         // Restore the original document row and drop the rejected upload.
         await supabase.from("user_documents").update(restorePayload).eq("id", documentId!);
-        await supabase.storage.from(DOCUMENTS_BUCKET).remove([path, thumbnailPath].filter(Boolean) as string[]);
+        await removeDocumentFiles([path, thumbnailPath]);
       };
 
       if (validationError) {
@@ -126,7 +126,7 @@ const DocumentUploadDialog = ({ open, onClose, maxSizeMb, replacing }: Props) =>
       }
 
       if (oldPaths.length) {
-        await supabase.storage.from(DOCUMENTS_BUCKET).remove(oldPaths);
+        await removeDocumentFiles(oldPaths);
       }
       return documentId;
 
