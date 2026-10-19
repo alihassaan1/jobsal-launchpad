@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { isR2DocumentKey, r2Delete, r2Download } from "../_shared/r2.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -80,7 +81,11 @@ Deno.serve(async (req) => {
     const maxPerUser = Number(settings.documents_max_per_user ?? 10) || 10;
 
     const fail = async (message: string) => {
-      await admin.storage.from(BUCKET).remove([doc.file_path, doc.thumbnail_path].filter(Boolean) as string[]);
+      const paths = [doc.file_path, doc.thumbnail_path].filter(Boolean) as string[];
+      const r2Keys = paths.filter(isR2DocumentKey);
+      const legacy = paths.filter((k) => !isR2DocumentKey(k));
+      if (r2Keys.length) await r2Delete(r2Keys);
+      if (legacy.length) await admin.storage.from(BUCKET).remove(legacy);
       if (!keepRecord) {
         await admin.from("user_documents").delete().eq("id", documentId);
       } else {
@@ -101,10 +106,14 @@ Deno.serve(async (req) => {
       return await fail(`You can store a maximum of ${maxPerUser} documents`);
     }
 
-    const { data: file, error: downloadError } = await admin.storage.from(BUCKET).download(doc.file_path);
-    if (downloadError || !file) return await fail("Uploaded file could not be read");
-
-    const buffer = new Uint8Array(await file.arrayBuffer());
+    let buffer: Uint8Array | null = null;
+    if (isR2DocumentKey(doc.file_path)) {
+      buffer = await r2Download(doc.file_path);
+    } else {
+      const { data: file } = await admin.storage.from(BUCKET).download(doc.file_path);
+      if (file) buffer = new Uint8Array(await file.arrayBuffer());
+    }
+    if (!buffer) return await fail("Uploaded file could not be read");
     if (buffer.length === 0) return await fail("Uploaded file is empty");
     if (buffer.length > maxSizeMb * 1024 * 1024) {
       return await fail(`File exceeds the ${maxSizeMb}MB limit`);

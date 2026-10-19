@@ -19,12 +19,12 @@ import { Loader2, Upload } from "lucide-react";
 import {
   ACCEPTED_EXT,
   ACCEPTED_MIME,
-  DOCUMENTS_BUCKET,
   DOC_TYPES,
   DocType,
-  extensionFor,
   formatBytes,
   makeImageThumbnail,
+  removeDocumentFiles,
+  uploadDocumentToR2,
 } from "@/lib/documents";
 
 interface Props {
@@ -53,23 +53,14 @@ const DocumentUploadDialog = ({ open, onClose, maxSizeMb, replacing }: Props) =>
   const uploadMutation = useMutation({
     mutationFn: async () => {
       if (!file) throw new Error("Please choose a file");
-      const ext = extensionFor(file);
-      const path = `${user!.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from(DOCUMENTS_BUCKET)
-        .upload(path, file, { contentType: file.type, upsert: false });
-      if (uploadError) throw uploadError;
+      // Stored in Cloudflare R2: documents/{certificates|cover-letters|experience-letters}/{userId}/
+      const path = await uploadDocumentToR2(file, file.type, docType);
 
       // Thumbnail for images
       let thumbnailPath: string | null = null;
       const thumb = await makeImageThumbnail(file);
       if (thumb) {
-        thumbnailPath = `${user!.id}/thumbs/${path.split("/").pop()!.replace(/\.[^.]+$/, "")}.jpg`;
-        const { error: thumbError } = await supabase.storage
-          .from(DOCUMENTS_BUCKET)
-          .upload(thumbnailPath, thumb, { contentType: "image/jpeg", upsert: true });
-        if (thumbError) thumbnailPath = null;
+        thumbnailPath = await uploadDocumentToR2(thumb, "image/jpeg", "thumbnail").catch(() => null);
       }
 
       const payload = {
@@ -122,7 +113,7 @@ const DocumentUploadDialog = ({ open, onClose, maxSizeMb, replacing }: Props) =>
         if (!isReplace || !restorePayload) return;
         // Restore the original document row and drop the rejected upload.
         await supabase.from("user_documents").update(restorePayload).eq("id", documentId!);
-        await supabase.storage.from(DOCUMENTS_BUCKET).remove([path, thumbnailPath].filter(Boolean) as string[]);
+        await removeDocumentFiles([path, thumbnailPath]);
       };
 
       if (validationError) {
@@ -135,7 +126,7 @@ const DocumentUploadDialog = ({ open, onClose, maxSizeMb, replacing }: Props) =>
       }
 
       if (oldPaths.length) {
-        await supabase.storage.from(DOCUMENTS_BUCKET).remove(oldPaths);
+        await removeDocumentFiles(oldPaths);
       }
       return documentId;
 
