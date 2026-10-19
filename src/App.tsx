@@ -136,6 +136,7 @@ const App = () => (
             <Route path="/employer/ads" element={<EmployerAds />} />
             <Route path="/employer/paypal" element={<Navigate to="/employer/billing" replace />} />
             <Route path="/post-job/:jobId/checkout" element={<JobCheckout />} />
+            <Route path="/subscribe/:packageKey" element={<SubscribePackage />} />
             <Route path="/employer/ads/checkout" element={<EmployerAdCheckout />} />
             <Route path="/employer/billing" element={<EmployerBilling />} />
             <Route path="/employer/talent" element={<EmployerTalentPool />} />
