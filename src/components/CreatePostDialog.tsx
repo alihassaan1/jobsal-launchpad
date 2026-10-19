@@ -388,6 +388,10 @@ export function CreatePostDialog({ open, onOpenChange, onSuccess, userId }: Crea
                   onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
                   placeholder="https://example.com/image.jpg"
                 />
+                <div className="mt-2">
+                  <R2ImageUpload folder="blog" onUploaded={(url) => setFormData({ ...formData, featured_image: url })} />
+                </div>
+
                 <p className="text-xs text-muted-foreground mt-1">
                   Recommended: 800x530px (3:2 ratio). Prefer images with darker tones or open space at the bottom so the white title stays readable.
                 </p>

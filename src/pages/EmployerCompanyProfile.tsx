@@ -342,6 +342,12 @@ const EmployerCompanyProfile = () => {
                     disabled={!isEditing}
                     placeholder="https://example.com/logo.png"
                   />
+                  {isEditing && (
+                    <div className="mt-2">
+                      <R2ImageUpload folder="logos" label="Upload logo" onUploaded={(url) => setFormData((f) => ({ ...f, logo_url: url }))} />
+                    </div>
+                  )}
+
                   {formData.logo_url && (
                     <div className="mt-2 w-20 h-20 border rounded overflow-hidden">
                       <img src={formData.logo_url} alt="Logo preview" className="w-full h-full object-cover" />
@@ -358,6 +364,12 @@ const EmployerCompanyProfile = () => {
                     disabled={!isEditing}
                     placeholder="https://example.com/banner.png"
                   />
+                  {isEditing && (
+                    <div className="mt-2">
+                      <R2ImageUpload folder="banners" label="Upload banner" onUploaded={(url) => setFormData((f) => ({ ...f, banner_url: url }))} />
+                    </div>
+                  )}
+
                   {formData.banner_url && (
                     <div className="mt-2 w-full h-32 border rounded overflow-hidden">
                       <img src={formData.banner_url} alt="Banner preview" className="w-full h-full object-cover" />

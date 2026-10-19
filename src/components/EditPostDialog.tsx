@@ -244,6 +244,10 @@ export function EditPostDialog({ open, onOpenChange, onSuccess, post }: EditPost
                   onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
                   placeholder="https://example.com/image.jpg"
                 />
+                <div className="mt-2">
+                  <R2ImageUpload folder="blog" onUploaded={(url) => setFormData({ ...formData, featured_image: url })} />
+                </div>
+
                 {formData.featured_image && (
                   <img 
                     src={formData.featured_image} 

@@ -223,6 +223,10 @@ export default function SetupCompany() {
                         onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
                         placeholder="https://example.com/logo.png"
                       />
+                      <div className="mt-2">
+                        <R2ImageUpload folder="logos" label="Upload logo" onUploaded={(url) => setFormData((f) => ({ ...f, logo_url: url }))} />
+                      </div>
+
                       {formData.logo_url && (
                         <div className="mt-2 w-16 h-16 border rounded-lg overflow-hidden">
                           <img src={formData.logo_url} alt="Logo preview" className="w-full h-full object-cover" />
