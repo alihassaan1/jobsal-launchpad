@@ -1,3 +1,4 @@
+import { R2ImageUpload } from "@/components/R2ImageUpload";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
