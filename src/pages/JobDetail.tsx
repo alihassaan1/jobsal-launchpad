@@ -256,7 +256,7 @@ const JobDetail = () => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-2">
-                      <CardTitle className="text-3xl">{job.title}</CardTitle>
+                      <h1 className="text-3xl font-semibold leading-none tracking-tight">{job.title}</h1>
                       <Button variant="ghost" size="icon" onClick={handleShare}>
                         <Share2 className="h-5 w-5" />
                       </Button>
