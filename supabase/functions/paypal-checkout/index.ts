@@ -315,11 +315,20 @@ Deno.serve(async (req) => {
           price_eur: product.amount_cents / 100, ends_at: ends.toISOString(),
           featured_until: featuredUntil?.toISOString() ?? null, paypal_order_id: row.id,
         });
+        // Apply the urgent add-on paid for in the same order.
+        if (row.urgent && row.job_id) {
+          const urgentProduct = PAYPAL_PRODUCTS.urgent_hiring;
+          await admin.from("job_listings").insert({
+            employer_user_id: user.id, job_id: row.job_id, product_key: urgentProduct.key, listing_tier: urgentProduct.key,
+            price_eur: urgentProduct.amount_cents / 100, ends_at: ends.toISOString(),
+            featured_until: new Date(Date.now() + urgentProduct.featured_days * 86400000).toISOString(), paypal_order_id: row.id,
+          });
+        }
         // Publish the job this order paid for.
         if (row.job_id) {
           await admin.from("jobs").update({
             is_active: true, payment_status: "paid",
-            is_featured: product.featured_days > 0,
+            is_featured: product.featured_days > 0 || !!row.urgent,
             updated_at: new Date().toISOString(),
           }).eq("id", row.job_id).eq("posted_by", user.id);
         }
