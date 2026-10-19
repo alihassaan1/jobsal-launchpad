@@ -249,14 +249,19 @@ Deno.serve(async (req) => {
         if (!job || job.posted_by !== user.id) return json({ error: "Job not found" }, 404);
         jobId = job.id;
       }
+      // Urgent hiring is charged as part of the same order so the buyer approves the full total once.
+      const urgentAddon = body.urgent && product.kind === "listing" && product.key !== "urgent_hiring" && jobId
+        ? PAYPAL_PRODUCTS.urgent_hiring
+        : null;
+      const totalCents = product.amount_cents + (urgentAddon?.amount_cents ?? 0);
       const ret = new URL(body.return_url);
       const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({
           intent: "CAPTURE",
-          purchase_units: [{ description: product.name, custom_id: `${user.id}:${product.key}`,
-            amount: { currency_code: "EUR", value: formatEur(product.amount_cents) } }],
+          purchase_units: [{ description: urgentAddon ? `${product.name} + ${urgentAddon.name}` : product.name, custom_id: `${user.id}:${product.key}`,
+            amount: { currency_code: "EUR", value: formatEur(totalCents) } }],
           application_context: { brand_name: "Jobs.al", user_action: "PAY_NOW",
             return_url: `${ret.origin}${ret.pathname}?paypal=return`, cancel_url: `${ret.origin}${ret.pathname}?paypal=cancel` },
         }),
@@ -264,9 +269,9 @@ Deno.serve(async (req) => {
       const order = await res.json();
       if (!res.ok) return json({ error: "PayPal could not create the order" }, 502);
       await admin.from("paypal_orders").insert({
-        user_id: user.id, paypal_order_id: order.id, product_key: product.key, amount_cents: product.amount_cents,
+        user_id: user.id, paypal_order_id: order.id, product_key: product.key, amount_cents: totalCents,
         listing_credits: product.listing_credits, featured_days: product.featured_days, environment: ENV,
-        job_id: jobId, client_offer_id: offerId,
+        job_id: jobId, client_offer_id: offerId, urgent: !!urgentAddon,
       });
       const approve = order.links?.find((l: { rel: string }) => l.rel === "approve")?.href;
       return json({ order_id: order.id, approve_url: approve });
