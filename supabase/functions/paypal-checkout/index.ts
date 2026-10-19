@@ -123,7 +123,7 @@ async function syncSubscription(
 
 const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("config") }),
-  z.object({ action: z.literal("create"), product_key: z.string().max(50), return_url: z.string().url().max(500), job_id: z.string().uuid().optional(), offer_id: z.string().uuid().optional() }),
+  z.object({ action: z.literal("create"), product_key: z.string().max(50), return_url: z.string().url().max(500), job_id: z.string().uuid().optional(), offer_id: z.string().uuid().optional(), urgent: z.boolean().optional() }),
   z.object({ action: z.literal("assign_offer"), company_id: z.string().uuid(), product_key: z.string().max(50), starts_at: z.string().datetime() }),
   z.object({ action: z.literal("capture"), order_id: z.string().min(5).max(64) }),
   z.object({ action: z.literal("subscribe"), product_key: z.string().max(50), return_url: z.string().url().max(500) }),
@@ -249,14 +249,19 @@ Deno.serve(async (req) => {
         if (!job || job.posted_by !== user.id) return json({ error: "Job not found" }, 404);
         jobId = job.id;
       }
+      // Urgent hiring is charged as part of the same order so the buyer approves the full total once.
+      const urgentAddon = body.urgent && product.kind === "listing" && product.key !== "urgent_hiring" && jobId
+        ? PAYPAL_PRODUCTS.urgent_hiring
+        : null;
+      const totalCents = product.amount_cents + (urgentAddon?.amount_cents ?? 0);
       const ret = new URL(body.return_url);
       const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({
           intent: "CAPTURE",
-          purchase_units: [{ description: product.name, custom_id: `${user.id}:${product.key}`,
-            amount: { currency_code: "EUR", value: formatEur(product.amount_cents) } }],
+          purchase_units: [{ description: urgentAddon ? `${product.name} + ${urgentAddon.name}` : product.name, custom_id: `${user.id}:${product.key}`,
+            amount: { currency_code: "EUR", value: formatEur(totalCents) } }],
           application_context: { brand_name: "Jobs.al", user_action: "PAY_NOW",
             return_url: `${ret.origin}${ret.pathname}?paypal=return`, cancel_url: `${ret.origin}${ret.pathname}?paypal=cancel` },
         }),
@@ -264,9 +269,9 @@ Deno.serve(async (req) => {
       const order = await res.json();
       if (!res.ok) return json({ error: "PayPal could not create the order" }, 502);
       await admin.from("paypal_orders").insert({
-        user_id: user.id, paypal_order_id: order.id, product_key: product.key, amount_cents: product.amount_cents,
+        user_id: user.id, paypal_order_id: order.id, product_key: product.key, amount_cents: totalCents,
         listing_credits: product.listing_credits, featured_days: product.featured_days, environment: ENV,
-        job_id: jobId, client_offer_id: offerId,
+        job_id: jobId, client_offer_id: offerId, urgent: !!urgentAddon,
       });
       const approve = order.links?.find((l: { rel: string }) => l.rel === "approve")?.href;
       return json({ order_id: order.id, approve_url: approve });
@@ -310,11 +315,20 @@ Deno.serve(async (req) => {
           price_eur: product.amount_cents / 100, ends_at: ends.toISOString(),
           featured_until: featuredUntil?.toISOString() ?? null, paypal_order_id: row.id,
         });
+        // Apply the urgent add-on paid for in the same order.
+        if (row.urgent && row.job_id) {
+          const urgentProduct = PAYPAL_PRODUCTS.urgent_hiring;
+          await admin.from("job_listings").insert({
+            employer_user_id: user.id, job_id: row.job_id, product_key: urgentProduct.key, listing_tier: urgentProduct.key,
+            price_eur: urgentProduct.amount_cents / 100, ends_at: ends.toISOString(),
+            featured_until: new Date(Date.now() + urgentProduct.featured_days * 86400000).toISOString(), paypal_order_id: row.id,
+          });
+        }
         // Publish the job this order paid for.
         if (row.job_id) {
           await admin.from("jobs").update({
             is_active: true, payment_status: "paid",
-            is_featured: product.featured_days > 0,
+            is_featured: product.featured_days > 0 || !!row.urgent,
             updated_at: new Date().toISOString(),
           }).eq("id", row.job_id).eq("posted_by", user.id);
         }

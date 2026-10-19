@@ -63,6 +63,7 @@ import AdminInvoices from "./pages/AdminInvoices";
 import AdminBillingSettings from "./pages/AdminBillingSettings";
 import EmployerAds from "./pages/EmployerAds";
 import JobCheckout from "./pages/JobCheckout";
+import SubscribePackage from "./pages/SubscribePackage";
 import EmployerAdCheckout from "./pages/EmployerAdCheckout";
 import EmployerBilling from "./pages/EmployerBilling";
 import CandidateVisibility from "./pages/CandidateVisibility";
@@ -135,6 +136,7 @@ const App = () => (
             <Route path="/employer/ads" element={<EmployerAds />} />
             <Route path="/employer/paypal" element={<Navigate to="/employer/billing" replace />} />
             <Route path="/post-job/:jobId/checkout" element={<JobCheckout />} />
+            <Route path="/subscribe/:packageKey" element={<SubscribePackage />} />
             <Route path="/employer/ads/checkout" element={<EmployerAdCheckout />} />
             <Route path="/employer/billing" element={<EmployerBilling />} />
             <Route path="/employer/talent" element={<EmployerTalentPool />} />
