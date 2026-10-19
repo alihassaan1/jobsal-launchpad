@@ -198,28 +198,34 @@ The image should make viewers want to read the article about ${topic}.`
       throw new Error("No image generated");
     }
 
-    // Upload image to Supabase storage
+    // Upload image to Cloudflare R2 (falls back to Supabase storage)
     const base64Data = imageBase64.split(",")[1];
     const imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     const fileName = `blog-${Date.now()}-${Math.random().toString(36).substring(7)}.png`;
 
     console.log("Uploading image to storage...");
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("blog-images")
-      .upload(fileName, imageBuffer, {
-        contentType: "image/png",
-        cacheControl: "3600",
-        upsert: false
-      });
+    let publicUrl: string;
+    if (r2Configured) {
+      publicUrl = await uploadImageToR2(fileName, imageBuffer, "image/png");
+    } else {
+      const { error: uploadError } = await supabase.storage
+        .from("blog-images")
+        .upload(fileName, imageBuffer, {
+          contentType: "image/png",
+          cacheControl: "3600",
+          upsert: false
+        });
 
-    if (uploadError) {
-      console.error("Upload error:", uploadError);
-      throw new Error("Failed to upload image to storage");
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        throw new Error("Failed to upload image to storage");
+      }
+
+      const { data: { publicUrl: supaUrl } } = supabase.storage
+        .from("blog-images")
+        .getPublicUrl(fileName);
+      publicUrl = supaUrl;
     }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from("blog-images")
-      .getPublicUrl(fileName);
 
     console.log("Image uploaded successfully:", publicUrl);
 
@@ -369,21 +375,26 @@ The infographic should be highly shareable and valuable for job seekers and empl
           const infographicBuffer = Uint8Array.from(atob(infographicBase64.split(",")[1]), c => c.charCodeAt(0));
           const infographicFileName = `infographic-${Date.now()}-${Math.random().toString(36).substring(7)}.png`;
 
-          const { data: infographicUpload, error: infographicUploadError } = await supabase.storage
-            .from("blog-images")
-            .upload(infographicFileName, infographicBuffer, {
-              contentType: "image/png",
-              cacheControl: "3600",
-              upsert: false
-            });
-
-          if (!infographicUploadError) {
-            const { data: { publicUrl: infographicPublicUrl } } = supabase.storage
-              .from("blog-images")
-              .getPublicUrl(infographicFileName);
-            
-            infographicUrl = infographicPublicUrl;
+          if (r2Configured) {
+            infographicUrl = await uploadImageToR2(infographicFileName, infographicBuffer, "image/png");
             console.log("Infographic created:", infographicUrl);
+          } else {
+            const { error: infographicUploadError } = await supabase.storage
+              .from("blog-images")
+              .upload(infographicFileName, infographicBuffer, {
+                contentType: "image/png",
+                cacheControl: "3600",
+                upsert: false
+              });
+
+            if (!infographicUploadError) {
+              const { data: { publicUrl: infographicPublicUrl } } = supabase.storage
+                .from("blog-images")
+                .getPublicUrl(infographicFileName);
+
+              infographicUrl = infographicPublicUrl;
+              console.log("Infographic created:", infographicUrl);
+            }
           }
         }
       }
