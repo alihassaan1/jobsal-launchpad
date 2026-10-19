@@ -98,13 +98,24 @@ Deno.serve(async (req) => {
         report.skipped++;
         continue;
       }
-      // Already an R2 key (resumes/<userId>/...) or a full public URL — nothing to do.
-      if (stored.startsWith("resumes/") || stored.startsWith("http")) {
+      // Already an R2 key (resumes/<userId>/...) — nothing to do.
+      if (stored.startsWith("resumes/")) {
         report.skipped++;
         continue;
       }
 
-      const legacyPath = stored; // e.g. "<userId>/<timestamp>.pdf"
+      // Legacy formats: a plain "<userId>/<file>" path, or a full Supabase storage URL
+      // (.../object/public/resumes/<userId>/<file>).
+      let legacyPath = stored;
+      if (stored.startsWith("http")) {
+        const marker = "/resumes/";
+        const idx = stored.indexOf(marker);
+        if (idx === -1) {
+          report.failed.push({ id: row.id, path: stored, error: "unrecognized URL format" });
+          continue;
+        }
+        legacyPath = stored.slice(idx + marker.length);
+      }
       const newKey = `resumes/${legacyPath}`;
 
       try {
