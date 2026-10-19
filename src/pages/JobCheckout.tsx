@@ -105,12 +105,15 @@ export default function JobCheckout() {
   // Load the PayPal JS SDK when entering the review step with a paid option.
   useEffect(() => {
     if (step !== "review" || totalCents === 0) return;
+    if (window.paypal) { setSdkReady(true); return; }
+    if (document.querySelector('script[data-paypal-sdk]')) return; // already loading
     let cancelled = false;
     (async () => {
       const { data, error } = await supabase.functions.invoke("paypal-checkout", { body: { action: "config" } });
       if (error || !data?.client_id || cancelled) return;
       const script = document.createElement("script");
       script.src = `https://www.paypal.com/sdk/js?client-id=${data.client_id}&currency=EUR&components=buttons&enable-funding=card`;
+      script.dataset.paypalSdk = "true";
       script.onload = () => !cancelled && setSdkReady(true);
       script.onerror = () => toast.error(sq ? "PayPal nuk u ngarkua" : "PayPal failed to load");
       document.body.appendChild(script);
@@ -118,15 +121,16 @@ export default function JobCheckout() {
     return () => { cancelled = true; };
   }, [step, totalCents]);
 
-  // Render PayPal buttons once the SDK is ready.
+  // Render PayPal buttons once the SDK is ready. Depends on step/busy so the
+  // buttons re-render after going Back or after a failed payment remounts the div.
   useEffect(() => {
-    if (!sdkReady || !paypalRef.current || !window.paypal || totalCents === 0) return;
+    if (step !== "review" || busy || !sdkReady || !paypalRef.current || !window.paypal || totalCents === 0) return;
     paypalRef.current.innerHTML = "";
-    // Paid option: urgent add-on is charged as its own order after the main one.
+    // The urgent add-on is charged in the same order as the listing (one approval, full total).
     window.paypal.Buttons({
       createOrder: async () => {
         const { data, error } = await supabase.functions.invoke("paypal-checkout", {
-          body: { action: "create", product_key: selected, job_id: jobId, return_url: window.location.origin + `/post-job/${jobId}/checkout` },
+          body: { action: "create", product_key: selected, job_id: jobId, urgent, return_url: window.location.origin + `/post-job/${jobId}/checkout` },
         });
         if (error || !data?.order_id) throw new Error(data?.error ?? "Could not create order");
         return data.order_id;
@@ -141,18 +145,13 @@ export default function JobCheckout() {
           toast.error(sq ? "Pagesa nuk u krye" : "Payment was not completed");
           return;
         }
-        if (urgent) {
-          await supabase.functions.invoke("paypal-checkout", {
-            body: { action: "create", product_key: "urgent_hiring", job_id: jobId, return_url: window.location.origin + `/post-job/${jobId}/checkout` },
-          }).then(({ data: u }) => u?.order_id && supabase.functions.invoke("paypal-checkout", { body: { action: "capture", order_id: u.order_id } }));
-        }
         setBusy(false);
         setStep("success");
         queryClient.invalidateQueries({ queryKey: ["employerJobs"] });
       },
       onError: () => toast.error(sq ? "PayPal nuk u hap" : "PayPal could not start"),
     }).render(paypalRef.current);
-  }, [sdkReady, selected, urgent, totalCents, jobId]);
+  }, [sdkReady, step, busy, selected, urgent, totalCents, jobId]);
 
   const publishFree = async () => {
     setBusy(true);
