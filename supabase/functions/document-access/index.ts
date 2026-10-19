@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import JSZip from "npm:jszip@3.10.1";
+import { isR2DocumentKey, r2Download, r2SignedGet } from "../_shared/r2.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -95,6 +96,9 @@ Deno.serve(async (req) => {
       const doc = await canAccessDocument(userId, documentId);
       if (!doc) return json({ error: "Not authorized for this document" }, 403);
 
+      if (isR2DocumentKey(doc.file_path)) {
+        return json({ url: await r2SignedGet(doc.file_path, body?.download ? doc.file_name : undefined) });
+      }
       const { data, error } = await admin.storage.from(BUCKET).createSignedUrl(doc.file_path, 120, {
         download: body?.download ? doc.file_name : undefined,
       });
@@ -122,15 +126,20 @@ Deno.serve(async (req) => {
       const zip = new JSZip();
       const used = new Set<string>();
       for (const doc of documents) {
-        const { data: file, error } = await admin.storage.from(BUCKET).download(doc.file_path);
-        if (error || !file) continue;
+        let bytes: Uint8Array | null = null;
+        if (isR2DocumentKey(doc.file_path)) bytes = await r2Download(doc.file_path);
+        else {
+          const { data: file } = await admin.storage.from(BUCKET).download(doc.file_path);
+          if (file) bytes = new Uint8Array(await file.arrayBuffer());
+        }
+        if (!bytes) continue;
         const ext = doc.file_name.includes(".") ? `.${doc.file_name.split(".").pop()}` : "";
         const base = `${doc.doc_type}-${(doc.title || doc.file_name).replace(/[^a-zA-Z0-9-_ ]/g, "").trim() || "document"}`;
         let name = `${base}${ext}`;
         let i = 2;
         while (used.has(name)) name = `${base} (${i++})${ext}`;
         used.add(name);
-        zip.file(name, new Uint8Array(await file.arrayBuffer()));
+        zip.file(name, bytes);
       }
 
       const content: Uint8Array = await zip.generateAsync({ type: "uint8array" });

@@ -28,6 +28,19 @@ const IMAGE_TYPES: Record<string, string> = {
   "image/png": "png",
   "image/webp": "webp",
 };
+const DOCUMENT_TYPES: Record<string, string> = {
+  "application/pdf": "pdf",
+  "image/jpeg": "jpg",
+  "image/png": "png",
+};
+// Each user document type gets its own folder: documents/{folder}/{userId}/...
+const DOCUMENT_FOLDERS: Record<string, string> = {
+  certification: "certificates",
+  cover_letter: "cover-letters",
+  experience_letter: "experience-letters",
+  thumbnail: "thumbnails",
+};
+const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
 const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 // Public image subfolders under images/ — keeps each file type in its own folder.
@@ -72,6 +85,42 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const action = typeof body?.action === "string" ? body.action : null;
     const aws = r2Client();
+
+    const isAdminUser = async () => {
+      const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+      const { data } = await admin.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+      return !!data;
+    };
+    // documents/{folder}/{ownerId}/file
+    const documentOwner = (key: string) => key.split("/")[2];
+
+    if (action === "presign_put" && body?.kind === "document") {
+      const folder = DOCUMENT_FOLDERS[body?.docType];
+      const contentType = typeof body?.contentType === "string" ? body.contentType : "";
+      const size = Number(body?.size) || 0;
+      const ext = DOCUMENT_TYPES[contentType];
+      if (!folder) return json({ error: "Invalid document type" }, 400);
+      if (!ext) return json({ error: "Only PDF, JPG and PNG files are allowed" }, 400);
+      if (size <= 0 || size > MAX_DOCUMENT_BYTES) return json({ error: "File is too large" }, 400);
+      const rand = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
+      const key = `documents/${folder}/${userId}/${Date.now()}-${rand}.${ext}`;
+      const signed = await aws.sign(objectUrl(key), {
+        method: "PUT",
+        aws: { signQuery: true, allHeaders: true },
+        headers: { "Content-Type": contentType },
+      });
+      return json({ uploadUrl: signed.url, key });
+    }
+
+    if (action === "delete") {
+      const keys: string[] = Array.isArray(body?.keys) ? body.keys.filter((k: unknown) => typeof k === "string") : [];
+      const valid = keys.filter((k) => k.startsWith("documents/") && !k.includes(".."));
+      if (!valid.length) return json({ error: "No valid files" }, 400);
+      const admin = valid.some((k) => documentOwner(k) !== userId) ? await isAdminUser() : true;
+      if (!admin) return json({ error: "Not authorized for this file" }, 403);
+      await Promise.all(valid.map((k) => aws.fetch(objectUrl(k), { method: "DELETE" })));
+      return json({ deleted: valid.length });
+    }
 
     if (action === "presign_put") {
       const kind = body?.kind === "image" ? "image" : "resume";
@@ -138,6 +187,18 @@ Deno.serve(async (req) => {
           method: "GET",
           aws: { signQuery: true },
         });
+        return json({ url: signed.url });
+      }
+
+      // Private user documents: owner or admin only (employers use document-access).
+      if (key.startsWith("documents/")) {
+        if (documentOwner(key) !== userId && !(await isAdminUser())) {
+          return json({ error: "Not authorized for this file" }, 403);
+        }
+        const url = new URL(objectUrl(key));
+        url.searchParams.set("X-Amz-Expires", "120");
+        if (body?.download === true) url.searchParams.set("response-content-disposition", "attachment");
+        const signed = await aws.sign(url.toString(), { method: "GET", aws: { signQuery: true } });
         return json({ url: signed.url });
       }
 
