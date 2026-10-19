@@ -18,7 +18,7 @@ import {
   DOC_TYPE_LABELS,
   DocType,
   formatBytes,
-  signDocumentPath,
+  signDocumentPath, removeDocumentFiles,
 } from "@/lib/documents";
 
 const MyDocuments = () => {
@@ -53,7 +53,7 @@ const MyDocuments = () => {
       const paths = [doc.file_path, doc.thumbnail_path].filter(Boolean);
       const { error } = await supabase.from("user_documents").update({ is_deleted: true }).eq("id", doc.id);
       if (error) throw error;
-      if (paths.length) await supabase.storage.from(DOCUMENTS_BUCKET).remove(paths);
+      if (paths.length) await removeDocumentFiles(paths);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-documents"] });

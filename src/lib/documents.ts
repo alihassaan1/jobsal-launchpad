@@ -57,8 +57,40 @@ export async function makeImageThumbnail(file: File): Promise<Blob | null> {
   }
 }
 
+/** New documents live in Cloudflare R2 under documents/{type}/{userId}/; older ones in the legacy bucket. */
+export const isR2DocumentKey = (path?: string | null) => !!path && path.startsWith("documents/");
+
+/** Uploads a document (or its thumbnail) straight to R2 and returns the stored key. */
+export async function uploadDocumentToR2(
+  file: Blob,
+  contentType: string,
+  docType: DocType | "thumbnail",
+): Promise<string> {
+  const { data, error } = await supabase.functions.invoke("r2-storage", {
+    body: { action: "presign_put", kind: "document", docType, contentType, size: file.size },
+  });
+  if (error || !data?.uploadUrl) throw new Error(data?.error || error?.message || "Upload failed");
+  const put = await fetch(data.uploadUrl, { method: "PUT", headers: { "Content-Type": contentType }, body: file });
+  if (!put.ok) throw new Error(`Upload failed (${put.status})`);
+  return data.key as string;
+}
+
+/** Deletes document files from R2 and/or the legacy bucket. */
+export async function removeDocumentFiles(paths: (string | null | undefined)[]) {
+  const all = paths.filter(Boolean) as string[];
+  const r2 = all.filter(isR2DocumentKey);
+  const legacy = all.filter((p) => !isR2DocumentKey(p));
+  if (r2.length) await supabase.functions.invoke("r2-storage", { body: { action: "delete", keys: r2 } });
+  if (legacy.length) await supabase.storage.from(DOCUMENTS_BUCKET).remove(legacy);
+}
+
 /** Signed URL for a path the current user owns (candidate + admin paths). */
 export async function signDocumentPath(path: string, expiresIn = 120) {
+  if (isR2DocumentKey(path)) {
+    const { data, error } = await supabase.functions.invoke("r2-storage", { body: { action: "presign_get", key: path } });
+    if (error || !data?.url) throw new Error(data?.error || error?.message || "File unavailable");
+    return data.url as string;
+  }
   const { data, error } = await supabase.storage.from(DOCUMENTS_BUCKET).createSignedUrl(path, expiresIn);
   if (error || !data?.signedUrl) throw new Error(error?.message || "File unavailable");
   return data.signedUrl;

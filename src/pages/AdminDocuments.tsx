@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, Trash2, FileText, HardDrive, Loader2, Save } from "lucide-react";
-import { DOC_TYPES, DOC_TYPE_LABELS, DocType, DOCUMENTS_BUCKET, formatBytes, signDocumentPath } from "@/lib/documents";
+import { DOC_TYPES, DOC_TYPE_LABELS, DocType, DOCUMENTS_BUCKET, formatBytes, signDocumentPath, removeDocumentFiles } from "@/lib/documents";
 import { useDocumentSettings } from "@/hooks/useDocumentSettings";
 
 const AdminDocuments = () => {
@@ -89,7 +89,7 @@ const AdminDocuments = () => {
       const { error } = await supabase.from("user_documents").update({ is_deleted: true }).eq("id", doc.id);
       if (error) throw error;
       const paths = [doc.file_path, doc.thumbnail_path].filter(Boolean);
-      if (paths.length) await supabase.storage.from(DOCUMENTS_BUCKET).remove(paths);
+      if (paths.length) await removeDocumentFiles(paths);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-documents"] });

@@ -53,23 +53,14 @@ const DocumentUploadDialog = ({ open, onClose, maxSizeMb, replacing }: Props) =>
   const uploadMutation = useMutation({
     mutationFn: async () => {
       if (!file) throw new Error("Please choose a file");
-      const ext = extensionFor(file);
-      const path = `${user!.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from(DOCUMENTS_BUCKET)
-        .upload(path, file, { contentType: file.type, upsert: false });
-      if (uploadError) throw uploadError;
+      // Stored in Cloudflare R2: documents/{certificates|cover-letters|experience-letters}/{userId}/
+      const path = await uploadDocumentToR2(file, file.type, docType);
 
       // Thumbnail for images
       let thumbnailPath: string | null = null;
       const thumb = await makeImageThumbnail(file);
       if (thumb) {
-        thumbnailPath = `${user!.id}/thumbs/${path.split("/").pop()!.replace(/\.[^.]+$/, "")}.jpg`;
-        const { error: thumbError } = await supabase.storage
-          .from(DOCUMENTS_BUCKET)
-          .upload(thumbnailPath, thumb, { contentType: "image/jpeg", upsert: true });
-        if (thumbError) thumbnailPath = null;
+        thumbnailPath = await uploadDocumentToR2(thumb, "image/jpeg", "thumbnail").catch(() => null);
       }
 
       const payload = {
