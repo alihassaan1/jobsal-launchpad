@@ -43,8 +43,14 @@ function r2Client() {
   });
 }
 
+// R2_ACCOUNT_ID may be stored as the bare account ID or the full endpoint URL — normalize it.
+const R2_ACCOUNT = (R2_ACCOUNT_ID || "")
+  .replace(/^https?:\/\//, "")
+  .replace(/\.r2\.cloudflarestorage\.com\/?$/, "")
+  .replace(/\/$/, "");
+
 function objectUrl(key: string) {
-  return `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET_NAME}/${key}`;
+  return `https://${R2_ACCOUNT}.r2.cloudflarestorage.com/${R2_BUCKET_NAME}/${key}`;
 }
 
 Deno.serve(async (req) => {

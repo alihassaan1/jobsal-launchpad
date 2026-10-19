@@ -1,0 +1,1 @@
+INSERT INTO public.admin_settings (key, value, description) VALUES ('r2_migration_token', '37b10f458a45ded69439d28d10c12443fd1463a9aa224785', 'One-time token for the resume-to-R2 migration; deleted after use') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
