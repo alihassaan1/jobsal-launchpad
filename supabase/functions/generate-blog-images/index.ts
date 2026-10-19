@@ -133,7 +133,7 @@ serve(async (req) => {
         }
 
         console.log(`Successfully added image for: ${post.title}`);
-        results.push({ slug: post.slug, success: true, imageUrl: publicUrlData.publicUrl });
+        results.push({ slug: post.slug, success: true, imageUrl: publicUrl });
 
         // Small delay between requests
         await new Promise(resolve => setTimeout(resolve, 500));
