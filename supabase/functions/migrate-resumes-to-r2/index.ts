@@ -31,24 +31,27 @@ Deno.serve(async (req) => {
       return json({ error: "R2 is not configured" }, 500);
     }
 
-    // Admin-only: require a valid user JWT with the admin role.
+    // Admin-only: accept the service role key directly, or a user JWT with the admin role.
     const authHeader = req.headers.get("Authorization") ?? "";
     if (!authHeader) return json({ error: "Unauthorized" }, 401);
 
-    const userClient = createClient(SUPABASE_URL, ANON_KEY, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: userData, error: userError } = await userClient.auth.getUser();
-    if (userError || !userData?.user) return json({ error: "Unauthorized" }, 401);
-
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
-    const { data: roleRow } = await admin
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userData.user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (!roleRow) return json({ error: "Admins only" }, 403);
+    const isServiceRole = authHeader === `Bearer ${SERVICE_ROLE_KEY}`;
+    if (!isServiceRole) {
+      const userClient = createClient(SUPABASE_URL, ANON_KEY, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: userData, error: userError } = await userClient.auth.getUser();
+      if (userError || !userData?.user) return json({ error: "Unauthorized" }, 401);
+
+      const { data: roleRow } = await admin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userData.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (!roleRow) return json({ error: "Admins only" }, 403);
+    }
 
     const r2 = new AwsClient({
       accessKeyId: R2_ACCESS_KEY_ID,
