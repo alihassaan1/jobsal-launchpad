@@ -24,8 +24,12 @@ export async function uploadImageToR2(
     service: "s3",
     region: "auto",
   });
+  // R2_ACCOUNT_ID may be the bare account ID or the full endpoint URL — normalize it.
+  const account = R2_ACCOUNT_ID!.replace(/^https?:\/\//, "")
+    .replace(/\.r2\.cloudflarestorage\.com\/?$/, "")
+    .replace(/\/$/, "");
   const resp = await aws.fetch(
-    `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET_NAME}/${key}`,
+    `https://${account}.r2.cloudflarestorage.com/${R2_BUCKET_NAME}/${key}`,
     { method: "PUT", headers: { "Content-Type": contentType }, body: bytes },
   );
   if (!resp.ok) throw new Error(`R2 upload failed: ${resp.status} ${await resp.text()}`);

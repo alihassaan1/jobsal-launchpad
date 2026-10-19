@@ -72,8 +72,12 @@ Deno.serve(async (req) => {
       service: "s3",
       region: "auto",
     });
+    // R2_ACCOUNT_ID may be the bare account ID or the full endpoint URL — normalize it.
+    const account = R2_ACCOUNT_ID!.replace(/^https?:\/\//, "")
+      .replace(/\.r2\.cloudflarestorage\.com\/?$/, "")
+      .replace(/\/$/, "");
     const r2Url = (key: string) =>
-      `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET_NAME}/${key}`;
+      `https://${account}.r2.cloudflarestorage.com/${R2_BUCKET_NAME}/${key}`;
 
     // Fetch all resumes (paginated past the 1000-row default).
     const rows: any[] = [];
