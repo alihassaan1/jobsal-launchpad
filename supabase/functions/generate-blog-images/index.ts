@@ -103,7 +103,7 @@ serve(async (req) => {
         let publicUrl: string;
         if (r2Configured) {
           // Website images go to Cloudflare R2
-          publicUrl = await uploadToR2(fileName, imageBuffer, 'image/jpeg');
+          publicUrl = await uploadToR2(`images/blog/${fileName}`, imageBuffer, 'image/jpeg');
         } else {
           const { error: uploadError } = await supabase.storage
             .from('blog-images')

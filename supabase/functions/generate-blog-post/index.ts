@@ -207,7 +207,7 @@ The image should make viewers want to read the article about ${topic}.`
     console.log("Uploading image to storage...");
     let publicUrl: string;
     if (r2Configured) {
-      publicUrl = await uploadImageToR2(fileName, imageBuffer, "image/png");
+      publicUrl = await uploadImageToR2(`images/blog/${fileName}`, imageBuffer, "image/png");
     } else {
       const { error: uploadError } = await supabase.storage
         .from("blog-images")
@@ -377,7 +377,7 @@ The infographic should be highly shareable and valuable for job seekers and empl
           const infographicFileName = `infographic-${Date.now()}-${Math.random().toString(36).substring(7)}.png`;
 
           if (r2Configured) {
-            infographicUrl = await uploadImageToR2(infographicFileName, infographicBuffer, "image/png");
+            infographicUrl = await uploadImageToR2(`images/blog/${infographicFileName}`, infographicBuffer, "image/png");
             console.log("Infographic created:", infographicUrl);
           } else {
             const { error: infographicUploadError } = await supabase.storage
