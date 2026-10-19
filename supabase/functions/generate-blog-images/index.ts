@@ -123,7 +123,7 @@ serve(async (req) => {
         // Update post with image URL
         const { error: updateError } = await supabase
           .from('posts')
-          .update({ featured_image: publicUrlData.publicUrl })
+          .update({ featured_image: publicUrl })
           .eq('id', post.id);
 
         if (updateError) {
