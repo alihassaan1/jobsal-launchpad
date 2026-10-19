@@ -80,3 +80,6 @@ verify_jwt = false
 
 [functions.r2-storage]
 verify_jwt = false
+
+[functions.migrate-resumes-to-r2]
+verify_jwt = false
