@@ -1,0 +1,1 @@
+DELETE FROM public.admin_settings WHERE key = 'r2_migration_token';
