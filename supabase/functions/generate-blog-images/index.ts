@@ -95,24 +95,30 @@ serve(async (req) => {
         }
         
         const fileName = `blog-${post.slug}-${Date.now()}.jpg`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('blog-images')
-          .upload(fileName, imageBuffer, {
-            contentType: 'image/jpeg',
-            upsert: true,
-          });
 
-        if (uploadError) {
-          console.error(`Upload failed for ${post.slug}:`, uploadError);
-          results.push({ slug: post.slug, success: false, error: uploadError.message });
-          continue;
+        let publicUrl: string;
+        if (r2Configured) {
+          // Website images go to Cloudflare R2
+          publicUrl = await uploadToR2(fileName, imageBuffer, 'image/jpeg');
+        } else {
+          const { error: uploadError } = await supabase.storage
+            .from('blog-images')
+            .upload(fileName, imageBuffer, {
+              contentType: 'image/jpeg',
+              upsert: true,
+            });
+
+          if (uploadError) {
+            console.error(`Upload failed for ${post.slug}:`, uploadError);
+            results.push({ slug: post.slug, success: false, error: uploadError.message });
+            continue;
+          }
+
+          const { data: publicUrlData } = supabase.storage
+            .from('blog-images')
+            .getPublicUrl(fileName);
+          publicUrl = publicUrlData.publicUrl;
         }
-
-        // Get public URL
-        const { data: publicUrlData } = supabase.storage
-          .from('blog-images')
-          .getPublicUrl(fileName);
 
         // Update post with image URL
         const { error: updateError } = await supabase
