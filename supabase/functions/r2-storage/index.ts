@@ -30,6 +30,8 @@ const IMAGE_TYPES: Record<string, string> = {
 };
 const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+// Public image subfolders under images/ — keeps each file type in its own folder.
+const IMAGE_FOLDERS = new Set(["blog", "logos", "banners", "ads", "jobs", "templates", "misc"]);
 
 function r2Client() {
   if (!R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_ACCOUNT_ID || !R2_BUCKET_NAME) {
@@ -91,8 +93,9 @@ Deno.serve(async (req) => {
       }
 
       const rand = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+      const folder = IMAGE_FOLDERS.has(body?.folder) ? `${body.folder}/` : "";
       const key = kind === "image"
-        ? `images/${Date.now()}-${rand}.${ext}`
+        ? `images/${folder}${Date.now()}-${rand}.${ext}`
         : `resumes/${userId}/${Date.now()}.${ext}`;
 
       const signed = await aws.sign(objectUrl(key), {

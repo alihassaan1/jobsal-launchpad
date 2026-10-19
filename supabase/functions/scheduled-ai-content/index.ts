@@ -75,6 +75,18 @@ async function generateImage(prompt: string): Promise<string | null> {
     
     if (imageUrl) {
       console.log('Image generated successfully');
+      // Persist base64 images to Cloudflare R2 (images/blog/) instead of storing raw data in the post.
+      const match = typeof imageUrl === 'string' ? imageUrl.match(/^data:(image\/[a-z]+);base64,(.+)$/) : null;
+      if (match && r2Configured) {
+        try {
+          const ext = match[1] === 'image/jpeg' ? 'jpg' : match[1].split('/')[1];
+          const bytes = Uint8Array.from(atob(match[2]), (c) => c.charCodeAt(0));
+          const key = `images/blog/scheduled-${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+          return await uploadImageToR2(key, bytes, match[1]);
+        } catch (e) {
+          console.error('R2 upload failed, keeping inline image:', e);
+        }
+      }
       return imageUrl;
     }
     
