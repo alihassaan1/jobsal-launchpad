@@ -60,3 +60,6 @@ Note: authenticated checkout flow (PayPal SDK buttons, free-slot publish) not te
 - [ ] Add admin assignment, agreed activation date and private PayPal purchase controls
 - [ ] Grant expiring total credits only after verified payment and consume them atomically
 - [ ] Test prices, durations, limits, security and available payment flow
+
+## Open
+- Admin must click "Migrate Resumes to R2" in Admin → Settings → Storage to move legacy Supabase-bucket resumes into R2 (one-time, idempotent).
