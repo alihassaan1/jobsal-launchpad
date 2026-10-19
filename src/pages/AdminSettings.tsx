@@ -401,6 +401,45 @@ export default function AdminSettings() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Storage Settings */}
+        <TabsContent value="storage">
+          <Card>
+            <CardHeader>
+              <CardTitle>Cloudflare R2 Storage</CardTitle>
+              <CardDescription>
+                Resumes and website images are stored in your Cloudflare R2 bucket. New uploads go there automatically.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Move existing resumes to R2</Label>
+                <p className="text-sm text-muted-foreground">
+                  Copies every resume uploaded before the R2 switch into the <code>resumes/</code> folder of your R2 bucket and updates each user's link. Safe to run more than once — resumes already in R2 are skipped.
+                </p>
+              </div>
+              <Button onClick={runResumeMigration} disabled={migrating}>
+                {migrating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <HardDrive className="mr-2 h-4 w-4" />}
+                {migrating ? "Migrating..." : "Migrate Resumes to R2"}
+              </Button>
+              {migrationReport && (
+                <div className="rounded-md border p-4 text-sm space-y-1">
+                  <p><strong>Total resumes:</strong> {migrationReport.total}</p>
+                  <p><strong>Moved to R2:</strong> {migrationReport.migrated}</p>
+                  <p><strong>Already in R2 / skipped:</strong> {migrationReport.skipped}</p>
+                  <p><strong>Failed:</strong> {migrationReport.failed.length}</p>
+                  {migrationReport.failed.length > 0 && (
+                    <ul className="mt-2 space-y-1 text-destructive">
+                      {migrationReport.failed.map((f) => (
+                        <li key={f.id}>{f.path}: {f.error}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
