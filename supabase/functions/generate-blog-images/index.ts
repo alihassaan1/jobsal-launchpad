@@ -1,10 +1,35 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { AwsClient } from "npm:aws4fetch@1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Cloudflare R2 (website images live at the bucket root / images/)
+const R2_ACCESS_KEY_ID = Deno.env.get("R2_ACCESS_KEY_ID");
+const R2_SECRET_ACCESS_KEY = Deno.env.get("R2_SECRET_ACCESS_KEY");
+const R2_ACCOUNT_ID = Deno.env.get("R2_ACCOUNT_ID");
+const R2_BUCKET_NAME = Deno.env.get("R2_BUCKET_NAME");
+const R2_PUBLIC_URL = (Deno.env.get("R2_PUBLIC_URL") || "").replace(/\/$/, "");
+
+const r2Configured = !!(R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY && R2_ACCOUNT_ID && R2_BUCKET_NAME && R2_PUBLIC_URL);
+
+async function uploadToR2(key: string, bytes: Uint8Array, contentType: string): Promise<string> {
+  const aws = new AwsClient({
+    accessKeyId: R2_ACCESS_KEY_ID!,
+    secretAccessKey: R2_SECRET_ACCESS_KEY!,
+    service: "s3",
+    region: "auto",
+  });
+  const resp = await aws.fetch(
+    `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET_NAME}/${key}`,
+    { method: "PUT", headers: { "Content-Type": contentType }, body: bytes },
+  );
+  if (!resp.ok) throw new Error(`R2 upload failed: ${resp.status} ${await resp.text()}`);
+  return `${R2_PUBLIC_URL}/${key}`;
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
