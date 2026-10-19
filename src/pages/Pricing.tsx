@@ -142,7 +142,7 @@ export default function Pricing() {
                         <li className="flex items-start gap-2"><Check className="h-4 w-4 text-green-600 mt-0.5" /><span>{sq ? copy.daysLive.sq : copy.daysLive.en}</span></li>
                         <li className="flex items-start gap-2"><Check className="h-4 w-4 text-green-600 mt-0.5" /><span>{sq ? copy.renews.sq : copy.renews.en}</span></li>
                       </ul>
-                      <Link to={postJobHref} className="block mt-6">
+                      <Link to={user && userRole === "employer" ? `/subscribe/${p.key}` : postJobHref} className="block mt-6">
                         <Button className="w-full" variant={p.recommended ? "default" : "outline"}>
                           {user && userRole === "employer" ? (sq ? copy.subscribe.sq : copy.subscribe.en) : (sq ? copy.getStarted.sq : copy.getStarted.en)}
                         </Button>

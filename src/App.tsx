@@ -63,6 +63,7 @@ import AdminInvoices from "./pages/AdminInvoices";
 import AdminBillingSettings from "./pages/AdminBillingSettings";
 import EmployerAds from "./pages/EmployerAds";
 import JobCheckout from "./pages/JobCheckout";
+import SubscribePackage from "./pages/SubscribePackage";
 import EmployerAdCheckout from "./pages/EmployerAdCheckout";
 import EmployerBilling from "./pages/EmployerBilling";
 import CandidateVisibility from "./pages/CandidateVisibility";
