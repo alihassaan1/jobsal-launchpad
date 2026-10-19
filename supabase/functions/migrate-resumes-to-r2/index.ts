@@ -31,13 +31,26 @@ Deno.serve(async (req) => {
       return json({ error: "R2 is not configured" }, 500);
     }
 
-    // Admin-only: accept the service role key directly, or a user JWT with the admin role.
+    // Authorization: one-time migration token (stored in admin_settings), service role key,
+    // or a user JWT with the admin role.
     const authHeader = req.headers.get("Authorization") ?? "";
-    if (!authHeader) return json({ error: "Unauthorized" }, 401);
+    const migrationToken = req.headers.get("x-migration-token") ?? "";
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
-    const isServiceRole = authHeader === `Bearer ${SERVICE_ROLE_KEY}`;
-    if (!isServiceRole) {
+
+    let authorized = authHeader === `Bearer ${SERVICE_ROLE_KEY}`;
+
+    if (!authorized && migrationToken) {
+      const { data: tokenRow } = await admin
+        .from("admin_settings")
+        .select("value")
+        .eq("key", "r2_migration_token")
+        .maybeSingle();
+      authorized = !!tokenRow?.value && tokenRow.value === migrationToken;
+    }
+
+    if (!authorized) {
+      if (!authHeader) return json({ error: "Unauthorized" }, 401);
       const userClient = createClient(SUPABASE_URL, ANON_KEY, {
         global: { headers: { Authorization: authHeader } },
       });
