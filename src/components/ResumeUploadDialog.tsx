@@ -46,35 +46,35 @@ export function ResumeUploadDialog({ onUploadSuccess }: ResumeUploadDialogProps)
 
     setUploading(true);
     try {
-      // Upload file to (private) storage bucket
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      // Upload file to Cloudflare R2 (private resumes/ folder) via a presigned URL
+      const { data: presign, error: presignError } = await supabase.functions.invoke('r2-storage', {
+        body: { action: 'presign_put', kind: 'resume', contentType: file.type, size: file.size },
+      });
+      if (presignError) throw presignError;
+      if (!presign?.uploadUrl || !presign?.key) throw new Error(presign?.error || 'Could not prepare upload');
 
-      const { error: uploadError } = await supabase.storage
-        .from('resumes')
-        .upload(fileName, file, { contentType: file.type, upsert: false });
+      const putResponse = await fetch(presign.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+      if (!putResponse.ok) throw new Error('Upload to storage failed');
 
-      if (uploadError) throw uploadError;
-
-      // Store the storage path (NOT a public URL — bucket is private).
-      // ResumeListCard generates short-lived signed URLs on view/download.
+      // Store the R2 object key (private — ResumeListCard generates
+      // short-lived signed URLs on view/download).
       const { error: insertError } = await supabase
         .from('resumes')
         .insert({
           user_id: user.id,
           title: resumeTitle,
           resume_type: resumeType || null,
-          resume_file_url: fileName,
+          resume_file_url: presign.key,
           is_uploaded: true,
           is_active: true,
           data: {}
         });
 
-      if (insertError) {
-        // Roll back the uploaded file if the DB insert fails
-        await supabase.storage.from('resumes').remove([fileName]);
-        throw insertError;
-      }
+      if (insertError) throw insertError;
 
       toast.success("Resume uploaded successfully!");
       setOpen(false);

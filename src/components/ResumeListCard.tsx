@@ -59,12 +59,24 @@ export function ResumeListCard({ resume, onDelete, showActions = true }: ResumeL
         toast.error("Invalid file reference");
         return;
       }
-      // Bucket is private — must use a signed URL
-      const { data, error } = await supabase.storage
-        .from("resumes")
-        .createSignedUrl(path, 60 * 10, action === "download" ? { download: true } : undefined);
-      if (error || !data?.signedUrl) throw error || new Error("Could not generate link");
-      window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+      let signedUrl: string;
+      if (path.startsWith("resumes/")) {
+        // New uploads live in Cloudflare R2 — get a presigned URL
+        const { data, error } = await supabase.functions.invoke("r2-storage", {
+          body: { action: "presign_get", key: path, download: action === "download" },
+        });
+        if (error) throw error;
+        if (!data?.url) throw new Error(data?.error || "Could not generate link");
+        signedUrl = data.url;
+      } else {
+        // Legacy uploads in the private Supabase bucket
+        const { data, error } = await supabase.storage
+          .from("resumes")
+          .createSignedUrl(path, 60 * 10, action === "download" ? { download: true } : undefined);
+        if (error || !data?.signedUrl) throw error || new Error("Could not generate link");
+        signedUrl = data.signedUrl;
+      }
+      window.open(signedUrl, "_blank", "noopener,noreferrer");
     } catch (err: any) {
       console.error("Open uploaded resume failed:", err);
       toast.error(err?.message || "Could not open resume");
