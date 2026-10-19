@@ -7,29 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Mail, CreditCard, Palette, Globe, FileText, Share2, HardDrive, Loader2 } from "lucide-react";
+import { Mail, CreditCard, Palette, Globe, FileText, Share2 } from "lucide-react";
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  const [migrating, setMigrating] = useState(false);
-  const [migrationReport, setMigrationReport] = useState<{ total: number; migrated: number; skipped: number; failed: { id: string; path: string; error: string }[] } | null>(null);
-
-  const runResumeMigration = async () => {
-    setMigrating(true);
-    setMigrationReport(null);
-    try {
-      const { data, error } = await supabase.functions.invoke("migrate-resumes-to-r2", { body: {} });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      setMigrationReport(data);
-      toast.success(`Migration complete: ${data.migrated} moved, ${data.skipped} already in R2, ${data.failed?.length ?? 0} failed`);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Migration failed");
-    } finally {
-      setMigrating(false);
-    }
-  };
 
   useEffect(() => {
     fetchSettings();
@@ -122,10 +104,6 @@ export default function AdminSettings() {
           <TabsTrigger value="social">
             <Share2 className="mr-2 h-4 w-4" />
             Social
-          </TabsTrigger>
-          <TabsTrigger value="storage">
-            <HardDrive className="mr-2 h-4 w-4" />
-            Storage
           </TabsTrigger>
         </TabsList>
 
