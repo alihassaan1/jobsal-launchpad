@@ -1,0 +1,1 @@
+ALTER TABLE public.paypal_orders ADD COLUMN IF NOT EXISTS urgent boolean NOT NULL DEFAULT false;

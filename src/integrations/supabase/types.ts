@@ -2037,6 +2037,7 @@ export type Database = {
           paypal_order_id: string
           product_key: string
           status: string
+          urgent: boolean
           user_id: string
         }
         Insert: {
@@ -2053,6 +2054,7 @@ export type Database = {
           paypal_order_id: string
           product_key: string
           status?: string
+          urgent?: boolean
           user_id: string
         }
         Update: {
@@ -2069,6 +2071,7 @@ export type Database = {
           paypal_order_id?: string
           product_key?: string
           status?: string
+          urgent?: boolean
           user_id?: string
         }
         Relationships: [
