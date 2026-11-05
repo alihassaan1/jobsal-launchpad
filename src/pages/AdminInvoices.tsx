@@ -71,6 +71,24 @@ const statusColors: Record<string, string> = {
   void: "bg-muted text-muted-foreground line-through",
 };
 
+
+const safeFormat = (value: string | Date | null | undefined, fmt: string) => {
+  if (!value) return "-";
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? "-" : format(d, fmt);
+};
+
+const downloadInvoicePdf = async (invoiceId: string) => {
+  const win = window.open("", "_blank");
+  const { data, error } = await supabase.functions.invoke("generate-invoice-pdf", { body: { invoiceId } });
+  if (error || !data?.html) { win?.close(); toast.error("Could not generate invoice PDF"); return; }
+  if (!win) { toast.error("Allow pop-ups to download the invoice"); return; }
+  win.document.write(data.html);
+  win.document.close();
+  win.onload = () => win.print();
+  setTimeout(() => win.print(), 600);
+};
+
 export default function AdminInvoices() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
@@ -93,7 +111,7 @@ export default function AdminInvoices() {
     queryFn: async () => {
       let query = supabase
         .from("invoices")
-        .select(`*, companies:company_id(name, slug)`)
+        .select(`*, companies!invoices_company_id_fkey(name, slug)`)
         .order("created_at", { ascending: false });
 
       if (statusFilter !== "all") {
@@ -124,9 +142,10 @@ export default function AdminInvoices() {
   const { data: stats } = useQuery({
     queryKey: ["invoice-stats"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("invoices").select("status, total, amount_paid");
+      let { data, error } = await supabase.from("invoices").select("status, total, amount_paid");
       if (error) throw error;
 
+      data = data ?? [];
       const total = data.length;
       const paid = data.filter(i => i.status === "paid").length;
       const pending = data.filter(i => ["pending", "sent"].includes(i.status)).length;
@@ -221,7 +240,7 @@ export default function AdminInvoices() {
             invoiceNumber: invoice.invoice_number,
             amount: (invoice.total / 100).toFixed(2),
             currency: invoice.currency,
-            dueDate: invoice.due_date ? format(new Date(invoice.due_date), "PPP") : "N/A",
+            dueDate: invoice.due_date ? safeFormat((invoice.due_date), "PPP") : "N/A",
           },
         },
       });
@@ -245,8 +264,8 @@ export default function AdminInvoices() {
       inv.billing_name || inv.companies?.name || "",
       inv.billing_email || "",
       inv.status,
-      format(new Date(inv.issue_date), "yyyy-MM-dd"),
-      inv.due_date ? format(new Date(inv.due_date), "yyyy-MM-dd") : "",
+      safeFormat((inv.issue_date), "yyyy-MM-dd"),
+      inv.due_date ? safeFormat((inv.due_date), "yyyy-MM-dd") : "",
       (inv.subtotal / 100).toFixed(2),
       (inv.tax_amount / 100).toFixed(2),
       (inv.total / 100).toFixed(2),
@@ -259,7 +278,7 @@ export default function AdminInvoices() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `invoices-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    a.download = `invoices-${safeFormat((), "yyyy-MM-dd")}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("Exported to CSV");
@@ -545,9 +564,9 @@ export default function AdminInvoices() {
                         {invoice.status.replace("_", " ")}
                       </Badge>
                     </TableCell>
-                    <TableCell>{format(new Date(invoice.issue_date), "MMM d, yyyy")}</TableCell>
+                    <TableCell>{safeFormat((invoice.issue_date), "MMM d, yyyy")}</TableCell>
                     <TableCell>
-                      {invoice.due_date ? format(new Date(invoice.due_date), "MMM d, yyyy") : "-"}
+                      {invoice.due_date ? safeFormat((invoice.due_date), "MMM d, yyyy") : "-"}
                     </TableCell>
                     <TableCell className="text-right font-medium">
                       €{(invoice.total / 100).toFixed(2)}
@@ -631,11 +650,11 @@ export default function AdminInvoices() {
                     {selectedInvoice.status.replace("_", " ")}
                   </Badge>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Issued: {format(new Date(selectedInvoice.issue_date), "PPP")}
+                    Issued: {safeFormat((selectedInvoice.issue_date), "PPP")}
                   </p>
                   {selectedInvoice.due_date && (
                     <p className="text-sm text-muted-foreground">
-                      Due: {format(new Date(selectedInvoice.due_date), "PPP")}
+                      Due: {safeFormat((selectedInvoice.due_date), "PPP")}
                     </p>
                   )}
                 </div>
@@ -681,7 +700,7 @@ export default function AdminInvoices() {
                 <Button variant="outline" onClick={() => setIsViewOpen(false)}>
                   Close
                 </Button>
-                <Button variant="outline">
+                <Button variant="outline" onClick={() => downloadInvoicePdf(selectedInvoice.id)}>
                   <Download className="h-4 w-4 mr-2" />
                   Download PDF
                 </Button>
