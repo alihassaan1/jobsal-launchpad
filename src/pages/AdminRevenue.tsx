@@ -30,61 +30,46 @@ import {
   Legend,
   ResponsiveContainer
 } from "recharts";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminRevenue() {
   const [filter, setFilter] = useState("all");
   const [timeRange, setTimeRange] = useState("month");
 
-  // Mock data - replace with actual Stripe/payment data
-  const mockTransactions = [
-    {
-      id: "TXN-001",
-      user: "John Doe",
-      email: "john@example.com",
-      plan: "Premium",
-      amount: 99.00,
-      status: "completed",
-      date: "2024-10-01"
-    },
-    {
-      id: "TXN-002",
-      user: "Jane Smith",
-      email: "jane@example.com",
-      plan: "Basic",
-      amount: 29.00,
-      status: "completed",
-      date: "2024-10-05"
-    },
-    {
-      id: "TXN-003",
-      user: "Tech Corp",
-      email: "contact@techcorp.com",
-      plan: "Pro",
-      amount: 59.00,
-      status: "completed",
-      date: "2024-10-08"
-    }
-  ];
+  const [orders, setOrders] = useState<any[]>([]);
+  useEffect(() => {
+    (supabase as any).from("paypal_orders").select("*").order("created_at", { ascending: false })
+      .then(({ data }: any) => setOrders(data ?? []));
+  }, []);
 
-  const mockRevenueByProduct = [
-    { name: "Subscriptions", value: 5400 },
-    { name: "Job Posts", value: 3200 },
-    { name: "Resume Templates", value: 1800 },
-    { name: "Sponsorships", value: 2100 }
-  ];
+  const mockTransactions = orders.map((o) => ({
+    id: String(o.paypal_order_id ?? o.id),
+    user: o.user_id?.slice(0, 8) ?? "-",
+    email: o.environment === "sandbox" ? "test" : "live",
+    plan: o.product_key,
+    amount: (o.amount_cents ?? 0) / 100,
+    status: o.status === "COMPLETED" || o.captured_at ? "completed" : String(o.status ?? "pending").toLowerCase(),
+    date: (o.captured_at ?? o.created_at ?? "").slice(0, 10),
+  }));
+  const paid = mockTransactions.filter((t) => t.status === "completed");
 
-  const mockMonthlyRevenue = [
-    { month: "May", revenue: 8500 },
-    { month: "Jun", revenue: 9200 },
-    { month: "Jul", revenue: 10100 },
-    { month: "Aug", revenue: 11500 },
-    { month: "Sep", revenue: 10800 },
-    { month: "Oct", revenue: 12500 }
-  ];
+  const byProduct: Record<string, number> = {};
+  paid.forEach((t) => { byProduct[t.plan] = (byProduct[t.plan] ?? 0) + t.amount; });
+  const mockRevenueByProduct = Object.entries(byProduct).map(([name, value]) => ({ name, value }));
 
-  const totalRevenue = mockTransactions.reduce((sum, t) => sum + t.amount, 0);
-  const monthRevenue = mockTransactions
-    .filter(t => new Date(t.date).getMonth() === new Date().getMonth())
+  const now = new Date();
+  const mockMonthlyRevenue = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
+    const key = d.toISOString().slice(0, 7);
+    return {
+      month: d.toLocaleString("en", { month: "short" }),
+      revenue: paid.filter((t) => t.date.startsWith(key)).reduce((s, t) => s + t.amount, 0),
+    };
+  });
+
+  const totalRevenue = paid.reduce((sum, t) => sum + t.amount, 0);
+  const monthRevenue = paid
+    .filter(t => t.date.startsWith(now.toISOString().slice(0, 7)))
     .reduce((sum, t) => sum + t.amount, 0);
 
   const exportToCSV = () => {

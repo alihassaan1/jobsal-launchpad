@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { loadPayPalSdk } from "@/lib/paypalSdk";
 import { useParams, Link, Navigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";

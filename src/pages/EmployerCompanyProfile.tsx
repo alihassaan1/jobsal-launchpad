@@ -218,7 +218,9 @@ const EmployerCompanyProfile = () => {
                       Verified
                     </Badge>
                   ) : (
-                    <Button variant="outline" size="sm">Request Verification</Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={`mailto:info@jobs.al?subject=${encodeURIComponent("Verification request: " + company.name)}&body=${encodeURIComponent("Please verify our company profile: https://jobs.al/companies/" + company.slug)}`}>Request Verification</a>
+                    </Button>
                   )}
                 </div>
               </CardContent>
