@@ -105,19 +105,11 @@ export default function JobCheckout() {
   // Load the PayPal JS SDK when entering the review step with a paid option.
   useEffect(() => {
     if (step !== "review" || totalCents === 0) return;
-    if (window.paypal) { setSdkReady(true); return; }
-    if (document.querySelector('script[data-paypal-sdk]')) return; // already loading
     let cancelled = false;
-    (async () => {
-      const { data, error } = await supabase.functions.invoke("paypal-checkout", { body: { action: "config" } });
-      if (error || !data?.client_id || cancelled) return;
-      const script = document.createElement("script");
-      script.src = `https://www.paypal.com/sdk/js?client-id=${data.client_id}&currency=EUR&components=buttons&enable-funding=card`;
-      script.dataset.paypalSdk = "true";
-      script.onload = () => !cancelled && setSdkReady(true);
-      script.onerror = () => toast.error(sq ? "PayPal nuk u ngarkua" : "PayPal failed to load");
-      document.body.appendChild(script);
-    })();
+    setSdkReady(false);
+    loadPayPalSdk("capture")
+      .then(() => !cancelled && setSdkReady(true))
+      .catch(() => !cancelled && toast.error(sq ? "PayPal nuk u ngarkua" : "PayPal failed to load"));
     return () => { cancelled = true; };
   }, [step, totalCents]);
 
