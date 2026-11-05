@@ -1,0 +1,1 @@
+CREATE POLICY "Admins view all paypal orders" ON public.paypal_orders FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'admin'));
