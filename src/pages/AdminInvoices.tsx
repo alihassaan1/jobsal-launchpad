@@ -278,7 +278,7 @@ export default function AdminInvoices() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `invoices-${safeFormat((), "yyyy-MM-dd")}.csv`;
+    a.download = `invoices-${safeFormat(new Date(), "yyyy-MM-dd")}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("Exported to CSV");
