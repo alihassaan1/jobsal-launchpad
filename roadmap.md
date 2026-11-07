@@ -1,5 +1,11 @@
 # Premium resume templates
 
+# Unified employer pricing and private packages
+- [ ] Replace legacy employer upgrade prices with the PayPal catalog and checkout
+- [ ] Make private employer quotations configurable under admin Packages
+- [ ] Validate PayPal amounts, package credits and publication limits
+- [ ] Verify tests and payment configuration; identify any live-payment credential blocker
+
 - [x] Add four A4 premium template renderers
 - [x] Register premium metadata and aliases
 - [x] Add premium/free-now labels in the selector and gallery
