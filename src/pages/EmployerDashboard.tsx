@@ -39,7 +39,7 @@ const EmployerDashboard = () => {
       const { data, error } = await supabase
         .from("companies")
         .select("*")
-        .eq("owner_id", user!.id)
+        .eq("owner_id", user?.id)
         .maybeSingle();
 
       if (error) throw error;
@@ -55,7 +55,7 @@ const EmployerDashboard = () => {
       const { data, error } = await supabase
         .from("jobs")
         .select("*")
-        .eq("company_id", company!.id)
+        .eq("company_id", company?.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -179,10 +179,10 @@ const EmployerDashboard = () => {
               <CardDescription>Job performance, views and applications.</CardDescription>
             </CardHeader>
           </Card>
-          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate("/employer/subscription")}>
+          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate("/employer/billing")}>
             <CardHeader>
               <CardTitle className="text-lg">💼 My Plan</CardTitle>
-              <CardDescription>Upgrade for unlimited posts and Talent Pool access.</CardDescription>
+              <CardDescription>View your job credits, private offers and monthly packages.</CardDescription>
             </CardHeader>
           </Card>
         </div>
@@ -395,18 +395,6 @@ const JobForm = ({
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Check subscription limits
-  const { data: canPost } = useQuery({
-    queryKey: ["can-post-job", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("can_post_job", {
-        user_id: user!.id,
-      });
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id && !job?.id, // Only check when creating new job
-  });
   const [formData, setFormData] = useState({
     title: job?.title || "",
     description: job?.description || "",
@@ -426,16 +414,12 @@ const JobForm = ({
 
   const createJobMutation = useMutation({
     mutationFn: async (data: any) => {
-      // Check limit before creating new job
-      if (!job?.id && canPost === false) {
-        throw new Error("You've reached your job posting limit. Please upgrade your subscription.");
-      }
-      
+      if (!user) throw new Error("Please sign in");
       const slug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       const jobData = {
         ...data,
         company_id: companyId,
-        posted_by: user!.id,
+        posted_by: user?.id,
         slug: `${slug}-${Date.now()}`,
         skills: data.skills ? data.skills.split(",").map((s: string) => s.trim()) : [],
         benefits: data.benefits ? data.benefits.split(",").map((b: string) => b.trim()) : [],

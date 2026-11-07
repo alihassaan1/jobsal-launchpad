@@ -21,6 +21,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 import { RefreshCw, ArrowUpRight } from "lucide-react";
+import { MONTHLY_PACKAGES, eur, approxLek } from "@/lib/pricingConfig";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Navigate } from "react-router-dom";
 import { PAYPAL_PRODUCTS, formatEur } from "../../supabase/functions/paypal-checkout/products";
 
 type Invoice = {
@@ -68,7 +71,9 @@ const statusColors: Record<string, string> = {
 };
 
 export default function EmployerBilling() {
-  const { user } = useAuth();
+  const { user, userRole, loading: authLoading } = useAuth();
+  const { language } = useLanguage();
+  const sq = language === "sq";
   const queryClient = useQueryClient();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
@@ -140,7 +145,8 @@ export default function EmployerBilling() {
     queryFn: async () => {
       const { data } = await (supabase as any).from("subscriptions").select("*")
         .not("paypal_subscription_id", "is", null)
-        .in("status", ["active", "pending", "past_due"])
+        .eq("user_id", user?.id)
+        .in("status", ["active", "trial"])
         .order("created_at", { ascending: false }).limit(1).maybeSingle();
       return data as any | null;
     },
@@ -154,7 +160,7 @@ export default function EmployerBilling() {
       const periodStart = subscription.current_period_start ?? subscription.created_at;
       const { count } = await (supabase as any).from("job_listings")
         .select("id", { count: "exact", head: true })
-        .eq("employer_user_id", user!.id)
+        .eq("employer_user_id", user?.id)
         .eq("product_key", `package:${subscription.plan_slug}`)
         .gte("created_at", periodStart);
       return count ?? 0;
@@ -166,7 +172,7 @@ export default function EmployerBilling() {
     queryKey: ["billing-receipts", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data } = await (supabase as any).from("paypal_orders").select("*")
+      const { data } = await (supabase as any).from("paypal_orders").select("*").eq("user_id", user?.id)
         .order("created_at", { ascending: false }).limit(20);
       return (data ?? []) as any[];
     },
@@ -243,6 +249,10 @@ export default function EmployerBilling() {
     URL.revokeObjectURL(url);
     toast.success("Exported to CSV");
   };
+
+  if (authLoading || (user && !userRole)) return <div className="min-h-screen bg-background" />;
+  if (!user) return <Navigate to="/auth?type=employer" replace />;
+  if (userRole !== "employer" && userRole !== "admin") return <Navigate to="/" replace />;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -342,7 +352,7 @@ export default function EmployerBilling() {
                       </div>
                       <div className="text-sm text-muted-foreground space-y-1">
                         <p>
-                          Usage this period: <strong>{packageUsage ?? 0}</strong> of <strong>{subscription.job_posts_limit}</strong> listings
+                          Usage this period: <strong>{packageUsage ?? 0}</strong> of <strong>{subscription.job_posts_limit}</strong> job postings
                         </p>
                         {subscription.current_period_end && (
                           <p>Next renewal: {format(new Date(subscription.current_period_end), "MMM d, yyyy")}</p>
@@ -353,7 +363,7 @@ export default function EmployerBilling() {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <Button variant="outline" asChild>
-                          <Link to="/pricing"><ArrowUpRight className="h-4 w-4 mr-2" />Upgrade package</Link>
+                          <Link to="/pricing?view=monthly"><ArrowUpRight className="h-4 w-4 mr-2" />Upgrade package</Link>
                         </Button>
                         <Button variant="ghost" onClick={cancelSubscription}>Cancel auto-renewal</Button>
                       </div>
@@ -361,13 +371,20 @@ export default function EmployerBilling() {
                   ) : (
                     <div className="text-center py-6 space-y-3">
                       <p className="text-muted-foreground">
-                        No monthly package. Your first standard listing each month is free — upgrade for more listings and featured slots.
+                        No monthly package. Your first standard job posting each month is free. Choose a package for more job postings.
                       </p>
-                      <Button asChild><Link to="/pricing">View packages</Link></Button>
+                      <Button asChild><Link to="/pricing?view=monthly">View packages</Link></Button>
                     </div>
                   )}
                 </CardContent>
               </Card>
+              <section className="mt-8 space-y-4">
+                <h2 className="text-xl font-semibold">{sq ? "Paketa mujore" : "Monthly packages"}</h2>
+                <div className="grid gap-4 md:grid-cols-3">{MONTHLY_PACKAGES.map(p => <Card key={p.key} className={p.recommended ? "border-primary" : ""}>
+                  <CardHeader><CardTitle>{p.name}</CardTitle><CardDescription>{eur(p.amount_cents)}{sq ? "/muaj" : "/month"} · {approxLek(p.amount_cents)}</CardDescription></CardHeader>
+                  <CardContent className="space-y-4"><p>{p.listing_credits} {sq ? "publikime pune çdo muaj" : "job postings each month"}</p><Button asChild className="w-full"><Link to={`/subscribe/${p.key}`}>{sq ? "Abonohu me PayPal" : "Subscribe with PayPal"}</Link></Button></CardContent>
+                </Card>)}</div>
+              </section>
             </TabsContent>
 
             <TabsContent value="receipts">

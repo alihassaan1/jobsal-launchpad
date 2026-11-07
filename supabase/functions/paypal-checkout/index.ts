@@ -2,7 +2,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3";
 import { PAYPAL_PRODUCTS, formatEur, type PaypalProduct } from "./products.ts";
-import { canPurchaseOffer, canUseOffer, offerExpiry, CLIENT_OFFER_VALID_UNTIL } from "./clientOffers.ts";
+import { canPurchaseOffer, canUseOffer, offerExpiry, CLIENT_OFFER_VALID_UNTIL, validCustomOffer, offerProduct } from "./clientOffers.ts";
 
 const PAYPAL_BASE = Deno.env.get("PAYPAL_ENV") === "live"
   ? "https://api-m.paypal.com"
@@ -83,10 +83,10 @@ async function syncSubscription(
     : undefined;
 
   const statusMap: Record<string, string> = {
-    ACTIVE: "active", APPROVAL_PENDING: "pending", APPROVED: "pending",
-    SUSPENDED: "past_due", CANCELLED: "cancelled", EXPIRED: "expired",
+    ACTIVE: "active", APPROVAL_PENDING: "trial", APPROVED: "trial",
+    SUSPENDED: "expired", CANCELLED: "cancelled", EXPIRED: "expired",
   };
-  const status = statusMap[sub.status] ?? "pending";
+  const status = statusMap[sub.status] ?? "trial";
   const start = sub.billing_info?.last_payment?.time ?? sub.start_time ?? sub.create_time;
   const nextBilling = sub.billing_info?.next_billing_time ?? null;
 
@@ -103,11 +103,12 @@ async function syncSubscription(
   }
 
   if (local) {
-    await admin.from("subscriptions").update(update).eq("id", local.id);
+    const { error } = await admin.from("subscriptions").update(update).eq("id", local.id);
+    if (error) return { error: "Could not save subscription status" };
   } else {
     await admin.from("subscriptions").insert({
       user_id: userId,
-      tier: product?.plan_slug ?? "starter",
+      tier: product?.plan_slug === "starter" ? "basic" : product?.plan_slug === "business" ? "pro" : "premium",
       status,
       paypal_subscription_id: paypalSubId,
       paypal_plan_id: sub.plan_id,
@@ -124,7 +125,7 @@ async function syncSubscription(
 const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("config") }),
   z.object({ action: z.literal("create"), product_key: z.string().max(50), return_url: z.string().url().max(500), job_id: z.string().uuid().optional(), offer_id: z.string().uuid().optional(), urgent: z.boolean().optional() }),
-  z.object({ action: z.literal("assign_offer"), company_id: z.string().uuid(), product_key: z.string().max(50), starts_at: z.string().datetime() }),
+  z.object({ action: z.literal("assign_offer"), company_id: z.string().uuid(), product_key: z.string().max(50), starts_at: z.string().datetime(), package_name: z.string().trim().min(1).max(120).optional(), amount_cents: z.number().int().positive().max(100000000).optional(), credit_limit: z.number().int().positive().max(1000000).optional(), duration_months: z.number().int().min(1).max(120).optional(), offer_expires_at: z.string().datetime().optional() }),
   z.object({ action: z.literal("capture"), order_id: z.string().min(5).max(64) }),
   z.object({ action: z.literal("subscribe"), product_key: z.string().max(50), return_url: z.string().url().max(500) }),
   z.object({ action: z.literal("activate"), subscription_id: z.string().min(5).max(64) }),
@@ -154,9 +155,12 @@ Deno.serve(async (req) => {
     if (body.action === "assign_offer") {
       const { data: roles, error: roleError } = await admin.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin");
       if (roleError || !roles?.length) return json({ error: "Admin access required" }, 403);
-      const product = PAYPAL_PRODUCTS[body.product_key];
+      const custom = body.product_key === "custom_package";
+      const terms = { package_name: body.package_name ?? "", amount_cents: body.amount_cents ?? 0, credit_limit: body.credit_limit ?? 0, duration_months: body.duration_months ?? 0, starts_at: body.starts_at, offer_expires_at: body.offer_expires_at ?? "" };
+      if (custom && !validCustomOffer(terms)) return json({ error: "Invalid custom package terms" }, 400);
+      const product = custom ? offerProduct({ ...terms, product_key: "custom_package" }) : PAYPAL_PRODUCTS[body.product_key];
       if (product?.kind !== "client_package" || !product.duration_months) return json({ error: "Unknown client package" }, 400);
-      if (new Date() >= new Date(CLIENT_OFFER_VALID_UNTIL)) return json({ error: "Quotation expired" }, 400);
+      if (!custom && new Date() >= new Date(CLIENT_OFFER_VALID_UNTIL)) return json({ error: "Quotation expired" }, 400);
       const { data: company } = await admin.from("companies").select("id, name, owner_id").eq("id", body.company_id).maybeSingle();
       if (!company?.owner_id) return json({ error: "Select the client's registered company with an owner account" }, 400);
       const { data: employerRole } = await admin.from("user_roles").select("role").eq("user_id", company.owner_id).eq("role", "employer").maybeSingle();
@@ -167,7 +171,7 @@ Deno.serve(async (req) => {
         company_id: company.id, employer_user_id: company.owner_id, product_key: product.key,
         amount_cents: product.amount_cents, credit_limit: product.listing_credits, duration_months: product.duration_months,
         starts_at: starts.toISOString(), expires_at: offerExpiry(starts.toISOString(), product.duration_months), assigned_by: user.id,
-        offer_expires_at: CLIENT_OFFER_VALID_UNTIL,
+        offer_expires_at: custom ? terms.offer_expires_at : CLIENT_OFFER_VALID_UNTIL, package_name: custom ? terms.package_name : product.name,
       }).select("id").single();
       if (error) return json({ error: error.code === "23505" ? "This company already has an unpaid offer" : "Could not assign offer" }, 400);
       return json({ offer_id: data.id });
@@ -187,68 +191,41 @@ Deno.serve(async (req) => {
         return json({ status, via: offer.product_key });
       }
 
-      const monthStart = new Date(); monthStart.setUTCDate(1); monthStart.setUTCHours(0, 0, 0, 0);
-
-      // (a) One free standard listing per employer per calendar month.
-      const { count: freeUsed } = await admin.from("job_listings").select("id", { count: "exact", head: true })
-        .eq("employer_user_id", user.id).eq("product_key", "free_monthly")
-        .gte("created_at", monthStart.toISOString());
-
-      // (b) Or a monthly package with remaining listing slots in the current period.
-      const { data: sub } = await admin.from("subscriptions").select("*")
-        .eq("user_id", user.id).eq("status", "active")
-        .not("paypal_subscription_id", "is", null)
-        .order("created_at", { ascending: false }).limit(1).maybeSingle();
-      let packageSlot = false;
-      if (sub) {
-        const periodStart = sub.current_period_start ?? sub.created_at;
-        const { count: used } = await admin.from("job_listings").select("id", { count: "exact", head: true })
-          .eq("employer_user_id", user.id).eq("product_key", `package:${sub.plan_slug}`)
-          .gte("created_at", periodStart);
-        packageSlot = (used ?? 0) < (sub.job_posts_limit ?? 0);
-      }
-
-      if ((freeUsed ?? 0) === 0 || packageSlot) {
-        const productKey = packageSlot && sub ? `package:${sub.plan_slug}` : "free_monthly";
-        const ends = new Date(); ends.setDate(ends.getDate() + 30);
-        await admin.from("jobs").update({ is_active: true, payment_status: "free", updated_at: new Date().toISOString() })
-          .eq("id", job.id);
-        await admin.from("job_listings").insert({
-          employer_user_id: user.id, job_id: job.id, product_key: productKey, listing_tier: "standard",
-          price_eur: 0, ends_at: ends.toISOString(),
-        });
-        return json({ status: "published", via: productKey });
-      }
-      return json({ error: "No free listing or package slot available this month" }, 403);
+      const { data: via, error } = await admin.rpc("publish_employer_credit_job", { _job_id: job.id, _user_id: user.id });
+      if (error) return json({ error: "No free job or package credit available this month" }, 403);
+      return json({ status: via === "already_live" ? via : "published", via });
     }
 
     const token = await paypalToken();
 
     if (body.action === "create") {
-      const product = PAYPAL_PRODUCTS[body.product_key];
-      if (!product || product.kind === "subscription") return json({ error: "Unknown product" }, 400);
+      let product = PAYPAL_PRODUCTS[body.product_key];
+      if ((!product && !body.offer_id) || product?.kind === "subscription") return json({ error: "Unknown product" }, 400);
       let offerId: string | null = null;
-      if (product.kind === "client_package") {
+      if (body.offer_id || product?.kind === "client_package") {
         if (!body.offer_id || body.job_id) return json({ error: "Client offer required" }, 400);
         const { data: offer } = await admin.from("client_package_offers").select("*").eq("id", body.offer_id).eq("employer_user_id", user.id).maybeSingle();
-        if (!offer || offer.product_key !== product.key || offer.amount_cents !== product.amount_cents || !canPurchaseOffer(offer)) return json({ error: "Offer unavailable or expired" }, 403);
+        if (!offer || offer.product_key !== body.product_key || !canPurchaseOffer(offer)) return json({ error: "Offer unavailable or expired" }, 403);
         const { data: company } = await admin.from("companies").select("owner_id").eq("id", offer.company_id).maybeSingle();
         if (company?.owner_id !== user.id) return json({ error: "Offer belongs to another company account" }, 403);
+        product = offerProduct(offer);
         offerId = offer.id;
         // Reuse the unpaid order, preventing a double purchase on repeated clicks.
-        const { data: pending } = await admin.from("paypal_orders").select("paypal_order_id").eq("client_offer_id", offerId).eq("status", "created").order("created_at", { ascending: false }).limit(1).maybeSingle();
+        const { data: pending } = await admin.from("paypal_orders").select("paypal_order_id").eq("client_offer_id", offerId).eq("status", "created").eq("environment", ENV).order("created_at", { ascending: false }).limit(1).maybeSingle();
         if (pending) {
           const previous = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${pending.paypal_order_id}`, { headers: { Authorization: `Bearer ${token}` } });
           const order = await previous.json();
           if (previous.ok && ["CREATED", "APPROVED", "PAYER_ACTION_REQUIRED"].includes(order.status)) return json({ order_id: order.id, approve_url: order.links?.find((l: { rel: string }) => l.rel === "approve")?.href });
         }
       }
+      if (!product) return json({ error: "Unknown product" }, 400);
       let jobId: string | null = null;
       if (body.job_id) {
         const { data: job } = await admin.from("jobs").select("id, posted_by").eq("id", body.job_id).maybeSingle();
         if (!job || job.posted_by !== user.id) return json({ error: "Job not found" }, 404);
         jobId = job.id;
       }
+      if (product.kind === "listing" && !jobId) return json({ error: "Job required" }, 400);
       // Urgent hiring is charged as part of the same order so the buyer approves the full total once.
       const urgentAddon = body.urgent && product.kind === "listing" && product.key !== "urgent_hiring" && jobId
         ? PAYPAL_PRODUCTS.urgent_hiring
@@ -268,18 +245,19 @@ Deno.serve(async (req) => {
       });
       const order = await res.json();
       if (!res.ok) return json({ error: "PayPal could not create the order" }, 502);
-      await admin.from("paypal_orders").insert({
+      const { error: orderError } = await admin.from("paypal_orders").insert({
         user_id: user.id, paypal_order_id: order.id, product_key: product.key, amount_cents: totalCents,
         listing_credits: product.listing_credits, featured_days: product.featured_days, environment: ENV,
         job_id: jobId, client_offer_id: offerId, urgent: !!urgentAddon,
       });
+      if (orderError) return json({ error: "Could not save payment order; no payment has been taken" }, 500);
       const approve = order.links?.find((l: { rel: string }) => l.rel === "approve")?.href;
       return json({ order_id: order.id, approve_url: approve });
     }
 
     if (body.action === "capture") {
       const { data: row } = await admin.from("paypal_orders").select("*").eq("paypal_order_id", body.order_id).maybeSingle();
-      if (!row || row.user_id !== user.id) return json({ error: "Order not found" }, 404);
+      if (!row || row.user_id !== user.id || row.environment !== ENV) return json({ error: "Order not found" }, 404);
       if (row.status === "completed") return json({ status: "completed", product_key: row.product_key, offer_id: row.client_offer_id });
       if (row.client_offer_id) {
         const { data: offer } = await admin.from("client_package_offers").select("status").eq("id", row.client_offer_id).maybeSingle();
@@ -302,37 +280,12 @@ Deno.serve(async (req) => {
         if (error) return json({ error: "Payment received; package confirmation pending. Please contact support with your order ID." }, 500);
         return json({ status: "completed", product_key: row.product_key, offer_id: row.client_offer_id });
       }
-      await admin.from("paypal_orders").update({ status: ok ? "completed" : "failed", captured_at: ok ? new Date().toISOString() : null })
-        .eq("id", row.id);
-      if (!ok) return json({ error: "Payment was not completed" }, 402);
-
-      const product = PAYPAL_PRODUCTS[row.product_key];
-      if (product) {
-        const ends = new Date(); ends.setDate(ends.getDate() + 30);
-        const featuredUntil = product.featured_days > 0 ? new Date(Date.now() + product.featured_days * 86400000) : null;
-        await admin.from("job_listings").insert({
-          employer_user_id: user.id, job_id: row.job_id ?? null, product_key: product.key, listing_tier: product.key,
-          price_eur: product.amount_cents / 100, ends_at: ends.toISOString(),
-          featured_until: featuredUntil?.toISOString() ?? null, paypal_order_id: row.id,
-        });
-        // Apply the urgent add-on paid for in the same order.
-        if (row.urgent && row.job_id) {
-          const urgentProduct = PAYPAL_PRODUCTS.urgent_hiring;
-          await admin.from("job_listings").insert({
-            employer_user_id: user.id, job_id: row.job_id, product_key: urgentProduct.key, listing_tier: urgentProduct.key,
-            price_eur: urgentProduct.amount_cents / 100, ends_at: ends.toISOString(),
-            featured_until: new Date(Date.now() + urgentProduct.featured_days * 86400000).toISOString(), paypal_order_id: row.id,
-          });
-        }
-        // Publish the job this order paid for.
-        if (row.job_id) {
-          await admin.from("jobs").update({
-            is_active: true, payment_status: "paid",
-            is_featured: product.featured_days > 0 || !!row.urgent,
-            updated_at: new Date().toISOString(),
-          }).eq("id", row.job_id).eq("posted_by", user.id);
-        }
+      if (!ok) {
+        await admin.from("paypal_orders").update({ status: "failed" }).eq("id", row.id);
+        return json({ error: "Payment was not completed" }, 402);
       }
+      const { error: settlementError } = await admin.rpc("settle_paid_job_order", { _order_id: row.id });
+      if (settlementError) return json({ error: "Payment received; publication confirmation pending. Contact support with your order ID." }, 500);
       return json({ status: "completed", product_key: row.product_key, job_id: row.job_id ?? null });
     }
 
@@ -342,7 +295,7 @@ Deno.serve(async (req) => {
 
       // One active subscription per employer at a time.
       const { data: active } = await admin.from("subscriptions").select("id")
-        .eq("user_id", user.id).in("status", ["active", "pending", "past_due"])
+        .eq("user_id", user.id).in("status", ["active", "trial"])
         .not("paypal_subscription_id", "is", null).limit(1);
       if (active && active.length > 0) {
         return json({ error: "You already have an active package. Cancel it before switching." }, 409);
@@ -364,10 +317,10 @@ Deno.serve(async (req) => {
       const sub = await res.json();
       if (!res.ok) return json({ error: "PayPal could not create the subscription" }, 502);
 
-      await admin.from("subscriptions").insert({
+      const { error: subscriptionError } = await admin.from("subscriptions").insert({
         user_id: user.id,
-        tier: product.plan_slug ?? "starter",
-        status: "pending",
+        tier: product.plan_slug === "starter" ? "basic" : product.plan_slug === "business" ? "pro" : "premium",
+        status: "trial",
         paypal_subscription_id: sub.id,
         paypal_plan_id: planId,
         plan_slug: product.plan_slug,
@@ -375,6 +328,7 @@ Deno.serve(async (req) => {
         currency: "EUR",
         job_posts_limit: product.listing_credits,
       });
+      if (subscriptionError) return json({ error: "Could not save the subscription; please contact support" }, 500);
       const approve = sub.links?.find((l: { rel: string }) => l.rel === "approve")?.href;
       return json({ subscription_id: sub.id, approve_url: approve });
     }

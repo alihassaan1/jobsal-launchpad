@@ -1,6 +1,7 @@
 # Project architecture
 
-- Keep all PayPal prices and allowances in the server product catalog; client views import it so charged and displayed amounts cannot diverge.
-- Client quotations are private company-and-employer-bound offers, separate from recurring subscriptions; only server-validated admins assign them, and service-only transactional functions settle payments and consume credits to prevent quota races.
+- Keep public PayPal prices and allowances in the server product catalog; public pricing, account upgrades and admin Packages import it rather than the legacy subscription-plan prices so charged and displayed amounts cannot diverge.
+- Client quotations store immutable private company-and-employer-bound price, credits, name and dates, separate from recurring subscriptions; server-validated admins assign them, checkout derives amounts from stored offers, and service-only transactional functions settle all payments and consume credits to prevent partial fulfillment and quota races.
+- Map PayPal package identities to supported subscription-tier enums and pending approval to trial status; preserve package identity in plan_slug so payment activation cannot fail on unsupported enum values.
 - Derive client publication expiry from stored publication timestamps in the public jobs view rather than polling to hide expired vacancies.
 - File storage lives in Cloudflare R2 (S3-compatible via aws4fetch): resumes under `resumes/` and user documents under `documents/{certificates,cover-letters,experience-letters,thumbnails}/{userId}/` (private; owner/admin presigned GET, employers via document-access), legacy Supabase-bucket paths still resolved by prefix, website images under `images/{blog,logos,banners,ads,jobs,templates,misc}/` (public via R2_PUBLIC_URL, folder allowlisted server-side); the `r2-storage` edge function issues presigned URLs and content generators fall back to the Supabase `blog-images` bucket when R2 is unconfigured.

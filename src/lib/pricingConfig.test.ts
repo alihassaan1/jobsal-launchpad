@@ -2,6 +2,9 @@ import { describe, it, expect } from "vitest";
 import { LISTING_OPTIONS, MONTHLY_PACKAGES, URGENT_ADDON, approxLek, eur, LEK_PER_EUR } from "./pricingConfig";
 
 describe("pricingConfig", () => {
+  it("uses agreed EUR monthly prices and allowances for all employer upgrade displays", () => {
+    expect(MONTHLY_PACKAGES.map(p => [p.amount_cents, p.listing_credits])).toEqual([[4900, 5], [8900, 10], [14900, 20]]);
+  });
   it("shows exactly three per-job options: Standard, Featured, Premium", () => {
     expect(LISTING_OPTIONS.map((o) => o.name)).toEqual(["Standard", "Featured", "Premium"]);
   });

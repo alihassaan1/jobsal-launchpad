@@ -41,7 +41,7 @@ export default function JobCheckout() {
     queryKey: ["checkout-job", jobId],
     enabled: !!user && !!jobId,
     queryFn: async () => {
-      const { data, error } = await supabase.from("jobs").select("*").eq("id", jobId!).single();
+      const { data, error } = await supabase.from("jobs").select("*").eq("id", jobId ?? "").single();
       if (error) throw error;
       return data as any;
     },
@@ -55,7 +55,7 @@ export default function JobCheckout() {
       const monthStart = new Date(); monthStart.setUTCDate(1); monthStart.setUTCHours(0, 0, 0, 0);
       const { count } = await (supabase as any).from("job_listings")
         .select("id", { count: "exact", head: true })
-        .eq("employer_user_id", user!.id).eq("product_key", "free_monthly")
+        .eq("employer_user_id", user?.id).eq("product_key", "free_monthly")
         .gte("created_at", monthStart.toISOString());
       return (count ?? 0) === 0;
     },
@@ -67,27 +67,27 @@ export default function JobCheckout() {
     enabled: !!user,
     queryFn: async () => {
       const { data: sub } = await (supabase as any).from("subscriptions").select("*")
-        .eq("user_id", user!.id).eq("status", "active")
+        .eq("user_id", user?.id).eq("status", "active")
         .not("paypal_subscription_id", "is", null)
         .order("created_at", { ascending: false }).limit(1).maybeSingle();
-      if (!sub) return null;
+      if (!sub || !sub.current_period_end || new Date(sub.current_period_end) <= new Date()) return null;
       const periodStart = sub.current_period_start ?? sub.created_at;
       const { count } = await (supabase as any).from("job_listings")
         .select("id", { count: "exact", head: true })
-        .eq("employer_user_id", user!.id).eq("product_key", `package:${sub.plan_slug}`)
+        .eq("employer_user_id", user?.id).eq("product_key", `package:${sub.plan_slug}`)
         .gte("created_at", periodStart);
       return (count ?? 0) < (sub.job_posts_limit ?? 0) ? sub : null;
     },
   });
 
   const { data: clientPackage } = useQuery({
-    queryKey: ["client-package-credit", user?.id],
-    enabled: !!user,
+    queryKey: ["client-package-credit", user?.id, job?.company_id],
+    enabled: !!user && !!job,
     queryFn: async () => {
       if (!user) return null;
       const { data, error } = await supabase.from("client_package_offers").select("*").eq("employer_user_id", user.id).eq("status", "paid").order("expires_at");
       if (error) throw error;
-      return data?.find(offer => canUseOffer(offer)) ?? null;
+      return data?.find(offer => offer.company_id === job?.company_id && canUseOffer(offer)) ?? null;
     },
   });
 

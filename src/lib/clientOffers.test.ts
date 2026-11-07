@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { PAYPAL_PRODUCTS } from "../../supabase/functions/paypal-checkout/products";
-import { canPurchaseOffer, canUseOffer, offerExpiry, CLIENT_OFFER_VALID_UNTIL } from "../../supabase/functions/paypal-checkout/clientOffers";
+import { canPurchaseOffer, canUseOffer, offerExpiry, CLIENT_OFFER_VALID_UNTIL, validCustomOffer, offerProduct } from "../../supabase/functions/paypal-checkout/clientOffers";
 
 describe("TIA client-only quotation", () => {
   it("Pilot costs €250 for 3 months and 10 total credits", () => {
@@ -32,5 +32,26 @@ describe("TIA client-only quotation", () => {
   it("computes calendar month expiry, clamping short months", () => {
     expect(offerExpiry("2026-10-17T00:00:00Z", 3)).toBe("2027-01-17T00:00:00.000Z");
     expect(offerExpiry("2026-08-31T00:00:00Z", 6)).toBe("2027-02-28T00:00:00.000Z");
+  });
+});
+
+describe("Private configurable employer packages", () => {
+  const terms = { package_name: "Agreed employer package", amount_cents: 37500, credit_limit: 17, duration_months: 4, starts_at: "2026-11-10T00:00:00Z", offer_expires_at: "2026-12-01T00:00:00Z" };
+  it("accepts a private price, job allowance and duration independently of public tiers", () => {
+    expect(validCustomOffer(terms, new Date("2026-11-07"))).toBe(true);
+    expect(offerExpiry(terms.starts_at, 4)).toBe("2027-03-10T00:00:00.000Z");
+  });
+  it("charges the stored private price and grants the stored allowance", () => {
+    expect(offerProduct({ ...terms, product_key: "custom_package" })).toMatchObject({ amount_cents: 37500, listing_credits: 17, duration_months: 4, kind: "client_package" });
+    expect(PAYPAL_PRODUCTS.starter_monthly.amount_cents).toBe(4900);
+  });
+  it("rejects fractional credits and invalid amounts", () => {
+    expect(validCustomOffer({ ...terms, credit_limit: 1.5 }, new Date("2026-11-07"))).toBe(false);
+    expect(validCustomOffer({ ...terms, amount_cents: -1 }, new Date("2026-11-07"))).toBe(false);
+  });
+  it("uses each offer's own acceptance deadline", () => {
+    const offer = { status: "offered", offer_expires_at: terms.offer_expires_at, expires_at: "2027-03-10T00:00:00Z" };
+    expect(canPurchaseOffer(offer, new Date("2026-11-20"))).toBe(true);
+    expect(canPurchaseOffer(offer, new Date(terms.offer_expires_at))).toBe(false);
   });
 });

@@ -785,6 +785,7 @@ export type Database = {
           expires_at: string
           id: string
           offer_expires_at: string
+          package_name: string | null
           paid_at: string | null
           product_key: string
           starts_at: string
@@ -803,6 +804,7 @@ export type Database = {
           expires_at: string
           id?: string
           offer_expires_at?: string
+          package_name?: string | null
           paid_at?: string | null
           product_key: string
           starts_at: string
@@ -821,6 +823,7 @@ export type Database = {
           expires_at?: string
           id?: string
           offer_expires_at?: string
+          package_name?: string | null
           paid_at?: string | null
           product_key?: string
           starts_at?: string
@@ -3326,7 +3329,12 @@ export type Database = {
         Args: { _job_id: string; _offer_id: string; _user_id: string }
         Returns: string
       }
+      publish_employer_credit_job: {
+        Args: { _job_id: string; _user_id: string }
+        Returns: string
+      }
       settle_client_package: { Args: { _order_id: string }; Returns: string }
+      settle_paid_job_order: { Args: { _order_id: string }; Returns: string }
       unlock_candidate: {
         Args: { _candidate_user_id: string; _company_id: string }
         Returns: Json
