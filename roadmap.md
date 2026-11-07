@@ -1,10 +1,12 @@
 # Premium resume templates
 
 # Unified employer pricing and private packages
-- [ ] Replace legacy employer upgrade prices with the PayPal catalog and checkout
-- [ ] Make private employer quotations configurable under admin Packages
-- [ ] Validate PayPal amounts, package credits and publication limits
-- [ ] Verify tests and payment configuration; identify any live-payment credential blocker
+- [x] Replace legacy employer upgrade prices with the PayPal catalog and checkout
+- [x] Make private employer quotations configurable under admin Packages
+- [x] Validate PayPal amounts, package credits and publication limits
+- [x] Verify public prices, redirects, mobile layout and 28 pricing/offer tests; deploy payment functions
+- [ ] Verify signed-in admin assignment, employer purchase and credit readback (external Supabase session unavailable)
+- [ ] Enable and verify live PayPal payments (needs confirmation that saved credentials are live; current configuration defaults to test)
 
 - [x] Add four A4 premium template renderers
 - [x] Register premium metadata and aliases
@@ -62,10 +64,10 @@
 Note: authenticated checkout flow (PayPal SDK buttons, free-slot publish) not tested end-to-end — no managed session (external Supabase). User should test with a sandbox buyer account.
 
 # TIA client-only quotation
-- [ ] Add quoted fixed-term products without changing public prices
-- [ ] Add admin assignment, agreed activation date and private PayPal purchase controls
-- [ ] Grant expiring total credits only after verified payment and consume them atomically
-- [ ] Test prices, durations, limits, security and available payment flow
+- [x] Add quoted fixed-term products without changing public prices
+- [x] Add admin assignment, agreed activation date and private PayPal purchase controls
+- [x] Grant expiring total credits only after verified payment and consume them atomically
+- [x] Test prices, durations, limits and service-only settlement access; signed-in payment verification tracked above
 
 ## Open
 - Admin must click "Migrate Resumes to R2" in Admin → Settings → Storage to move legacy Supabase-bucket resumes into R2 (one-time, idempotent).
