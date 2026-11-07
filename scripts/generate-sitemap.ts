@@ -57,7 +57,7 @@ async function fetchAll(table: string, select: string, filter?: { col: string; v
 function urlTag(e: Entry) {
   return [
     "  <url>",
-    `    <loc>${BASE_URL}${e.loc}</loc>`,
+    `    <loc>${BASE_URL}${e.loc.replace(/&/g, "&amp;")}</loc>`,
     e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
     e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
     e.priority ? `    <priority>${e.priority}</priority>` : null,
@@ -68,31 +68,28 @@ function urlTag(e: Entry) {
 }
 
 async function main() {
-  const now = new Date().toISOString();
   const entries: Entry[] = [...staticRoutes];
 
   try {
     const [jobs, posts, companies] = await Promise.all([
-      fetchAll("jobs", "slug, updated_at, category, location", { col: "is_active", val: true }),
-      fetchAll("posts", "slug, updated_at", { col: "is_published", val: true }),
-      fetchAll("companies", "slug, updated_at"),
+      fetchAll("jobs_public", "slug, updated_at, category, location", { col: "is_active", val: true }),
+      fetchAll("posts_public", "slug, updated_at"),
+      fetchAll("companies_public", "slug, updated_at"),
     ]);
 
-    const categories = [...new Set(jobs.map((j: any) => j.category).filter(Boolean))];
-    const locations = [...new Set(jobs.map((j: any) => j.location).filter(Boolean))];
+    const categories = [...new Set(jobs.map((j: any) => String(j.category || "").trim().toLowerCase()).filter(Boolean))];
+    const locations = [...new Set(jobs.map((j: any) => String(j.location || "").split(",")[0].trim().toLowerCase()).filter(Boolean))];
 
     categories.forEach((c: any) =>
       entries.push({
-        loc: `/jobs?category=${encodeURIComponent(c)}`,
-        lastmod: now,
+        loc: `/jobs/category/${encodeURIComponent(c)}`,
         changefreq: "daily",
         priority: "0.8",
       })
     );
     locations.forEach((l: any) =>
       entries.push({
-        loc: `/jobs?location=${encodeURIComponent(l)}`,
-        lastmod: now,
+        loc: `/jobs/location/${encodeURIComponent(l)}`,
         changefreq: "daily",
         priority: "0.8",
       })
