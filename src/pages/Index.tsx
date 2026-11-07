@@ -86,35 +86,34 @@ const BlogSection = () => {
               <button
                 key={post.id}
                 onClick={() => navigate(`/blog/${post.slug}`)}
-                className={`group flex w-full text-left rounded-2xl bg-card border border-border/70 p-2.5 transition-all duration-300 motion-reduce:transition-none hover:-translate-y-1 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${featured ? 'flex-col lg:col-span-3 lg:row-span-2' : 'flex-col sm:flex-row sm:items-center lg:col-span-2 gap-0 sm:gap-4'}`}
+                className={`group relative isolate flex w-full overflow-hidden rounded-3xl bg-muted text-left transition-transform duration-300 motion-reduce:transition-none hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${featured ? 'min-h-[320px] sm:min-h-[420px] lg:col-span-3 lg:row-span-2 lg:min-h-[460px]' : 'min-h-[220px] lg:col-span-2'}`}
               >
-                <div className={`relative overflow-hidden rounded-xl bg-muted shrink-0 ${featured ? 'aspect-[16/10] w-full' : 'aspect-[16/10] w-full sm:aspect-[4/5] sm:w-36 lg:w-40'}`}>
-                  {post.featured_image ? (
-                    <img
-                      src={post.featured_image}
-                      alt={post.title}
-                      loading="lazy"
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 motion-reduce:transition-none group-hover:scale-105"
-                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/15 to-primary/5">
-                      <ImageIcon className="h-8 w-8 text-primary/50" />
-                    </div>
-                  )}
-                  <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary backdrop-blur-sm">
-                    {post.category || 'Career insights'}
-                  </span>
-                </div>
-                <div className={`flex flex-1 flex-col ${featured ? 'p-3 pt-4 sm:p-4' : 'p-3 sm:p-1 sm:py-2'}`}>
-                  {date && <span className="text-xs font-medium text-muted-foreground">{date}</span>}
-                  <h3 className={`mt-1.5 font-bold leading-snug tracking-tight text-foreground ${featured ? 'text-xl sm:text-2xl line-clamp-3' : 'text-base line-clamp-3'}`}>
+                {post.featured_image ? (
+                  <img
+                    src={post.featured_image}
+                    alt={post.title}
+                    loading="lazy"
+                    className="absolute inset-0 -z-10 h-full w-full object-cover transition-transform duration-700 motion-reduce:transition-none group-hover:scale-105"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : (
+                  <div className="absolute inset-0 -z-10 flex items-center justify-center bg-gradient-to-br from-primary to-primary/70">
+                    <ImageIcon className="h-10 w-10 text-primary-foreground/50" />
+                  </div>
+                )}
+                <div className="blog-card-overlay absolute inset-0 -z-10" />
+                <span className="absolute left-4 top-4 rounded-full bg-background/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-primary backdrop-blur-sm">
+                  {post.category || 'Career insights'}
+                </span>
+                <div className={`mt-auto flex w-full flex-col ${featured ? 'p-5 sm:p-7' : 'p-5'}`}>
+                  {date && <span className="blog-card-overlay-muted text-xs font-medium">{date}</span>}
+                  <h3 className={`blog-card-overlay-text mt-1.5 font-bold leading-snug tracking-tight ${featured ? 'text-xl sm:text-2xl lg:text-3xl line-clamp-3' : 'text-base sm:text-lg line-clamp-2'}`}>
                     {post.title}
                   </h3>
                   {featured && post.excerpt && (
-                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{post.excerpt}</p>
+                    <p className="blog-card-overlay-muted mt-2 line-clamp-2 text-sm sm:text-base max-w-xl">{post.excerpt}</p>
                   )}
-                  <span className="mt-auto inline-flex items-center gap-1.5 pt-3 text-sm font-semibold text-primary">
+                  <span className="blog-card-overlay-text mt-3 inline-flex items-center gap-1.5 text-sm font-semibold">
                     Read article
                     <ArrowRight className="h-4 w-4 transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-1" />
                   </span>

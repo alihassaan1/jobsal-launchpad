@@ -209,3 +209,11 @@ All colors MUST be HSL.
   break-after: avoid;
   page-break-after: avoid;
 }
+
+@layer components {
+  .blog-card-overlay {
+    background: linear-gradient(to top, hsl(220 30% 8% / 0.92) 0%, hsl(220 30% 8% / 0.55) 45%, hsl(220 30% 8% / 0) 75%);
+  }
+  .blog-card-overlay-text { color: hsl(0 0% 100%); }
+  .blog-card-overlay-muted { color: hsl(0 0% 100% / 0.78); }
+}
