@@ -91,7 +91,7 @@ const adminMenuItems: MenuGroup[] = [
     color: "text-amber-500",
     items: [
       { title: "Transactions", url: "/admin/revenue", icon: DollarSign },
-      { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
+      { title: "Packages", url: "/admin/subscriptions", icon: Package },
       { 
         title: "Ads", 
         url: "/admin/ads", 
