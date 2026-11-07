@@ -38,14 +38,14 @@ Deno.serve(async (req) => {
     const { data: subs } = await admin.from("subscriptions")
       .select("id, paypal_subscription_id, status")
       .not("paypal_subscription_id", "is", null)
-      .or(`status.in.(pending,past_due),and(status.eq.active,current_period_end.lt.${soon})`);
+      .or(`status.in.(trial,expired),and(status.eq.active,current_period_end.lt.${soon})`);
 
     if (!subs || subs.length === 0) return json({ synced: 0 });
 
     const token = await paypalToken();
     const statusMap: Record<string, string> = {
-      ACTIVE: "active", APPROVAL_PENDING: "pending", APPROVED: "pending",
-      SUSPENDED: "past_due", CANCELLED: "cancelled", EXPIRED: "expired",
+      ACTIVE: "active", APPROVAL_PENDING: "trial", APPROVED: "trial",
+      SUSPENDED: "expired", CANCELLED: "cancelled", EXPIRED: "expired",
     };
     let synced = 0;
     for (const s of subs) {
