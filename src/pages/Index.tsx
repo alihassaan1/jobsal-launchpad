@@ -35,7 +35,7 @@ import FeaturedCompanies from "./FeaturedCompanies";
 import { TopEmployers } from "@/components/TopEmployers";
 import { Helmet } from "react-helmet";
 import { ALBANIAN_CITIES } from "@/lib/i18n";
-import { cn } from "@/lib/utils";
+import { cn, htmlToPlainText } from "@/lib/utils";
 
 // Blog section component
 const BlogSection = () => {
@@ -441,7 +441,7 @@ const Index = () => {
                     </div>
                     <div>
                       <h4 className="text-lg font-bold text-foreground mb-2">{job.title}</h4>
-                      <p className="text-sm text-muted-foreground line-clamp-2">{job.description}</p>
+                      <p className="text-sm text-muted-foreground line-clamp-2">{htmlToPlainText(job.description)}</p>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
