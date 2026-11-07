@@ -3334,6 +3334,7 @@ export type Database = {
         Returns: string
       }
       settle_client_package: { Args: { _order_id: string }; Returns: string }
+      settle_paid_job_order: { Args: { _order_id: string }; Returns: string }
       unlock_candidate: {
         Args: { _candidate_user_id: string; _company_id: string }
         Returns: Json
