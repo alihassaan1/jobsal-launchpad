@@ -86,9 +86,9 @@ const BlogSection = () => {
               <button
                 key={post.id}
                 onClick={() => navigate(`/blog/${post.slug}`)}
-                className={`group flex w-full text-left rounded-2xl bg-card border border-border/70 p-2.5 transition-all duration-300 motion-reduce:transition-none hover:-translate-y-1 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${featured ? 'flex-col lg:col-span-3 lg:row-span-2' : 'flex-col sm:flex-row lg:col-span-2 gap-0 sm:gap-4'}`}
+                className={`group flex w-full text-left rounded-2xl bg-card border border-border/70 p-2.5 transition-all duration-300 motion-reduce:transition-none hover:-translate-y-1 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${featured ? 'flex-col lg:col-span-3 lg:row-span-2' : 'flex-col sm:flex-row sm:items-center lg:col-span-2 gap-0 sm:gap-4'}`}
               >
-                <div className={`relative overflow-hidden rounded-xl bg-muted shrink-0 ${featured ? 'aspect-[16/10] w-full' : 'aspect-[16/10] w-full sm:aspect-square sm:w-36 lg:w-32'}`}>
+                <div className={`relative overflow-hidden rounded-xl bg-muted shrink-0 ${featured ? 'aspect-[16/10] w-full' : 'aspect-[16/10] w-full sm:aspect-[4/5] sm:w-36 lg:w-40'}`}>
                   {post.featured_image ? (
                     <img
                       src={post.featured_image}
