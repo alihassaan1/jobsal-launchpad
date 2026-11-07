@@ -136,21 +136,19 @@ const Body = z.discriminatedUnion("action", [
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
+    const parsed = Body.safeParse(await req.json());
+    if (!parsed.success) return json({ error: parsed.error.flatten().fieldErrors }, 400);
+    const body = parsed.data;
+    // Client ID is publishable; credentials and payment actions remain server-only.
+    if (body.action === "config") {
+      return json({ client_id: Deno.env.get("PAYPAL_CLIENT_ID"), env: ENV, currency: "EUR" });
+    }
     const url = Deno.env.get("SUPABASE_URL")!;
     const authHeader = req.headers.get("Authorization") ?? "";
     const userClient = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
     const { data: { user } } = await userClient.auth.getUser();
     if (!user) return json({ error: "Please sign in" }, 401);
     const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-
-    const parsed = Body.safeParse(await req.json());
-    if (!parsed.success) return json({ error: parsed.error.flatten().fieldErrors }, 400);
-    const body = parsed.data;
-
-    // Public client config so the PayPal JS SDK buttons can load (client id is publishable).
-    if (body.action === "config") {
-      return json({ client_id: Deno.env.get("PAYPAL_CLIENT_ID"), env: ENV, currency: "EUR" });
-    }
 
     if (body.action === "assign_offer") {
       const { data: roles, error: roleError } = await admin.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin");
