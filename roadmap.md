@@ -6,7 +6,7 @@
 - [x] Validate PayPal amounts, package credits and publication limits
 - [x] Verify public prices, redirects, mobile layout and 28 pricing/offer tests; deploy payment functions
 - [ ] Verify signed-in admin assignment, employer purchase and credit readback (external Supabase session unavailable)
-- [ ] Enable and verify live PayPal payments (needs confirmation that saved credentials are live; current configuration defaults to test)
+- [x] Enable live PayPal mode using the user's confirmed live credentials; full payment verification awaits a signed-in employer
 
 - [x] Add four A4 premium template renderers
 - [x] Register premium metadata and aliases

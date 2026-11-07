@@ -719,6 +719,12 @@
     <priority>0.65</priority>
   </url>
   <url>
+    <loc>https://jobs.al/blog/albania-tech-boom-2026-tirana-startup-hub</loc>
+    <lastmod>2026-11-07T16:03:51.238Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
     <loc>https://jobs.al/blog/interview-tips-for-albanian-job-seekers-1765692061244</loc>
     <lastmod>2026-10-19T16:06:56.160Z</lastmod>
     <changefreq>monthly</changefreq>
@@ -739,12 +745,6 @@
   <url>
     <loc>https://jobs.al/blog/employment-guide-vlor-1767852200391</loc>
     <lastmod>2026-11-06T10:54:34.408Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/albania-tech-boom-2026-tirana-startup-hub</loc>
-    <lastmod>2026-11-06T20:50:02.832Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
@@ -875,14 +875,14 @@
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/freelancing-vs-full-time-employment-in-albania-1767160867380</loc>
-    <lastmod>2026-10-23T00:07:07.685Z</lastmod>
+    <loc>https://jobs.al/blog/tourism-boom-albania-career-opportunities-2026</loc>
+    <lastmod>2026-11-07T16:06:51.733Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/tourism-boom-albania-career-opportunities-2026</loc>
-    <lastmod>2026-11-07T00:43:28.456Z</lastmod>
+    <loc>https://jobs.al/blog/freelancing-vs-full-time-employment-in-albania-1767160867380</loc>
+    <lastmod>2026-10-23T00:07:07.685Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
