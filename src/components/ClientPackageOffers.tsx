@@ -128,7 +128,7 @@ export default function ClientPackageOffers({ admin = false }: { admin?: boolean
         <p className="text-sm text-muted-foreground">{sq ? "Një kredit për një vend vakant, aktiv deri në 30 ditë. Kreditë e papërdorura skadojnë. Pa rinovim automatik." : "One credit per vacancy, live up to 30 days. Unused credits expire. No auto-renewal."}</p>
         <p className="text-sm font-medium">{offer.status === "paid" ? (active ? (sq ? "Aktive" : "Active") : new Date(offer.starts_at) > new Date() ? (sq ? "Paguar, në pritje të aktivizimit" : "Paid, awaiting activation") : (sq ? "Kreditet mbaruan ose paketa skadoi" : "Credits exhausted or package expired")) : (sq ? "Në pritje të pagesës" : "Awaiting payment")}</p>
         {!admin && canPurchaseOffer(offer) && <Button disabled={busy} onClick={() => pay(offer)} className="w-full">{sq ? "Paguaj me PayPal" : "Pay with PayPal"}</Button>}
-        {offer.status === "offered" && <p className="text-xs text-muted-foreground">{sq ? "Oferta e vlefshme deri më" : "Offer valid through"}</p>}
+        {offer.status === "offered" && <p className="text-xs text-muted-foreground">{sq ? "Oferta e vlefshme deri më" : "Offer valid through"} {new Date(offer.offer_expires_at).toLocaleDateString(sq ? "sq-AL" : "en-GB")}</p>}
       </CardContent></Card>;
     })}</div>
     {!admin && offers.some(o => canPurchaseOffer(o)) && <p className="text-sm text-muted-foreground">{sq ? PAYPAL_NOTE.sq : PAYPAL_NOTE.en}</p>}

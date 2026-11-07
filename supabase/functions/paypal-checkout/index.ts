@@ -225,6 +225,7 @@ Deno.serve(async (req) => {
         if (!job || job.posted_by !== user.id) return json({ error: "Job not found" }, 404);
         jobId = job.id;
       }
+      if (product.kind === "listing" && !jobId) return json({ error: "Job required" }, 400);
       // Urgent hiring is charged as part of the same order so the buyer approves the full total once.
       const urgentAddon = body.urgent && product.kind === "listing" && product.key !== "urgent_hiring" && jobId
         ? PAYPAL_PRODUCTS.urgent_hiring
@@ -279,37 +280,12 @@ Deno.serve(async (req) => {
         if (error) return json({ error: "Payment received; package confirmation pending. Please contact support with your order ID." }, 500);
         return json({ status: "completed", product_key: row.product_key, offer_id: row.client_offer_id });
       }
-      await admin.from("paypal_orders").update({ status: ok ? "completed" : "failed", captured_at: ok ? new Date().toISOString() : null })
-        .eq("id", row.id);
-      if (!ok) return json({ error: "Payment was not completed" }, 402);
-
-      const product = PAYPAL_PRODUCTS[row.product_key];
-      if (product) {
-        const ends = new Date(); ends.setDate(ends.getDate() + 30);
-        const featuredUntil = product.featured_days > 0 ? new Date(Date.now() + product.featured_days * 86400000) : null;
-        await admin.from("job_listings").insert({
-          employer_user_id: user.id, job_id: row.job_id ?? null, product_key: product.key, listing_tier: product.key,
-          price_eur: product.amount_cents / 100, ends_at: ends.toISOString(),
-          featured_until: featuredUntil?.toISOString() ?? null, paypal_order_id: row.id,
-        });
-        // Apply the urgent add-on paid for in the same order.
-        if (row.urgent && row.job_id) {
-          const urgentProduct = PAYPAL_PRODUCTS.urgent_hiring;
-          await admin.from("job_listings").insert({
-            employer_user_id: user.id, job_id: row.job_id, product_key: urgentProduct.key, listing_tier: urgentProduct.key,
-            price_eur: urgentProduct.amount_cents / 100, ends_at: ends.toISOString(),
-            featured_until: new Date(Date.now() + urgentProduct.featured_days * 86400000).toISOString(), paypal_order_id: row.id,
-          });
-        }
-        // Publish the job this order paid for.
-        if (row.job_id) {
-          await admin.from("jobs").update({
-            is_active: true, payment_status: "paid",
-            is_featured: product.featured_days > 0 || !!row.urgent,
-            updated_at: new Date().toISOString(),
-          }).eq("id", row.job_id).eq("posted_by", user.id);
-        }
+      if (!ok) {
+        await admin.from("paypal_orders").update({ status: "failed" }).eq("id", row.id);
+        return json({ error: "Payment was not completed" }, 402);
       }
+      const { error: settlementError } = await admin.rpc("settle_paid_job_order", { _order_id: row.id });
+      if (settlementError) return json({ error: "Payment received; publication confirmation pending. Contact support with your order ID." }, 500);
       return json({ status: "completed", product_key: row.product_key, job_id: row.job_id ?? null });
     }
 

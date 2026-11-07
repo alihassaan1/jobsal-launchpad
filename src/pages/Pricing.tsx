@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,7 @@ const copy = {
   recommended: { sq: "Rekomandohet", en: "Recommended" },
   daysLive: { sq: "30 ditë aktiv", en: "30 days live" },
   daysFeatured: (d: number, sq: boolean) => (sq ? `${d} ditë i veçuar` : `${d} days featured`),
-  activeListings: (n: number, sq: boolean) => (sq ? `deri në ${n} njoftime aktive` : `up to ${n} active listings`),
+  activeListings: (n: number, sq: boolean) => (sq ? `${n} publikime pune në muaj` : `${n} job postings per month`),
   renews: { sq: "Rinovohet automatikisht çdo muaj, anulo kur të duash", en: "Renews automatically every month, cancel anytime" },
   perMonth: { sq: "/muaj", en: "/month" },
   enterpriseTitle: { sq: "Enterprise", en: "Enterprise" },
@@ -41,7 +41,8 @@ export default function Pricing() {
   const { user, userRole } = useAuth();
   const { language } = useLanguage();
   const sq = language === "sq";
-  const [tab, setTab] = useState<"perjob" | "monthly">("perjob");
+  const [params] = useSearchParams();
+  const [tab, setTab] = useState<"perjob" | "monthly">(params.get("view") === "monthly" ? "monthly" : "perjob");
 
   const postJobHref = user && userRole === "employer" ? "/dashboard" : "/auth?type=employer";
   const quoteMailto = `mailto:info@jobs.al?subject=${encodeURIComponent("Enterprise plan inquiry / Kërkesë për planin Enterprise")}`;
@@ -67,18 +68,18 @@ export default function Pricing() {
             <p className="text-sm text-muted-foreground mb-8">{sq ? copy.firstFree.sq : copy.firstFree.en}</p>
 
             <div className="inline-flex items-center gap-2 p-1 bg-muted rounded-lg">
-              <button
+              <Button variant="ghost"
                 onClick={() => setTab("perjob")}
                 className={`px-6 py-2 rounded-md transition-colors ${tab === "perjob" ? "bg-background shadow-sm" : "hover:bg-background/50"}`}
               >
                 {sq ? copy.perJob.sq : copy.perJob.en}
-              </button>
-              <button
+              </Button>
+              <Button variant="ghost"
                 onClick={() => setTab("monthly")}
                 className={`px-6 py-2 rounded-md transition-colors ${tab === "monthly" ? "bg-background shadow-sm" : "hover:bg-background/50"}`}
               >
                 {sq ? copy.monthly.sq : copy.monthly.en}
-              </button>
+              </Button>
             </div>
           </div>
 

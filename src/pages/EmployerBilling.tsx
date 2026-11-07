@@ -363,7 +363,7 @@ export default function EmployerBilling() {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <Button variant="outline" asChild>
-                          <Link to="/pricing"><ArrowUpRight className="h-4 w-4 mr-2" />Upgrade package</Link>
+                          <Link to="/pricing?view=monthly"><ArrowUpRight className="h-4 w-4 mr-2" />Upgrade package</Link>
                         </Button>
                         <Button variant="ghost" onClick={cancelSubscription}>Cancel auto-renewal</Button>
                       </div>
@@ -373,7 +373,7 @@ export default function EmployerBilling() {
                       <p className="text-muted-foreground">
                         No monthly package. Your first standard job posting each month is free. Choose a package for more job postings.
                       </p>
-                      <Button asChild><Link to="/pricing">View packages</Link></Button>
+                      <Button asChild><Link to="/pricing?view=monthly">View packages</Link></Button>
                     </div>
                   )}
                 </CardContent>
