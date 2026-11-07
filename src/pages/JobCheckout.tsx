@@ -176,7 +176,6 @@ export default function JobCheckout() {
         <div>
           <h1 className="text-3xl font-bold">{sq ? "Publiko punën" : "Publish your job"}</h1>
           <p className="text-muted-foreground">{job.title}</p>
-          {userRole === "admin" && <Badge variant="secondary" className="mt-2">{sq ? "Modalitet testimi" : "Test mode"}</Badge>}
         </div>
 
         {step === "visibility" && (
