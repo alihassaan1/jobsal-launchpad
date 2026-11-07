@@ -78,47 +78,50 @@ const BlogSection = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
-          {latestPosts.map(post => (
-            <button
-              key={post.id}
-              onClick={() => navigate(`/blog/${post.slug}`)}
-              className="group relative block aspect-[3/2] w-full cursor-pointer overflow-hidden rounded-lg border border-border text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              {post.featured_image ? (
-                <img
-                  src={post.featured_image}
-                  alt={post.title}
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.04]"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col items-center justify-center p-6">
-                  <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-4">
-                    <ImageIcon className="w-8 h-8 text-white/60" />
-                  </div>
-                  <span className="text-white/40 text-sm font-medium">jobs.al blog</span>
-                </div>
-              )}
-              <div className="absolute inset-x-3 bottom-3 rounded-md border border-border/60 bg-background/95 p-3 text-foreground transition-transform duration-300 motion-reduce:transition-none group-hover:-translate-y-1 min-[360px]:inset-x-4 min-[360px]:bottom-4 min-[360px]:p-4">
-                <div className="mb-1.5 flex items-center justify-between gap-3">
-                  <span className="truncate text-[11px] font-bold uppercase text-primary">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-5 max-w-6xl mx-auto">
+          {latestPosts.map((post, i) => {
+            const featured = i === 0;
+            const date = post.published_at ? new Date(post.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
+            return (
+              <button
+                key={post.id}
+                onClick={() => navigate(`/blog/${post.slug}`)}
+                className={`group flex w-full text-left rounded-2xl bg-card border border-border/70 p-2.5 transition-all duration-300 motion-reduce:transition-none hover:-translate-y-1 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${featured ? 'flex-col lg:col-span-3 lg:row-span-2' : 'flex-col sm:flex-row sm:items-center lg:col-span-2 gap-0 sm:gap-4'}`}
+              >
+                <div className={`relative overflow-hidden rounded-xl bg-muted shrink-0 ${featured ? 'aspect-[16/10] w-full' : 'aspect-[16/10] w-full sm:aspect-[4/5] sm:w-36 lg:w-40'}`}>
+                  {post.featured_image ? (
+                    <img
+                      src={post.featured_image}
+                      alt={post.title}
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 motion-reduce:transition-none group-hover:scale-105"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/15 to-primary/5">
+                      <ImageIcon className="h-8 w-8 text-primary/50" />
+                    </div>
+                  )}
+                  <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary backdrop-blur-sm">
                     {post.category || 'Career insights'}
                   </span>
-                  <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground transition-colors group-hover:text-primary">
-                    Read
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-0.5" />
+                </div>
+                <div className={`flex flex-1 flex-col ${featured ? 'p-3 pt-4 sm:p-4' : 'p-3 sm:p-1 sm:py-2'}`}>
+                  {date && <span className="text-xs font-medium text-muted-foreground">{date}</span>}
+                  <h3 className={`mt-1.5 font-bold leading-snug tracking-tight text-foreground ${featured ? 'text-xl sm:text-2xl line-clamp-3' : 'text-base line-clamp-3'}`}>
+                    {post.title}
+                  </h3>
+                  {featured && post.excerpt && (
+                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{post.excerpt}</p>
+                  )}
+                  <span className="mt-auto inline-flex items-center gap-1.5 pt-3 text-sm font-semibold text-primary">
+                    Read article
+                    <ArrowRight className="h-4 w-4 transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-1" />
                   </span>
                 </div>
-                <h3 className="line-clamp-2 text-base font-bold leading-snug sm:text-lg">
-                  {post.title}
-                </h3>
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
 
         <div className="text-center mt-8">
