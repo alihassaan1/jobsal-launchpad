@@ -219,6 +219,14 @@ Deno.serve(async (req) => {
         if (!offer || !canUseOffer(offer)) return json({ error: "No active client package credits available" }, 403);
         const { data: status, error } = await admin.rpc("publish_client_package_job", { _offer_id: offer.id, _job_id: job.id, _user_id: user.id });
         if (error) return json({ error: "Could not use package credit" }, 409);
+        const left = offer.credit_limit - offer.credits_used - 1;
+        const lowAt = Math.max(2, Math.ceil(offer.credit_limit * 0.1));
+        if (left === lowAt || left === 0) {
+          await sendPackageEmail(admin, user.id, "package-credits-low", {
+            packageName: offer.package_name ?? offer.product_key, creditsLeft: String(left), creditsUsed: String(offer.credits_used + 1),
+            credits: String(offer.credit_limit), expiryDate: day(offer.expires_at),
+          }, `credits-low:${offer.id}:${left}`);
+        }
         return json({ status, via: offer.product_key });
       }
 
