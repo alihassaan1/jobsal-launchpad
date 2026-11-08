@@ -3,6 +3,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3";
 import { PAYPAL_PRODUCTS, formatEur, type PaypalProduct } from "./products.ts";
 import { canPurchaseOffer, canUseOffer, offerExpiry, CLIENT_OFFER_VALID_UNTIL, validCustomOffer, offerProduct } from "./clientOffers.ts";
+import { canCreateOfferCompany } from "./companyAccess.ts";
 
 const PAYPAL_BASE = Deno.env.get("PAYPAL_ENV") === "live"
   ? "https://api-m.paypal.com"
@@ -157,7 +158,7 @@ Deno.serve(async (req) => {
       const { data: owner, error: ownerError } = await admin.from("profiles").select("id").eq("email", body.owner_email.toLowerCase()).maybeSingle();
       if (ownerError || !owner) return json({ error: "No account found. Ask the employer to register first, then use their account email." }, 400);
       const { data: employer } = await admin.from("user_roles").select("role").eq("user_id", owner.id).eq("role", "employer").maybeSingle();
-      if (!employer) return json({ error: "The selected owner must have an employer account." }, 400);
+      if (!canCreateOfferCompany(roles ?? [], employer ? [employer] : [])) return json({ error: "The selected owner must have an employer account." }, 400);
       const base = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "company";
       const { data: company, error } = await admin.from("companies").insert({ name: body.name, slug: `${base}-${crypto.randomUUID().slice(0, 8)}`, owner_id: owner.id, email: body.owner_email.toLowerCase(), industry: body.industry || null, location: body.location || null, description: body.description || null, is_verified: false }).select("id, name, owner_id").single();
       if (error) return json({ error: "Could not create company. Please try again." }, 400);
