@@ -4,6 +4,7 @@ import { z } from "npm:zod@3";
 import { PAYPAL_PRODUCTS, formatEur, type PaypalProduct } from "./products.ts";
 import { canPurchaseOffer, canUseOffer, offerExpiry, CLIENT_OFFER_VALID_UNTIL, validCustomOffer, offerProduct } from "./clientOffers.ts";
 import { canCreateOfferCompany } from "./companyAccess.ts";
+import { sendPackageEmail, eur, day } from "../_shared/packageEmails.ts";
 
 const PAYPAL_BASE = Deno.env.get("PAYPAL_ENV") === "live"
   ? "https://api-m.paypal.com"
@@ -103,6 +104,18 @@ async function syncSubscription(
     update.last_payment_amount = Number(sub.billing_info.last_payment.amount?.value ?? 0);
   }
 
+  const mail = { packageName: product?.name ?? local?.plan_slug ?? "Package", amount: product ? eur(product.amount_cents) : "",
+    credits: String(product?.listing_credits ?? ""), renewalDate: day(nextBilling) };
+  const paidAt = update.last_payment_at as string | undefined;
+  if (status === "active" && local?.status !== "active" && !local?.last_payment_at) {
+    await sendPackageEmail(admin, userId, "package-subscribed", mail, `sub:${paypalSubId}`, { notifyAdmin: true });
+  } else if (status === "active" && paidAt && local?.last_payment_at && new Date(local.last_payment_at).getTime() !== new Date(paidAt).getTime()) {
+    await sendPackageEmail(admin, userId, "subscription-renewed", mail, `renew:${paypalSubId}:${paidAt}`, { notifyAdmin: true });
+  }
+  if (status === "cancelled" && local?.status !== "cancelled") {
+    await sendPackageEmail(admin, userId, "subscription-cancelled", mail, `cancel:${paypalSubId}`);
+  }
+
   if (local) {
     const { error } = await admin.from("subscriptions").update(update).eq("id", local.id);
     if (error) return { error: "Could not save subscription status" };
@@ -187,6 +200,11 @@ Deno.serve(async (req) => {
         offer_expires_at: custom ? terms.offer_expires_at : CLIENT_OFFER_VALID_UNTIL, package_name: custom ? terms.package_name : product.name,
       }).select("id").single();
       if (error) return json({ error: error.code === "23505" ? "This company already has an unpaid offer" : "Could not assign offer" }, 400);
+      await sendPackageEmail(admin, company.owner_id, "package-offer-ready", {
+        packageName: custom ? terms.package_name : product.name, companyName: company.name, amount: eur(product.amount_cents),
+        credits: String(product.listing_credits), duration: `${product.duration_months} muaj / months`, startDate: day(starts.toISOString()),
+        offerDeadline: day(custom ? terms.offer_expires_at : CLIENT_OFFER_VALID_UNTIL),
+      }, `offer:${data.id}`);
       return json({ offer_id: data.id });
     }
 
@@ -201,6 +219,14 @@ Deno.serve(async (req) => {
         if (!offer || !canUseOffer(offer)) return json({ error: "No active client package credits available" }, 403);
         const { data: status, error } = await admin.rpc("publish_client_package_job", { _offer_id: offer.id, _job_id: job.id, _user_id: user.id });
         if (error) return json({ error: "Could not use package credit" }, 409);
+        const left = offer.credit_limit - offer.credits_used - 1;
+        const lowAt = Math.max(2, Math.ceil(offer.credit_limit * 0.1));
+        if (left === lowAt || left === 0) {
+          await sendPackageEmail(admin, user.id, "package-credits-low", {
+            packageName: offer.package_name ?? offer.product_key, creditsLeft: String(left), creditsUsed: String(offer.credits_used + 1),
+            credits: String(offer.credit_limit), expiryDate: day(offer.expires_at),
+          }, `credits-low:${offer.id}:${left}`);
+        }
         return json({ status, via: offer.product_key });
       }
 
@@ -291,6 +317,11 @@ Deno.serve(async (req) => {
       if (row.client_offer_id && ok) {
         const { error } = await admin.rpc("settle_client_package", { _order_id: row.id });
         if (error) return json({ error: "Payment received; package confirmation pending. Please contact support with your order ID." }, 500);
+        const { data: o } = await admin.from("client_package_offers").select("package_name, credit_limit, expires_at, companies(name)").eq("id", row.client_offer_id).maybeSingle();
+        await sendPackageEmail(admin, user.id, "package-payment-completed", {
+          packageName: o?.package_name ?? row.product_key, companyName: (o as any)?.companies?.name ?? "", amount: eur(row.amount_cents),
+          credits: String(o?.credit_limit ?? ""), expiryDate: day(o?.expires_at), orderId: body.order_id, paymentDate: day(new Date().toISOString()),
+        }, `order:${row.id}`, { notifyAdmin: true });
         return json({ status: "completed", product_key: row.product_key, offer_id: row.client_offer_id });
       }
       if (!ok) {
@@ -299,6 +330,11 @@ Deno.serve(async (req) => {
       }
       const { error: settlementError } = await admin.rpc("settle_paid_job_order", { _order_id: row.id });
       if (settlementError) return json({ error: "Payment received; publication confirmation pending. Contact support with your order ID." }, 500);
+      const { data: job } = row.job_id ? await admin.from("jobs").select("title, slug").eq("id", row.job_id).maybeSingle() : { data: null };
+      await sendPackageEmail(admin, user.id, "job-payment-completed", {
+        jobTitle: job?.title ?? "", jobUrl: job?.slug ? `https://jobs.al/jobs/${job.slug}` : "", packageName: PAYPAL_PRODUCTS[row.product_key]?.name ?? row.product_key,
+        amount: eur(row.amount_cents), orderId: body.order_id, paymentDate: day(new Date().toISOString()),
+      }, `order:${row.id}`, { notifyAdmin: true });
       return json({ status: "completed", product_key: row.product_key, job_id: row.job_id ?? null });
     }
 
