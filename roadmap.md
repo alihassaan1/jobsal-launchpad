@@ -1,11 +1,12 @@
 # Premium resume templates
 
 # Unified employer pricing and private packages
+- [x] Keep admin English and add Create package with select/add company and editable quotation terms; isolated desktop/mobile form verified, 30 tests passed
 - [x] Replace legacy employer upgrade prices with the PayPal catalog and checkout
 - [x] Make private employer quotations configurable under admin Packages
 - [x] Validate PayPal amounts, package credits and publication limits
 - [x] Verify public prices, redirects, mobile layout and 28 pricing/offer tests; deploy payment functions
-- [ ] Verify signed-in admin assignment, employer purchase and credit readback (external Supabase session unavailable)
+- [ ] Verify signed-in company creation, admin assignment, employer purchase and credit readback (external Supabase authenticated testing unavailable)
 - [x] Enable live PayPal mode using the user's confirmed live credentials; full payment verification awaits a signed-in employer
 
 - [x] Add four A4 premium template renderers

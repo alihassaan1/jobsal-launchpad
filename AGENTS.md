@@ -1,4 +1,6 @@
 # Project architecture
+- Scope admin language with a fixed English context without changing the saved public-language preference.
+- Create companies for private packages through server-validated admin actions linked to existing employer accounts, never to the current admin by default.
 
 - Keep public PayPal prices and allowances in the server product catalog; public pricing, account upgrades and admin Packages import it rather than the legacy subscription-plan prices so charged and displayed amounts cannot diverge.
 - Client quotations store immutable private company-and-employer-bound price, credits, name and dates, separate from recurring subscriptions; server-validated admins assign them, checkout derives amounts from stored offers, and service-only transactional functions settle all payments and consume credits to prevent partial fulfillment and quota races.

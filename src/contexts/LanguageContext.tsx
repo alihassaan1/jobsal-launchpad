@@ -48,3 +48,8 @@ export function useLanguage() {
   }
   return context;
 }
+
+// Admin language is scoped, so visiting admin never changes the public preference.
+export function AdminLanguageProvider({ children }: { children: ReactNode }) {
+  return <LanguageContext.Provider value={{ language: 'en', setLanguage: () => {}, t: key => getTranslation(key, 'en') }}>{children}</LanguageContext.Provider>;
+}
