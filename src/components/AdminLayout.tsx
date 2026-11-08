@@ -48,6 +48,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AdminLanguageProvider } from "@/contexts/LanguageContext";
 
 interface SubMenuItem {
   title: string;
@@ -370,6 +371,7 @@ export default function AdminLayout() {
   if (!user || userRole !== 'admin') return null;
 
   return (
+    <AdminLanguageProvider>
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
@@ -389,5 +391,6 @@ export default function AdminLayout() {
         </SidebarInset>
       </div>
     </SidebarProvider>
+    </AdminLanguageProvider>
   );
 }

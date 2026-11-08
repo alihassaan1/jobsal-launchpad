@@ -124,6 +124,7 @@ async function syncSubscription(
 
 const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("config") }),
+  z.object({ action: z.literal("create_offer_company"), name: z.string().trim().min(1).max(255), owner_email: z.string().trim().email().max(255), industry: z.string().trim().max(255).optional(), location: z.string().trim().max(255).optional(), description: z.string().trim().max(5000).optional() }),
   z.object({ action: z.literal("create"), product_key: z.string().max(50), return_url: z.string().url().max(500), job_id: z.string().uuid().optional(), offer_id: z.string().uuid().optional(), urgent: z.boolean().optional() }),
   z.object({ action: z.literal("assign_offer"), company_id: z.string().uuid(), product_key: z.string().max(50), starts_at: z.string().datetime(), package_name: z.string().trim().min(1).max(120).optional(), amount_cents: z.number().int().positive().max(100000000).optional(), credit_limit: z.number().int().positive().max(1000000).optional(), duration_months: z.number().int().min(1).max(120).optional(), offer_expires_at: z.string().datetime().optional() }),
   z.object({ action: z.literal("capture"), order_id: z.string().min(5).max(64) }),
@@ -149,6 +150,19 @@ Deno.serve(async (req) => {
     const { data: { user } } = await userClient.auth.getUser();
     if (!user) return json({ error: "Please sign in" }, 401);
     const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+
+    if (body.action === "create_offer_company") {
+      const { data: roles, error: roleError } = await admin.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin");
+      if (roleError || !roles?.length) return json({ error: "Admin access required" }, 403);
+      const { data: owner, error: ownerError } = await admin.from("profiles").select("id").eq("email", body.owner_email.toLowerCase()).maybeSingle();
+      if (ownerError || !owner) return json({ error: "No account found. Ask the employer to register first, then use their account email." }, 400);
+      const { data: employer } = await admin.from("user_roles").select("role").eq("user_id", owner.id).eq("role", "employer").maybeSingle();
+      if (!employer) return json({ error: "The selected owner must have an employer account." }, 400);
+      const base = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "company";
+      const { data: company, error } = await admin.from("companies").insert({ name: body.name, slug: `${base}-${crypto.randomUUID().slice(0, 8)}`, owner_id: owner.id, email: body.owner_email.toLowerCase(), industry: body.industry || null, location: body.location || null, description: body.description || null, is_verified: false }).select("id, name, owner_id").single();
+      if (error) return json({ error: "Could not create company. Please try again." }, 400);
+      return json({ company });
+    }
 
     if (body.action === "assign_offer") {
       const { data: roles, error: roleError } = await admin.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin");
