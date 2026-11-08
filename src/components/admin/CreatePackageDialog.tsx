@@ -41,7 +41,7 @@ export default function CreatePackageDialog({ companies }: { companies: Company[
     setPrice(product ? String(product.amount_cents / 100) : "");
     setPosts(product ? String(product.listing_credits) : "");
     setMonths(product ? String(product.duration_months) : "");
-    setDeadline(product ? CLIENT_OFFER_VALID_UNTIL.slice(0, 10).replace("2026-11-17", "2026-11-16") : "");
+    setDeadline(product ? new Date(Date.parse(CLIENT_OFFER_VALID_UNTIL) - 1).toISOString().slice(0, 10) : "");
   }
 
   async function addCompany() {
