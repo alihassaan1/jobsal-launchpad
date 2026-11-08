@@ -78,7 +78,8 @@ export default function ClientPackageOffers({ admin = false }: { admin?: boolean
     <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-semibold">{sq ? "Oferta korporative private" : "Private employer packages"}</h2>{admin && <CreatePackageDialog companies={companies} />}</div>
     {isLoading && <p className="text-muted-foreground">{sq ? "Duke ngarkuar…" : "Loading…"}</p>}
     {error && <p role="alert" className="text-destructive">{sq ? "Ofertat nuk u ngarkuan" : "Could not load offers"}</p>}
-    {admin && !isLoading && !error && !offers.length && <p className="text-muted-foreground">No private packages yet.</p>}
+    {admin && <p className="text-sm text-muted-foreground max-w-3xl">Custom quoted packages for one specific employer (e.g. a signed quotation). You set the price, number of job posts, duration and dates. The employer sees it only on their own Billing page with a "Pay with PayPal" button; once paid, the job posts unlock and are used one per vacancy (each live 30 days) until they run out or the package expires. No auto-renewal. Public prices are not affected.</p>}
+    {admin && !isLoading && !error && !offers.length && <p className="text-muted-foreground">No private packages yet. Click "Create package" to add one.</p>}
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{offers.map(offer => {
       const product = PAYPAL_PRODUCTS[offer.product_key];
       const active = canUseOffer(offer);
