@@ -1,6 +1,7 @@
 # Premium resume templates
 
 # Unified employer pricing and private packages
+- [ ] Keep admin English and add Create package with select/add company and editable quotation terms
 - [x] Replace legacy employer upgrade prices with the PayPal catalog and checkout
 - [x] Make private employer quotations configurable under admin Packages
 - [x] Validate PayPal amounts, package credits and publication limits
