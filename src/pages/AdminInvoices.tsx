@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { INVOICE_SELLER, reverseChargeNote } from "@/lib/invoiceRules";
+import { downloadInvoicePdf } from "@/lib/invoiceDownload";
 import { 
   FileText, Search, Download, Plus, Eye, Send, 
   RefreshCcw, Ban, DollarSign, Calendar, Building,
@@ -84,16 +85,6 @@ const safeFormat = (value: string | Date | null | undefined, fmt: string) => {
   return isNaN(d.getTime()) ? "-" : format(d, fmt);
 };
 
-const downloadInvoicePdf = async (invoiceId: string) => {
-  const win = window.open("", "_blank");
-  const { data, error } = await supabase.functions.invoke("generate-invoice-pdf", { body: { invoiceId } });
-  if (error || !data?.html) { win?.close(); toast.error("Could not generate invoice PDF"); return; }
-  if (!win) { toast.error("Allow pop-ups to download the invoice"); return; }
-  win.document.write(data.html);
-  win.document.close();
-  win.onload = () => win.print();
-  setTimeout(() => win.print(), 600);
-};
 
 export default function AdminInvoices() {
   const queryClient = useQueryClient();

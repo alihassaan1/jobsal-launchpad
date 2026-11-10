@@ -21,6 +21,22 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { invoiceId }: InvoiceData = await req.json();
+    if (typeof invoiceId !== "string" || !/^[0-9a-f-]{36}$/i.test(invoiceId)) {
+      return new Response(JSON.stringify({ error: "Invalid invoice" }), { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } });
+    }
+    const token = (req.headers.get("Authorization") || "").replace("Bearer ", "");
+    const { data: { user } } = await supabase.auth.getUser(token);
+    const deny = () => new Response(JSON.stringify({ error: "Not allowed" }), { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } });
+    if (!user) return deny();
+    const { data: inv } = await supabase.from("invoices").select("user_id, company_id").eq("id", invoiceId).maybeSingle();
+    if (!inv) return deny();
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+    let allowed = !!isAdmin || inv.user_id === user.id;
+    if (!allowed && inv.company_id) {
+      const { data: member } = await supabase.rpc("is_company_member", { _company_id: inv.company_id, _user_id: user.id, _min_role: "viewer" });
+      allowed = !!member;
+    }
+    if (!allowed) return deny();
 
     // Fetch invoice with items
     const { data: invoice, error: invoiceError } = await supabase
