@@ -31,10 +31,7 @@ import {
   ResponsiveContainer
 } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
-
-// "YYYY-MM" for a date's own calendar month. toISOString() would shift the
-// month back for anyone east of UTC, so build the key from local parts.
-const monthKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+import { monthKey, recentMonthBuckets } from "@/lib/revenuePeriods";
 
 export default function AdminRevenue() {
   const [filter, setFilter] = useState("all");
@@ -62,14 +59,10 @@ export default function AdminRevenue() {
   const mockRevenueByProduct = Object.entries(byProduct).map(([name, value]) => ({ name, value }));
 
   const now = new Date();
-  const mockMonthlyRevenue = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
-    const key = monthKey(d);
-    return {
-      month: d.toLocaleString("en", { month: "short" }),
-      revenue: paid.filter((t) => t.date.startsWith(key)).reduce((s, t) => s + t.amount, 0),
-    };
-  });
+  const mockMonthlyRevenue = recentMonthBuckets(now).map(({ key, label }) => ({
+    month: label,
+    revenue: paid.filter((t) => t.date.startsWith(key)).reduce((s, t) => s + t.amount, 0),
+  }));
 
   const totalRevenue = paid.reduce((sum, t) => sum + t.amount, 0);
   const monthRevenue = paid
