@@ -641,7 +641,7 @@ export default function AdminInvoices() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => { setSelectedInvoice(invoice); setIsViewOpen(true); }}>
+                          <DropdownMenuItem onClick={() => openInvoice(invoice)}>
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
@@ -688,22 +688,37 @@ export default function AdminInvoices() {
 
       {/* View Invoice Dialog */}
       <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Invoice {selectedInvoice?.invoice_number}</DialogTitle>
           </DialogHeader>
           {selectedInvoice && (
             <div className="space-y-4">
-              <div className="flex justify-between">
-                <div>
+              <div className="flex justify-between gap-4">
+                <div className="text-sm">
+                  <p className="text-xs uppercase text-muted-foreground mb-1">From</p>
+                  <p className="font-medium">{INVOICE_SELLER.name}</p>
+                  <p className="text-muted-foreground">{INVOICE_SELLER.tagline}</p>
+                  {INVOICE_SELLER.address.map((l) => <p key={l} className="text-muted-foreground">{l}</p>)}
+                  <p className="text-muted-foreground">{INVOICE_SELLER.email}</p>
+                </div>
+                <div className="text-sm">
+                  <p className="text-xs uppercase text-muted-foreground mb-1">Bill to</p>
                   <p className="font-medium">{selectedInvoice.billing_name}</p>
-                  <p className="text-sm text-muted-foreground">{selectedInvoice.billing_email}</p>
-                  <p className="text-sm text-muted-foreground">{selectedInvoice.billing_address}</p>
+                  {selectedInvoice.tax_id && <p className="text-muted-foreground">NUIS: {selectedInvoice.tax_id}</p>}
+                  {selectedInvoice.billing_address && <p className="text-muted-foreground">{selectedInvoice.billing_address}</p>}
+                  {(selectedInvoice.billing_city || selectedInvoice.billing_country) && (
+                    <p className="text-muted-foreground">{[selectedInvoice.billing_city, selectedInvoice.billing_country].filter(Boolean).join(", ")}</p>
+                  )}
+                  <p className="text-muted-foreground">{selectedInvoice.billing_email}</p>
                 </div>
                 <div className="text-right">
                   <Badge className={statusColors[selectedInvoice.status]}>
                     {selectedInvoice.status.replace("_", " ")}
                   </Badge>
+                  {selectedInvoice.reference && (
+                    <p className="text-sm text-muted-foreground mt-2">Reference: {selectedInvoice.reference}</p>
+                  )}
                   <p className="text-sm text-muted-foreground mt-2">
                     Issued: {safeFormat((selectedInvoice.issue_date), "PPP")}
                   </p>
@@ -749,6 +764,30 @@ export default function AdminInvoices() {
                     <p className="font-medium">Balance Due: €{(selectedInvoice.amount_due / 100).toFixed(2)}</p>
                   </>
                 )}
+              </div>
+
+              {reverseChargeNote(selectedInvoice.tax_rate, selectedInvoice.tax_id) && (
+                <p className="text-sm">{reverseChargeNote(selectedInvoice.tax_rate, selectedInvoice.tax_id)}</p>
+              )}
+              {selectedInvoice.payment_link && !["paid", "void", "cancelled"].includes(selectedInvoice.status) && (
+                <p className="text-sm break-all">
+                  Pay online: <a className="text-primary underline" href={selectedInvoice.payment_link} target="_blank" rel="noreferrer">{selectedInvoice.payment_link}</a>
+                </p>
+              )}
+
+              <div className="border-t pt-4 space-y-3">
+                <p className="font-medium text-sm">Edit details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1"><Label>Due date</Label><Input type="date" value={details.due_date} onChange={(e) => setDetails(d => ({ ...d, due_date: e.target.value }))} /></div>
+                  <div className="space-y-1"><Label>Reference</Label><Input value={details.reference} onChange={(e) => setDetails(d => ({ ...d, reference: e.target.value }))} /></div>
+                  <div className="space-y-1"><Label>Tax ID (NUIS)</Label><Input value={details.tax_id} onChange={(e) => setDetails(d => ({ ...d, tax_id: e.target.value }))} /></div>
+                  <div className="space-y-1"><Label>Address</Label><Input value={details.billing_address} onChange={(e) => setDetails(d => ({ ...d, billing_address: e.target.value }))} /></div>
+                  <div className="space-y-1"><Label>City</Label><Input value={details.billing_city} onChange={(e) => setDetails(d => ({ ...d, billing_city: e.target.value }))} /></div>
+                  <div className="space-y-1"><Label>Country</Label><Input value={details.billing_country} onChange={(e) => setDetails(d => ({ ...d, billing_country: e.target.value }))} /></div>
+                </div>
+                <div className="flex justify-end">
+                  <Button size="sm" onClick={() => saveDetailsMutation.mutate()} disabled={saveDetailsMutation.isPending}>Save details</Button>
+                </div>
               </div>
 
               <div className="flex gap-2 justify-end">
