@@ -869,6 +869,7 @@ export type Database = {
           founded_year: number | null
           id: string
           industry: string | null
+          is_hidden: boolean
           is_sponsored: boolean | null
           is_top_employer: boolean | null
           is_verified: boolean | null
@@ -904,6 +905,7 @@ export type Database = {
           founded_year?: number | null
           id?: string
           industry?: string | null
+          is_hidden?: boolean
           is_sponsored?: boolean | null
           is_top_employer?: boolean | null
           is_verified?: boolean | null
@@ -939,6 +941,7 @@ export type Database = {
           founded_year?: number | null
           id?: string
           industry?: string | null
+          is_hidden?: boolean
           is_sponsored?: boolean | null
           is_top_employer?: boolean | null
           is_verified?: boolean | null
