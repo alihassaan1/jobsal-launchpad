@@ -206,13 +206,13 @@ async function handlePayLink(admin: any, body: { action: string; offer_id: strin
     const { data: dup } = await admin.from("email_logs").select("id").eq("template_slug", "package-payment-completed").eq("email_to", to).eq("metadata->>delivery_key", `link:${row.id}`).limit(1);
     if (dup?.length) continue;
     try {
-      await fetch(`${url()}/functions/v1/send-email`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}` },
+      await fetch(`${supaUrl()}/functions/v1/send-email`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}` },
         body: JSON.stringify({ to, templateSlug: "package-payment-completed", data: { ...mail, email: to, delivery_key: `link:${row.id}` } }) });
     } catch (e) { console.error("receipt email failed", to, e); }
   }
   return json({ status: "completed", offer: { ...info, status: "paid" } });
 }
-const url = () => Deno.env.get("SUPABASE_URL")!;
+const supaUrl = () => Deno.env.get("SUPABASE_URL")!;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
