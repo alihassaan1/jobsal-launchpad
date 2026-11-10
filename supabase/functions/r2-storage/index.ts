@@ -177,6 +177,20 @@ Deno.serve(async (req) => {
             .eq("role", "admin")
             .maybeSingle();
           isAdmin = !!roleRow;
+          // Employers may open resumes of candidates who applied to their company's jobs.
+          if (!isAdmin) {
+            const applicantId = key.split("/")[1];
+            const { data: apps } = await admin
+              .from("applications")
+              .select("jobs!inner(company_id)")
+              .eq("applicant_id", applicantId);
+            const companyIds = [...new Set((apps || []).map((a: any) => a.jobs?.company_id).filter(Boolean))];
+            if (companyIds.length) {
+              const { data: owned } = await admin.from("companies").select("id").in("id", companyIds).eq("owner_id", userId).limit(1);
+              const { data: member } = await admin.from("company_members").select("id").in("company_id", companyIds).eq("user_id", userId).limit(1);
+              isAdmin = !!(owned?.length || member?.length);
+            }
+          }
         }
         if (!isOwner && !isAdmin) return json({ error: "Not authorized for this file" }, 403);
 
