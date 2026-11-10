@@ -32,6 +32,10 @@ import {
 } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 
+// "YYYY-MM" for a date's own calendar month. toISOString() would shift the
+// month back for anyone east of UTC, so build the key from local parts.
+const monthKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+
 export default function AdminRevenue() {
   const [filter, setFilter] = useState("all");
   const [timeRange, setTimeRange] = useState("month");
