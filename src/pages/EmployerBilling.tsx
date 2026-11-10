@@ -707,7 +707,7 @@ export default function EmployerBilling() {
                   </p>
                 )}
               </div>
-              <Button className="w-full" variant="outline">
+              <Button className="w-full" variant="outline" onClick={() => downloadInvoicePdf(selectedInvoice.id, selectedInvoice.invoice_number)}>
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF
               </Button>
