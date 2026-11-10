@@ -376,11 +376,8 @@ export default function AdminLayout() {
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <SidebarInset className="flex-1">
-          <header className="h-14 border-b flex items-center px-4 bg-card/50 backdrop-blur-sm gap-4 sticky top-0 z-10">
-            <SidebarTrigger className="md:hidden" />
-            <div className="flex-1">
-              <h1 className="text-lg font-semibold">Jobs.al Admin</h1>
-            </div>
+          <header className="h-12 border-b flex md:hidden items-center px-4 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+            <SidebarTrigger />
           </header>
 
           <main className="flex-1 overflow-auto bg-muted/30">
