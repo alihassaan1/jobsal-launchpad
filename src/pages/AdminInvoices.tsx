@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { INVOICE_SELLER, reverseChargeNote } from "@/lib/invoiceRules";
 import { 
   FileText, Search, Download, Plus, Eye, Send, 
   RefreshCcw, Ban, DollarSign, Calendar, Building,
@@ -44,6 +45,11 @@ type Invoice = {
   currency: string;
   billing_name: string | null;
   billing_email: string | null;
+  billing_city: string | null;
+  billing_country: string | null;
+  tax_id: string | null;
+  reference: string | null;
+  payment_link: string | null;
   source_type: string | null;
   created_at: string;
   companies?: { name: string; slug: string } | null;
@@ -102,6 +108,8 @@ export default function AdminInvoices() {
     billing_name: "",
     billing_email: "",
     billing_address: "",
+    tax_id: "",
+    reference: "",
     notes: "",
     items: [{ description: "", quantity: 1, unit_price: 0 }],
   });
@@ -172,6 +180,8 @@ export default function AdminInvoices() {
           billing_name: newInvoice.billing_name,
           billing_email: newInvoice.billing_email,
           billing_address: newInvoice.billing_address,
+          tax_id: newInvoice.tax_id || null,
+          reference: newInvoice.reference || null,
           notes: newInvoice.notes,
           subtotal,
           tax_rate: taxRate,
@@ -208,9 +218,44 @@ export default function AdminInvoices() {
       queryClient.invalidateQueries({ queryKey: ["invoice-stats"] });
       toast.success("Invoice created successfully");
       setIsCreateOpen(false);
-      setNewInvoice({ billing_name: "", billing_email: "", billing_address: "", notes: "", items: [{ description: "", quantity: 1, unit_price: 0 }] });
+      setNewInvoice({ billing_name: "", billing_email: "", billing_address: "", tax_id: "", reference: "", notes: "", items: [{ description: "", quantity: 1, unit_price: 0 }] });
     },
     onError: (error) => toast.error("Failed to create invoice: " + error.message),
+  });
+
+  const [details, setDetails] = useState({ due_date: "", tax_id: "", billing_address: "", billing_city: "", billing_country: "", reference: "" });
+  const openInvoice = (inv: Invoice) => {
+    setSelectedInvoice(inv);
+    setDetails({
+      due_date: inv.due_date ? inv.due_date.slice(0, 10) : "",
+      tax_id: inv.tax_id ?? "",
+      billing_address: inv.billing_address ?? "",
+      billing_city: inv.billing_city ?? "",
+      billing_country: inv.billing_country ?? "",
+      reference: inv.reference ?? "",
+    });
+    setIsViewOpen(true);
+  };
+  const saveDetailsMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedInvoice) return;
+      const updates = {
+        due_date: details.due_date ? new Date(details.due_date + "T12:00:00Z").toISOString() : null,
+        tax_id: details.tax_id.trim() || null,
+        billing_address: details.billing_address.trim() || null,
+        billing_city: details.billing_city.trim() || null,
+        billing_country: details.billing_country.trim() || null,
+        reference: details.reference.trim() || null,
+      };
+      const { error } = await supabase.from("invoices").update(updates).eq("id", selectedInvoice.id);
+      if (error) throw error;
+      setSelectedInvoice({ ...selectedInvoice, ...updates });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-invoices"] });
+      toast.success("Invoice details saved");
+    },
+    onError: (error) => toast.error("Failed to save: " + error.message),
   });
 
   const updateStatusMutation = useMutation({
@@ -358,6 +403,16 @@ export default function AdminInvoices() {
                       onChange={(e) => setNewInvoice(prev => ({ ...prev, billing_email: e.target.value }))}
                       placeholder="billing@example.com"
                     />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Tax ID (NUIS)</Label>
+                    <Input value={newInvoice.tax_id} onChange={(e) => setNewInvoice(prev => ({ ...prev, tax_id: e.target.value }))} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Reference</Label>
+                    <Input value={newInvoice.reference} onChange={(e) => setNewInvoice(prev => ({ ...prev, reference: e.target.value }))} placeholder="e.g. Contract number" />
                   </div>
                 </div>
                 <div className="space-y-2">
