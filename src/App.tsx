@@ -66,6 +66,7 @@ import JobCheckout from "./pages/JobCheckout";
 import SubscribePackage from "./pages/SubscribePackage";
 import EmployerAdCheckout from "./pages/EmployerAdCheckout";
 import EmployerBilling from "./pages/EmployerBilling";
+import PayPackage from "./pages/PayPackage";
 import CandidateVisibility from "./pages/CandidateVisibility";
 import EmployerTalentPool from "./pages/EmployerTalentPool";
 import ImpersonationBanner from "./components/ImpersonationBanner";
@@ -139,6 +140,7 @@ const App = () => (
             <Route path="/subscribe/:packageKey" element={<SubscribePackage />} />
             <Route path="/employer/ads/checkout" element={<EmployerAdCheckout />} />
             <Route path="/employer/billing" element={<EmployerBilling />} />
+            <Route path="/pay/:offerId" element={<PayPackage />} />
             <Route path="/employer/talent" element={<EmployerTalentPool />} />
             <Route path="/candidate/visibility" element={<CandidateVisibility />} />
             <Route path="/recommended-jobs" element={<RecommendedJobs />} />

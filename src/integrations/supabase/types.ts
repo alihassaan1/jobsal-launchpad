@@ -787,7 +787,9 @@ export type Database = {
           offer_expires_at: string
           package_name: string | null
           paid_at: string | null
+          pay_token: string | null
           product_key: string
+          receipt_emails: string[]
           starts_at: string
           status: string
           updated_at: string
@@ -806,7 +808,9 @@ export type Database = {
           offer_expires_at?: string
           package_name?: string | null
           paid_at?: string | null
+          pay_token?: string | null
           product_key: string
+          receipt_emails?: string[]
           starts_at: string
           status?: string
           updated_at?: string
@@ -825,7 +829,9 @@ export type Database = {
           offer_expires_at?: string
           package_name?: string | null
           paid_at?: string | null
+          pay_token?: string | null
           product_key?: string
+          receipt_emails?: string[]
           starts_at?: string
           status?: string
           updated_at?: string
