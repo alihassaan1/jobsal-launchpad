@@ -146,7 +146,73 @@ const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("activate"), subscription_id: z.string().min(5).max(64) }),
   z.object({ action: z.literal("cancel"), subscription_id: z.string().min(5).max(64) }),
   z.object({ action: z.literal("publish_free"), job_id: z.string().uuid(), offer_id: z.string().uuid().optional() }),
+  z.object({ action: z.literal("link_offer"), offer_id: z.string().uuid(), token: z.string().min(32).max(100) }),
+  z.object({ action: z.literal("link_create"), offer_id: z.string().uuid(), token: z.string().min(32).max(100), return_url: z.string().url().max(500) }),
+  z.object({ action: z.literal("link_capture"), offer_id: z.string().uuid(), token: z.string().min(32).max(100), order_id: z.string().min(5).max(64) }),
 ]);
+
+// Public one-time payment link for a private package: no login, token-bound to one offer.
+// deno-lint-ignore no-explicit-any
+async function handlePayLink(admin: any, body: { action: string; offer_id: string; token: string; return_url?: string; order_id?: string }) {
+  const { data: offer } = await admin.from("client_package_offers")
+    .select("id, company_id, employer_user_id, product_key, package_name, amount_cents, credit_limit, duration_months, starts_at, expires_at, offer_expires_at, status, paid_at, pay_token, receipt_emails, companies(name)")
+    .eq("id", body.offer_id).maybeSingle();
+  if (!offer || !offer.pay_token || offer.pay_token !== body.token) return json({ error: "Invalid payment link" }, 404);
+  const info = { package_name: offer.package_name, company_name: offer.companies?.name ?? "", amount_cents: offer.amount_cents,
+    credit_limit: offer.credit_limit, expires_at: offer.expires_at, offer_expires_at: offer.offer_expires_at, status: offer.status, paid_at: offer.paid_at };
+  if (body.action === "link_offer") return json({ offer: info });
+  if (offer.status === "paid") return json({ status: "completed", offer: info });
+  if (offer.status !== "offered" || new Date() > new Date(offer.offer_expires_at)) return json({ error: "This payment link has expired" }, 410);
+  const token = await paypalToken();
+
+  if (body.action === "link_create") {
+    const { data: pending } = await admin.from("paypal_orders").select("paypal_order_id").eq("client_offer_id", offer.id).eq("status", "created").eq("environment", ENV).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    if (pending) {
+      const prev = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${pending.paypal_order_id}`, { headers: { Authorization: `Bearer ${token}` } });
+      const o = await prev.json();
+      if (prev.ok && ["CREATED", "APPROVED", "PAYER_ACTION_REQUIRED"].includes(o.status)) return json({ order_id: o.id });
+    }
+    const product = offerProduct(offer);
+    const ret = new URL(body.return_url!);
+    const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
+      method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "PayPal-Request-Id": crypto.randomUUID() },
+      body: JSON.stringify({ intent: "CAPTURE",
+        purchase_units: [{ description: `${offer.package_name ?? "Jobs.al package"} - ${info.company_name}`.slice(0, 127), custom_id: `offer:${offer.id}`,
+          amount: { currency_code: "EUR", value: formatEur(offer.amount_cents) } }],
+        application_context: { brand_name: "Jobs.al", user_action: "PAY_NOW", shipping_preference: "NO_SHIPPING",
+          return_url: `${ret.origin}${ret.pathname}${ret.search}`, cancel_url: `${ret.origin}${ret.pathname}${ret.search}` } }),
+    });
+    const order = await res.json();
+    if (!res.ok) return json({ error: "PayPal could not create the order" }, 502);
+    const { error } = await admin.from("paypal_orders").insert({ user_id: offer.employer_user_id, paypal_order_id: order.id, product_key: offer.product_key,
+      amount_cents: offer.amount_cents, listing_credits: product.listing_credits, featured_days: product.featured_days, environment: ENV, client_offer_id: offer.id });
+    if (error) return json({ error: "Could not save payment order; no payment has been taken" }, 500);
+    return json({ order_id: order.id });
+  }
+
+  const { data: row } = await admin.from("paypal_orders").select("*").eq("paypal_order_id", body.order_id).eq("client_offer_id", offer.id).maybeSingle();
+  if (!row || row.environment !== ENV) return json({ error: "Order not found" }, 404);
+  const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${body.order_id}/capture`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "PayPal-Request-Id": `cap-${row.id}` } });
+  let cap = await res.json();
+  if (!res.ok) { const r = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${body.order_id}`, { headers: { Authorization: `Bearer ${token}` } }); if (r.ok) cap = await r.json(); }
+  const c = cap.purchase_units?.[0]?.payments?.captures?.[0];
+  const ok = cap.status === "COMPLETED" && c?.status === "COMPLETED" && c?.amount?.value === formatEur(row.amount_cents) && c?.amount?.currency_code === "EUR";
+  if (!ok) { await admin.from("paypal_orders").update({ status: "failed" }).eq("id", row.id); return json({ error: "Payment was not completed" }, 402); }
+  const { error } = await admin.rpc("settle_client_package", { _order_id: row.id });
+  if (error) return json({ error: "Payment received; package confirmation pending. Contact info@jobs.al with your order ID." }, 500);
+  const mail = { packageName: offer.package_name ?? "Package", companyName: info.company_name, amount: eur(row.amount_cents), credits: String(offer.credit_limit),
+    expiryDate: day(offer.expires_at), orderId: body.order_id!, paymentDate: day(new Date().toISOString()), name: info.company_name };
+  for (const to of (offer.receipt_emails?.length ? offer.receipt_emails : ["info@jobs.al"])) {
+    const { data: dup } = await admin.from("email_logs").select("id").eq("template_slug", "package-payment-completed").eq("email_to", to).eq("metadata->>delivery_key", `link:${row.id}`).limit(1);
+    if (dup?.length) continue;
+    try {
+      await fetch(`${url()}/functions/v1/send-email`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}` },
+        body: JSON.stringify({ to, templateSlug: "package-payment-completed", data: { ...mail, email: to, delivery_key: `link:${row.id}` } }) });
+    } catch (e) { console.error("receipt email failed", to, e); }
+  }
+  return json({ status: "completed", offer: { ...info, status: "paid" } });
+}
+const url = () => Deno.env.get("SUPABASE_URL")!;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -159,6 +225,9 @@ Deno.serve(async (req) => {
       return json({ client_id: Deno.env.get("PAYPAL_CLIENT_ID"), env: ENV, currency: "EUR" });
     }
     const url = Deno.env.get("SUPABASE_URL")!;
+    if (body.action === "link_offer" || body.action === "link_create" || body.action === "link_capture") {
+      return await handlePayLink(createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!), body);
+    }
     const authHeader = req.headers.get("Authorization") ?? "";
     const userClient = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
     const { data: { user } } = await userClient.auth.getUser();
