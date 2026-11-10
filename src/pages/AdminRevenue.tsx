@@ -73,7 +73,7 @@ export default function AdminRevenue() {
 
   const totalRevenue = paid.reduce((sum, t) => sum + t.amount, 0);
   const monthRevenue = paid
-    .filter(t => t.date.startsWith(now.toISOString().slice(0, 7)))
+    .filter(t => t.date.startsWith(monthKey(now)))
     .reduce((sum, t) => sum + t.amount, 0);
 
   const exportToCSV = () => {
