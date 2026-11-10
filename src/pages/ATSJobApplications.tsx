@@ -21,6 +21,8 @@ import { Briefcase, ArrowLeft, FileText, Mail, Phone, MapPin, Calendar, Download
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
 import ApplicationDocuments from "@/components/documents/ApplicationDocuments";
+import { applicationsToCsv, downloadCsv } from "@/lib/applicationsCsv";
+import { getStoragePath } from "@/lib/storage";
 
 const ATSJobApplications = () => {
   const { jobId } = useParams();
