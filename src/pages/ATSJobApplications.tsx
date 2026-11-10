@@ -22,7 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
 import ApplicationDocuments from "@/components/documents/ApplicationDocuments";
 import { applicationsToCsv, downloadCsv } from "@/lib/applicationsCsv";
-import { getStoragePath } from "@/lib/storage";
+
 
 const ATSJobApplications = () => {
   const { jobId } = useParams();
@@ -192,6 +192,39 @@ const ATSJobApplications = () => {
     return filtered;
   };
 
+  const exportCsv = (list: any[]) => {
+    if (!list.length) {
+      toast({ title: "No applications to export" });
+      return;
+    }
+    const slug = (job?.slug || jobId || "job").toString().slice(0, 60);
+    downloadCsv(applicationsToCsv(list), `applications-${slug}-${new Date().toISOString().slice(0, 10)}.csv`);
+  };
+
+  const openResumeFile = async (ref: string) => {
+    const win = window.open("", "_blank");
+    try {
+      const idx = ref.indexOf("/resumes/");
+      const path = idx >= 0 ? ref.substring(idx + 9) : ref;
+      let url: string;
+      if (path.startsWith("resumes/")) {
+        const { data, error } = await supabase.functions.invoke("r2-storage", {
+          body: { action: "presign_get", key: path, download: true },
+        });
+        if (error || !data?.url) throw error || new Error(data?.error || "Could not open resume");
+        url = data.url;
+      } else {
+        const { data, error } = await supabase.storage.from("resumes").createSignedUrl(path, 600, { download: true });
+        if (error || !data?.signedUrl) throw error || new Error("Could not open resume");
+        url = data.signedUrl;
+      }
+      if (win) win.location.href = url; else window.location.href = url;
+    } catch (e: any) {
+      win?.close();
+      toast({ title: "Error downloading resume", description: e.message, variant: "destructive" });
+    }
+  };
+
   const downloadResume = async (resumeUrl: string) => {
     const { data, error } = await supabase.storage.from("resumes").download(resumeUrl);
     if (error) {
@@ -256,13 +289,17 @@ const ATSJobApplications = () => {
         </div>
 
         {/* Search and Filters */}
-        <div className="mb-6">
+        <div className="mb-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
           <Input
             placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="max-w-md"
           />
+          <Button variant="outline" onClick={() => exportCsv(filterByStatus("all"))} disabled={!applications?.length}>
+            <Download className="h-4 w-4 mr-2" />
+            Export to CSV
+          </Button>
         </div>
 
         {/* Applications List with Tabs */}
@@ -452,7 +489,7 @@ const ATSJobApplications = () => {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => window.open(resume.resume_file_url, '_blank')}
+                                  onClick={() => openResumeFile(resume.resume_file_url)}
                                   className="flex-shrink-0"
                                 >
                                   <Download className="h-3 w-3" />
