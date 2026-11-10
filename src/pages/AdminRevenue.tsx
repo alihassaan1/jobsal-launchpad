@@ -64,7 +64,7 @@ export default function AdminRevenue() {
   const now = new Date();
   const mockMonthlyRevenue = Array.from({ length: 6 }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
-    const key = d.toISOString().slice(0, 7);
+    const key = monthKey(d);
     return {
       month: d.toLocaleString("en", { month: "short" }),
       revenue: paid.filter((t) => t.date.startsWith(key)).reduce((s, t) => s + t.amount, 0),
