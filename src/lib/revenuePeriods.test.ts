@@ -41,4 +41,25 @@ describe("recentMonthBuckets", () => {
       "2026-11",
     ]);
   });
+
+  it("puts each month's revenue under its own label", () => {
+    // Same aggregation the Revenue page does: bucket by month key, sum the
+    // completed payments whose date starts with that key.
+    const paid = [
+      { date: "2026-10-04", amount: 39 },
+      { date: "2026-10-22", amount: 59 },
+      { date: "2026-11-02", amount: 1200 },
+      { date: "2026-11-09", amount: 19 },
+    ];
+    const chart = recentMonthBuckets(new Date(2026, 10, 10)).map(({ key, label }) => ({
+      month: label,
+      revenue: paid.filter((t) => t.date.startsWith(key)).reduce((s, t) => s + t.amount, 0),
+    }));
+
+    const nov = chart.find((c) => c.month === "Nov");
+    const oct = chart.find((c) => c.month === "Oct");
+    expect(nov?.revenue).toBe(1219);
+    expect(oct?.revenue).toBe(98);
+    expect(chart.find((c) => c.month === "Jun")?.revenue).toBe(0);
+  });
 });
