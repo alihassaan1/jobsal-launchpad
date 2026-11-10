@@ -3285,6 +3285,10 @@ export type Database = {
         Returns: number
       }
       can_post_job: { Args: { user_id: string }; Returns: boolean }
+      can_view_profile: {
+        Args: { _profile_id: string; _viewer: string }
+        Returns: boolean
+      }
       company_has_talent_pool: {
         Args: { _company_id: string }
         Returns: boolean
@@ -3337,6 +3341,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_published_author: { Args: { _profile_id: string }; Returns: boolean }
       publish_client_package_job: {
         Args: { _job_id: string; _offer_id: string; _user_id: string }
         Returns: string
