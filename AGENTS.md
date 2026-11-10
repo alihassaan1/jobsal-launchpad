@@ -1,4 +1,5 @@
 # Project architecture
+- Keep one persistent invoice per private package, with invoice payment status synchronized transactionally from the package to prevent duplicate invoices and payment drift.
 - Scope admin language with a fixed English context without changing the saved public-language preference.
 - Create companies for private packages through server-validated admin actions linked to existing employer accounts, never to the current admin by default.
 
