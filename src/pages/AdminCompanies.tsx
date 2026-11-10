@@ -36,6 +36,7 @@ import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
 import { LoadingState } from "@/components/admin/LoadingState";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { useAuth } from "@/contexts/AuthContext";
+import { CompanyDetailSheet } from "@/components/admin/CompanyDetailSheet";
 
 export default function AdminCompanies() {
   const { user } = useAuth();
@@ -44,6 +45,7 @@ export default function AdminCompanies() {
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+  const [detail, setDetail] = useState<any>(null);
   const [creating, setCreating] = useState(false);
   const [newCompany, setNewCompany] = useState({
     name: "",
@@ -489,7 +491,7 @@ export default function AdminCompanies() {
               </TableHeader>
               <TableBody>
                 {filteredCompanies.map((company) => (
-                  <TableRow key={company.id} className={company.is_orphan_employer ? "bg-amber-50/50 dark:bg-amber-950/10" : undefined}>
+                  <TableRow key={company.id} onClick={(e) => { if (company.is_orphan_employer) return; if ((e.target as HTMLElement).closest("button,[role=combobox],a")) return; setDetail(company); }} className={company.is_orphan_employer ? "bg-amber-50/50 dark:bg-amber-950/10" : "cursor-pointer"}>
                     <TableCell>
                       <div>
                         <div className="font-medium">{company.name}</div>
@@ -569,6 +571,9 @@ export default function AdminCompanies() {
                             Create company
                           </Button>
                         ) : (
+                          <Button size="sm" variant="outline" onClick={() => setDetail(company)}>Manage</Button>
+                        )}
+                        {!company.is_orphan_employer && (
                           <Button
                             size="sm"
                             variant={company.is_verified ? "outline" : "default"}
@@ -586,6 +591,7 @@ export default function AdminCompanies() {
           )}
         </CardContent>
       </Card>
+      <CompanyDetailSheet company={detail} open={!!detail} onOpenChange={(o) => !o && setDetail(null)} onChanged={fetchCompanies} />
     </div>
   );
 }
