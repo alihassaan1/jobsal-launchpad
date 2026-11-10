@@ -78,6 +78,14 @@ serve(async (req) => {
   }
 });
 
+const esc = (v: unknown) => String(v ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
+
+function reverseChargeNote(taxRate: unknown, buyerTaxId: unknown): string | null {
+  const id = String(buyerTaxId ?? "").trim();
+  if (Number(taxRate ?? 0) !== 0 || !id) return null;
+  return `Reverse charge: VAT to be accounted for by the recipient (NUIS ${id}). / Autongarkesë: TVSH llogaritet nga marrësi.`;
+}
+
 function generateInvoiceHTML(
   invoice: Record<string, unknown>,
   items: Record<string, unknown>[],
@@ -92,7 +100,7 @@ function generateInvoiceHTML(
 
   const itemsHtml = items.map((item) => `
     <tr>
-      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.description}</td>
+      <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${esc(item.description)}</td>
       <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${item.quantity}</td>
       <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">${formatCurrency(item.unit_price as number)}</td>
       <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">${formatCurrency(item.total as number)}</td>
@@ -109,7 +117,7 @@ function generateInvoiceHTML(
     body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px; color: #1f2937; }
     .invoice-header { display: flex; justify-content: space-between; margin-bottom: 40px; }
     .company-info { text-align: right; }
-    .company-name { font-size: 24px; font-weight: bold; color: #2563eb; margin-bottom: 8px; }
+    .company-name { font-size: 24px; font-weight: bold; color: #E8272C; margin-bottom: 8px; }
     .invoice-title { font-size: 32px; font-weight: bold; color: #1f2937; margin-bottom: 8px; }
     .invoice-number { font-size: 18px; color: #6b7280; }
     .addresses { display: flex; justify-content: space-between; margin-bottom: 40px; }
@@ -143,26 +151,28 @@ function generateInvoiceHTML(
       </div>
     </div>
     <div class="company-info">
-      <div class="company-name">${settings.company_name || 'Jobs.al'}</div>
-      <div>${settings.company_address || 'Tirana, Albania'}</div>
-      <div>${settings.company_email || 'billing@jobs.al'}</div>
-      <div>${settings.company_phone || ''}</div>
-      ${settings.company_tax_id ? `<div>NIPT: ${settings.company_tax_id}</div>` : ''}
+      <div class="company-name">iMake LLC</div>
+      <div>Operator of Jobs.al</div>
+      <div>5900 Balcones Drive STE 100</div>
+      <div>Austin, TX 78731</div>
+      <div>USA</div>
+      <div>info@jobs.al</div>
     </div>
   </div>
 
   <div class="addresses">
     <div class="address-block">
       <div class="address-label">Bill To</div>
-      <div style="font-weight: 600;">${invoice.billing_name || 'N/A'}</div>
-      <div>${invoice.billing_address || ''}</div>
-      <div>${invoice.billing_city || ''} ${invoice.billing_postal_code || ''}</div>
-      <div>${invoice.billing_country || ''}</div>
-      ${invoice.billing_email ? `<div>${invoice.billing_email}</div>` : ''}
-      ${invoice.tax_id ? `<div>NIPT: ${invoice.tax_id}</div>` : ''}
+      <div style="font-weight: 600;">${esc(invoice.billing_name || 'N/A')}</div>
+      ${invoice.tax_id ? `<div>NUIS: ${esc(invoice.tax_id)}</div>` : ''}
+      ${invoice.billing_address ? `<div>${esc(invoice.billing_address)}</div>` : ''}
+      ${invoice.billing_city || invoice.billing_postal_code ? `<div>${esc(invoice.billing_city)} ${esc(invoice.billing_postal_code)}</div>` : ''}
+      ${invoice.billing_country ? `<div>${esc(invoice.billing_country)}</div>` : ''}
+      ${invoice.billing_email ? `<div>${esc(invoice.billing_email)}</div>` : ''}
     </div>
     <div class="address-block" style="text-align: right;">
       <div class="address-label">Invoice Details</div>
+      ${invoice.reference ? `<div><strong>Reference:</strong> ${esc(invoice.reference)}</div>` : ''}
       <div><strong>Issue Date:</strong> ${formatDate(invoice.issue_date as string)}</div>
       ${invoice.due_date ? `<div><strong>Due Date:</strong> ${formatDate(invoice.due_date as string)}</div>` : ''}
       ${invoice.paid_date ? `<div><strong>Paid Date:</strong> ${formatDate(invoice.paid_date as string)}</div>` : ''}
@@ -216,6 +226,15 @@ function generateInvoiceHTML(
     ` : ''}
   </div>
 
+  ${reverseChargeNote(invoice.tax_rate, invoice.tax_id) ? `
+  <div style="margin-top: 24px; font-size: 13px;">${esc(reverseChargeNote(invoice.tax_rate, invoice.tax_id))}</div>` : ''}
+
+  ${invoice.payment_link && !['paid', 'void', 'cancelled'].includes(invoice.status as string) ? `
+  <div class="bank-details">
+    <div class="bank-details-title">Pay online (PayPal or card)</div>
+    <div style="word-break: break-all;"><a href="${esc(invoice.payment_link)}">${esc(invoice.payment_link)}</a></div>
+  </div>` : ''}
+
   ${settings.bank_name ? `
   <div class="bank-details">
     <div class="bank-details-title">Payment Details</div>
@@ -229,7 +248,7 @@ function generateInvoiceHTML(
   ${invoice.notes ? `
   <div style="margin-top: 30px;">
     <div style="font-weight: 600; margin-bottom: 8px;">Notes</div>
-    <div style="color: #6b7280;">${invoice.notes}</div>
+    <div style="color: #6b7280;">${esc(invoice.notes)}</div>
   </div>
   ` : ''}
 

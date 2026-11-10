@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { INVOICE_SELLER, reverseChargeNote } from "@/lib/invoiceRules";
 import { 
   FileText, Search, Download, Plus, Eye, Send, 
   RefreshCcw, Ban, DollarSign, Calendar, Building,
@@ -44,6 +45,11 @@ type Invoice = {
   currency: string;
   billing_name: string | null;
   billing_email: string | null;
+  billing_city: string | null;
+  billing_country: string | null;
+  tax_id: string | null;
+  reference: string | null;
+  payment_link: string | null;
   source_type: string | null;
   created_at: string;
   companies?: { name: string; slug: string } | null;
@@ -102,6 +108,8 @@ export default function AdminInvoices() {
     billing_name: "",
     billing_email: "",
     billing_address: "",
+    tax_id: "",
+    reference: "",
     notes: "",
     items: [{ description: "", quantity: 1, unit_price: 0 }],
   });
@@ -172,6 +180,8 @@ export default function AdminInvoices() {
           billing_name: newInvoice.billing_name,
           billing_email: newInvoice.billing_email,
           billing_address: newInvoice.billing_address,
+          tax_id: newInvoice.tax_id || null,
+          reference: newInvoice.reference || null,
           notes: newInvoice.notes,
           subtotal,
           tax_rate: taxRate,
@@ -208,9 +218,44 @@ export default function AdminInvoices() {
       queryClient.invalidateQueries({ queryKey: ["invoice-stats"] });
       toast.success("Invoice created successfully");
       setIsCreateOpen(false);
-      setNewInvoice({ billing_name: "", billing_email: "", billing_address: "", notes: "", items: [{ description: "", quantity: 1, unit_price: 0 }] });
+      setNewInvoice({ billing_name: "", billing_email: "", billing_address: "", tax_id: "", reference: "", notes: "", items: [{ description: "", quantity: 1, unit_price: 0 }] });
     },
     onError: (error) => toast.error("Failed to create invoice: " + error.message),
+  });
+
+  const [details, setDetails] = useState({ due_date: "", tax_id: "", billing_address: "", billing_city: "", billing_country: "", reference: "" });
+  const openInvoice = (inv: Invoice) => {
+    setSelectedInvoice(inv);
+    setDetails({
+      due_date: inv.due_date ? inv.due_date.slice(0, 10) : "",
+      tax_id: inv.tax_id ?? "",
+      billing_address: inv.billing_address ?? "",
+      billing_city: inv.billing_city ?? "",
+      billing_country: inv.billing_country ?? "",
+      reference: inv.reference ?? "",
+    });
+    setIsViewOpen(true);
+  };
+  const saveDetailsMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedInvoice) return;
+      const updates = {
+        due_date: details.due_date ? new Date(details.due_date + "T12:00:00Z").toISOString() : null,
+        tax_id: details.tax_id.trim() || null,
+        billing_address: details.billing_address.trim() || null,
+        billing_city: details.billing_city.trim() || null,
+        billing_country: details.billing_country.trim() || null,
+        reference: details.reference.trim() || null,
+      };
+      const { error } = await supabase.from("invoices").update(updates).eq("id", selectedInvoice.id);
+      if (error) throw error;
+      setSelectedInvoice({ ...selectedInvoice, ...updates });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-invoices"] });
+      toast.success("Invoice details saved");
+    },
+    onError: (error) => toast.error("Failed to save: " + error.message),
   });
 
   const updateStatusMutation = useMutation({
@@ -358,6 +403,16 @@ export default function AdminInvoices() {
                       onChange={(e) => setNewInvoice(prev => ({ ...prev, billing_email: e.target.value }))}
                       placeholder="billing@example.com"
                     />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Tax ID (NUIS)</Label>
+                    <Input value={newInvoice.tax_id} onChange={(e) => setNewInvoice(prev => ({ ...prev, tax_id: e.target.value }))} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Reference</Label>
+                    <Input value={newInvoice.reference} onChange={(e) => setNewInvoice(prev => ({ ...prev, reference: e.target.value }))} placeholder="e.g. Contract number" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -586,7 +641,7 @@ export default function AdminInvoices() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => { setSelectedInvoice(invoice); setIsViewOpen(true); }}>
+                          <DropdownMenuItem onClick={() => openInvoice(invoice)}>
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
@@ -633,22 +688,37 @@ export default function AdminInvoices() {
 
       {/* View Invoice Dialog */}
       <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Invoice {selectedInvoice?.invoice_number}</DialogTitle>
           </DialogHeader>
           {selectedInvoice && (
             <div className="space-y-4">
-              <div className="flex justify-between">
-                <div>
+              <div className="flex justify-between gap-4">
+                <div className="text-sm">
+                  <p className="text-xs uppercase text-muted-foreground mb-1">From</p>
+                  <p className="font-medium">{INVOICE_SELLER.name}</p>
+                  <p className="text-muted-foreground">{INVOICE_SELLER.tagline}</p>
+                  {INVOICE_SELLER.address.map((l) => <p key={l} className="text-muted-foreground">{l}</p>)}
+                  <p className="text-muted-foreground">{INVOICE_SELLER.email}</p>
+                </div>
+                <div className="text-sm">
+                  <p className="text-xs uppercase text-muted-foreground mb-1">Bill to</p>
                   <p className="font-medium">{selectedInvoice.billing_name}</p>
-                  <p className="text-sm text-muted-foreground">{selectedInvoice.billing_email}</p>
-                  <p className="text-sm text-muted-foreground">{selectedInvoice.billing_address}</p>
+                  {selectedInvoice.tax_id && <p className="text-muted-foreground">NUIS: {selectedInvoice.tax_id}</p>}
+                  {selectedInvoice.billing_address && <p className="text-muted-foreground">{selectedInvoice.billing_address}</p>}
+                  {(selectedInvoice.billing_city || selectedInvoice.billing_country) && (
+                    <p className="text-muted-foreground">{[selectedInvoice.billing_city, selectedInvoice.billing_country].filter(Boolean).join(", ")}</p>
+                  )}
+                  <p className="text-muted-foreground">{selectedInvoice.billing_email}</p>
                 </div>
                 <div className="text-right">
                   <Badge className={statusColors[selectedInvoice.status]}>
                     {selectedInvoice.status.replace("_", " ")}
                   </Badge>
+                  {selectedInvoice.reference && (
+                    <p className="text-sm text-muted-foreground mt-2">Reference: {selectedInvoice.reference}</p>
+                  )}
                   <p className="text-sm text-muted-foreground mt-2">
                     Issued: {safeFormat((selectedInvoice.issue_date), "PPP")}
                   </p>
@@ -694,6 +764,30 @@ export default function AdminInvoices() {
                     <p className="font-medium">Balance Due: €{(selectedInvoice.amount_due / 100).toFixed(2)}</p>
                   </>
                 )}
+              </div>
+
+              {reverseChargeNote(selectedInvoice.tax_rate, selectedInvoice.tax_id) && (
+                <p className="text-sm">{reverseChargeNote(selectedInvoice.tax_rate, selectedInvoice.tax_id)}</p>
+              )}
+              {selectedInvoice.payment_link && !["paid", "void", "cancelled"].includes(selectedInvoice.status) && (
+                <p className="text-sm break-all">
+                  Pay online: <a className="text-primary underline" href={selectedInvoice.payment_link} target="_blank" rel="noreferrer">{selectedInvoice.payment_link}</a>
+                </p>
+              )}
+
+              <div className="border-t pt-4 space-y-3">
+                <p className="font-medium text-sm">Edit details</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1"><Label>Due date</Label><Input type="date" value={details.due_date} onChange={(e) => setDetails(d => ({ ...d, due_date: e.target.value }))} /></div>
+                  <div className="space-y-1"><Label>Reference</Label><Input value={details.reference} onChange={(e) => setDetails(d => ({ ...d, reference: e.target.value }))} /></div>
+                  <div className="space-y-1"><Label>Tax ID (NUIS)</Label><Input value={details.tax_id} onChange={(e) => setDetails(d => ({ ...d, tax_id: e.target.value }))} /></div>
+                  <div className="space-y-1"><Label>Address</Label><Input value={details.billing_address} onChange={(e) => setDetails(d => ({ ...d, billing_address: e.target.value }))} /></div>
+                  <div className="space-y-1"><Label>City</Label><Input value={details.billing_city} onChange={(e) => setDetails(d => ({ ...d, billing_city: e.target.value }))} /></div>
+                  <div className="space-y-1"><Label>Country</Label><Input value={details.billing_country} onChange={(e) => setDetails(d => ({ ...d, billing_country: e.target.value }))} /></div>
+                </div>
+                <div className="flex justify-end">
+                  <Button size="sm" onClick={() => saveDetailsMutation.mutate()} disabled={saveDetailsMutation.isPending}>Save details</Button>
+                </div>
               </div>
 
               <div className="flex gap-2 justify-end">

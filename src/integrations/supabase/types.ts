@@ -1441,10 +1441,12 @@ export type Database = {
           notes: string | null
           overdue_notice_sent_at: string | null
           paid_date: string | null
+          payment_link: string | null
           payment_method: string | null
           payment_reference: string | null
           pdf_url: string | null
           promo_code_id: string | null
+          reference: string | null
           reminder_sent_at: string | null
           sent_at: string | null
           source_id: string | null
@@ -1480,10 +1482,12 @@ export type Database = {
           notes?: string | null
           overdue_notice_sent_at?: string | null
           paid_date?: string | null
+          payment_link?: string | null
           payment_method?: string | null
           payment_reference?: string | null
           pdf_url?: string | null
           promo_code_id?: string | null
+          reference?: string | null
           reminder_sent_at?: string | null
           sent_at?: string | null
           source_id?: string | null
@@ -1519,10 +1523,12 @@ export type Database = {
           notes?: string | null
           overdue_notice_sent_at?: string | null
           paid_date?: string | null
+          payment_link?: string | null
           payment_method?: string | null
           payment_reference?: string | null
           pdf_url?: string | null
           promo_code_id?: string | null
+          reference?: string | null
           reminder_sent_at?: string | null
           sent_at?: string | null
           source_id?: string | null
