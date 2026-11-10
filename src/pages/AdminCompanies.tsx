@@ -155,13 +155,27 @@ export default function AdminCompanies() {
       if (rolesErr) console.warn('Could not load employer roles:', rolesErr);
 
       const employerIds = Array.from(new Set((employerRoles || []).map((r: any) => r.user_id)));
-      const ownersWithCompanies = new Set(list.map((c: any) => c.owner_id));
-      const orphanEmployerIds = employerIds.filter((id) => !ownersWithCompanies.has(id));
+      // Team members linked to companies (owner/recruiter/viewer)
+      const { data: membersData, error: membersErr } = await supabase
+        .from('company_members')
+        .select('company_id, user_id, role');
+      if (membersErr) console.warn('Could not load company members:', membersErr);
+      const membersByCompany: Record<string, { user_id: string; role: string }[]> = {};
+      for (const m of (membersData || []) as any[]) {
+        (membersByCompany[m.company_id] ||= []).push({ user_id: m.user_id, role: m.role });
+      }
 
-      // Profiles needed: owners of existing companies + orphan employers
+      const linkedUserIds = new Set<string>([
+        ...list.map((c: any) => c.owner_id),
+        ...((membersData || []) as any[]).map((m) => m.user_id),
+      ]);
+      const orphanEmployerIds = employerIds.filter((id) => !linkedUserIds.has(id));
+
+      // Profiles needed: owners, team members, orphan employers
       const profileIds = Array.from(
         new Set([
           ...list.map((c: any) => c.owner_id).filter(Boolean),
+          ...((membersData || []) as any[]).map((m) => m.user_id),
           ...orphanEmployerIds,
         ])
       );
@@ -201,6 +215,9 @@ export default function AdminCompanies() {
       const companiesEnriched = list.map((c: any) => ({
         ...c,
         profiles: profilesById[c.owner_id] || null,
+        team: (membersByCompany[c.id] || [])
+          .filter((m) => m.user_id !== c.owner_id)
+          .map((m) => ({ ...m, ...(profilesById[m.user_id] || {}) })),
         jobs_count: jobsCountById[c.id] || 0,
         is_orphan_employer: false,
       }));
@@ -483,6 +500,18 @@ export default function AdminCompanies() {
                       <div>
                         <div className="text-sm">{company.profiles?.full_name || 'N/A'}</div>
                         <div className="text-xs text-muted-foreground">{company.profiles?.email}</div>
+                        {company.team?.length > 0 && (
+                          <div className="mt-2 space-y-1 border-t pt-2">
+                            <div className="text-xs font-medium text-muted-foreground">Team ({company.team.length})</div>
+                            {company.team.map((m: any) => (
+                              <div key={m.user_id} className="text-xs">
+                                {m.full_name || m.email || 'Unknown'}{' '}
+                                <span className="text-muted-foreground">· {m.role}</span>
+                                {m.email && m.full_name && <div className="text-muted-foreground">{m.email}</div>}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
