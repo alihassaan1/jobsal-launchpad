@@ -148,6 +148,7 @@ export function CompanyDetailSheet({ company, open, onOpenChange, onChanged }: {
                       <div className="flex-1 min-w-0">
                         <div className="font-medium truncate">{m.full_name || m.email || "Unknown"}</div>
                         <div className="text-xs text-muted-foreground truncate">{m.email}</div>
+                        {m.user_id === company.owner_id && <div className="text-xs text-muted-foreground mt-0.5">Main account (holds the company package)</div>}
                       </div>
                       <Select value={m.role} onValueChange={(v) => setRole(m, v)} disabled={busy === m.user_id || m.user_id === company.owner_id}>
                         <SelectTrigger className="w-[120px]"><SelectValue /></SelectTrigger>
