@@ -85,7 +85,7 @@ export default function JobCheckout() {
     enabled: !!user && !!job,
     queryFn: async () => {
       if (!user) return null;
-      const { data, error } = await supabase.from("client_package_offers").select("*").eq("employer_user_id", user.id).eq("status", "paid").order("expires_at");
+      const { data, error } = await supabase.from("client_package_offers").select("*").eq("company_id", job!.company_id).eq("status", "paid").order("expires_at");
       if (error) throw error;
       return data?.find(offer => offer.company_id === job?.company_id && canUseOffer(offer)) ?? null;
     },

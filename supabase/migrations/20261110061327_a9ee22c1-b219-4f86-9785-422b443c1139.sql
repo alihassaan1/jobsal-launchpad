@@ -1,0 +1,1 @@
+DELETE FROM public.jobs WHERE slug = 'test-delete-dgm' AND company_id = 'fd88f8a7-1ade-4803-821b-697ea43697de';

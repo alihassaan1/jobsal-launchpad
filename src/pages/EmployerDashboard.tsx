@@ -43,7 +43,18 @@ const EmployerDashboard = () => {
         .maybeSingle();
 
       if (error) throw error;
-      return data;
+      if (data) return data;
+      // Team members (e.g. recruiters added by admin) work under their company
+      const { data: membership } = await supabase
+        .from("company_members")
+        .select("company_id")
+        .eq("user_id", user!.id)
+        .in("role", ["owner", "recruiter"])
+        .limit(1)
+        .maybeSingle();
+      if (!membership) return null;
+      const { data: memberCompany } = await supabase.from("companies").select("*").eq("id", membership.company_id).maybeSingle();
+      return memberCompany;
     },
   });
 

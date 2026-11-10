@@ -215,8 +215,9 @@ Deno.serve(async (req) => {
       if (job.is_active) return json({ status: "already_live" });
 
       if (body.offer_id) {
-        const { data: offer } = await admin.from("client_package_offers").select("*").eq("id", body.offer_id).eq("employer_user_id", user.id).maybeSingle();
-        if (!offer || !canUseOffer(offer)) return json({ error: "No active client package credits available" }, 403);
+        const { data: offer } = await admin.from("client_package_offers").select("*").eq("id", body.offer_id).maybeSingle();
+        const { data: member } = offer ? await admin.rpc("is_company_member", { _company_id: offer.company_id, _user_id: user.id, _min_role: "recruiter" }) : { data: false };
+        if (!offer || !member || !canUseOffer(offer)) return json({ error: "No active client package credits available" }, 403);
         const { data: status, error } = await admin.rpc("publish_client_package_job", { _offer_id: offer.id, _job_id: job.id, _user_id: user.id });
         if (error) return json({ error: "Could not use package credit" }, 409);
         const left = offer.credit_limit - offer.credits_used - 1;

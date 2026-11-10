@@ -24,7 +24,7 @@ export default function ClientPackageOffers({ admin = false }: { admin?: boolean
     enabled: !!user && (!admin || userRole === "admin"),
     queryFn: async () => {
       let query = supabase.from("client_package_offers").select("*").order("created_at", { ascending: false });
-      if (!admin && user) query = query.eq("employer_user_id", user.id);
+      // Non-admins only receive their own or their company team's offers (enforced by access rules)
       const { data, error } = await query;
       if (error) throw error;
       return data ?? [];
