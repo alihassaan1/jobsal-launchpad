@@ -596,11 +596,9 @@ const Index = () => {
                       {category.icon}
                     </span>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors duration-300">
+                  <h3 className="text-lg font-semibold group-hover:text-primary transition-colors duration-300">
                     {category.name}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                  </p>
                 </CardContent>
               </Card>
             ))}
