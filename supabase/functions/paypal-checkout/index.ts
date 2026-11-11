@@ -278,7 +278,7 @@ Deno.serve(async (req) => {
         offer_expires_at: custom ? terms.offer_expires_at : CLIENT_OFFER_VALID_UNTIL, package_name: custom ? terms.package_name : product.name,
       }).select("id").single();
       if (error) return json({ error: error.code === "23505" ? "This company already has an unpaid offer" : "Could not assign offer" }, 400);
-      await admin.from("companies").update({ is_verified: true, is_hidden: false }).eq("id", company.id);
+      await admin.from("companies").update({ is_verified: true }).eq("id", company.id);
       await sendPackageEmail(admin, company.owner_id, "package-offer-ready", {
         packageName: custom ? terms.package_name : product.name, companyName: company.name, amount: eur(product.amount_cents),
         credits: String(product.listing_credits), duration: `${product.duration_months} muaj / months`, startDate: day(starts.toISOString()),
