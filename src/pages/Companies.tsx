@@ -51,7 +51,8 @@ const Companies = () => {
         .order("is_sponsored", { ascending: false })
         .order("sponsorship_plan", { ascending: false })
         .order("followers_count", { ascending: false })
-        .not("name", "ilike", "%(Draft)%");
+        .not("name", "ilike", "%(Draft)%")
+        .eq("is_verified", true);
 
       if (searchTerm) {
         query = query.or(`name.ilike.%${searchTerm}%,industry.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`);
