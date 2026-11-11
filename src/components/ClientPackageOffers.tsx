@@ -24,7 +24,17 @@ export default function ClientPackageOffers({ admin = false }: { admin?: boolean
     enabled: !!user && (!admin || userRole === "admin"),
     queryFn: async () => {
       let query = supabase.from("client_package_offers").select("*").order("created_at", { ascending: false });
-      // Non-admins only receive their own or their company team's offers (enforced by access rules)
+      // Employer view: only packages of companies this user owns or belongs to.
+      // Access rules let admins read every row, so scope explicitly here.
+      if (!admin) {
+        const [{ data: owned }, { data: memberships }] = await Promise.all([
+          supabase.from("companies").select("id").eq("owner_id", user!.id),
+          supabase.from("company_members").select("company_id").eq("user_id", user!.id),
+        ]);
+        const ids = [...new Set([...(owned ?? []).map((c) => c.id), ...(memberships ?? []).map((m) => m.company_id)])];
+        if (ids.length === 0) return [];
+        query = query.in("company_id", ids);
+      }
       const { data, error } = await query;
       if (error) throw error;
       return data ?? [];
