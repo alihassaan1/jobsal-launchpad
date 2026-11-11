@@ -1,3 +1,4 @@
+import { htmlToPlainText } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -241,7 +242,7 @@ export default function RecommendedJobs() {
 
                   <CardContent>
                     <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-                      {job.description}
+                      {htmlToPlainText(job.description)}
                     </p>
                     <div className="flex items-center justify-between">
                       <Badge variant="outline">{job.category}</Badge>
