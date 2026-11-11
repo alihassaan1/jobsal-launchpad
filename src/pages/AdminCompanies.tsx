@@ -214,7 +214,33 @@ export default function AdminCompanies() {
         }
       }
 
+      const packageById: Record<string, string> = {};
+      if (list.length > 0) {
+        const { data: offerRows } = await supabase
+          .from('client_package_offers')
+          .select('company_id, package_name, status, expires_at')
+          .in('company_id', list.map((c: any) => c.id))
+          .in('status', ['offered', 'paid']);
+        for (const o of (offerRows || []) as any[]) {
+          if (o.status === 'paid' && new Date(o.expires_at) <= new Date()) continue;
+          const label = `${o.package_name || 'Private package'}${o.status === 'paid' ? '' : ' (awaiting payment)'}`;
+          if (!packageById[o.company_id] || o.status === 'paid') packageById[o.company_id] = label;
+        }
+        const ownerIds = list.map((c: any) => c.owner_id).filter(Boolean);
+        const { data: subRows } = await supabase
+          .from('subscriptions')
+          .select('user_id, plan_slug, status, current_period_end')
+          .in('user_id', ownerIds)
+          .eq('status', 'active');
+        for (const c of list as any[]) {
+          if (packageById[c.id]) continue;
+          const sub = (subRows || []).find((x: any) => x.user_id === c.owner_id && x.plan_slug && (!x.current_period_end || new Date(x.current_period_end) > new Date()));
+          if (sub) packageById[c.id] = `${String(sub.plan_slug).replace(/^package:/, '').replace(/^\w/, (m: string) => m.toUpperCase())} (monthly)`;
+        }
+      }
+
       const companiesEnriched = list.map((c: any) => ({
+        package_label: packageById[c.id] || null,
         ...c,
         profiles: profilesById[c.owner_id] || null,
         team: (membersByCompany[c.id] || [])
@@ -483,7 +509,7 @@ export default function AdminCompanies() {
                   <TableHead>Company</TableHead>
                   <TableHead>Owner</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Sponsorship</TableHead>
+                  <TableHead>Package</TableHead>
                   <TableHead>Active Jobs</TableHead>
                   <TableHead>Stats</TableHead>
                   <TableHead>Actions</TableHead>
@@ -534,20 +560,9 @@ export default function AdminCompanies() {
                       {company.is_orphan_employer ? (
                         <span className="text-xs text-muted-foreground">—</span>
                       ) : (
-                        <Select
-                          value={company.sponsorship_plan}
-                          onValueChange={(value) => updateSponsorshipTier(company.id, value)}
-                        >
-                          <SelectTrigger className="w-[130px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">None</SelectItem>
-                            <SelectItem value="silver">Silver</SelectItem>
-                            <SelectItem value="gold">Gold</SelectItem>
-                            <SelectItem value="platinum">Platinum</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        company.package_label
+                          ? <Badge variant="outline">{company.package_label}</Badge>
+                          : <span className="text-xs text-muted-foreground">Free</span>
                       )}
                     </TableCell>
                     <TableCell>

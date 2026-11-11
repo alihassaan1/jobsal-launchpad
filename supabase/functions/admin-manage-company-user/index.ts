@@ -87,6 +87,35 @@ Deno.serve(async (req) => {
       return json({ success: true });
     }
 
+    if (action === "delete_company") {
+      const [{ count: offers }, { count: invoices }, { data: jobRows }] = await Promise.all([
+        admin.from("client_package_offers").select("id", { count: "exact", head: true }).eq("company_id", companyId),
+        admin.from("invoices").select("id", { count: "exact", head: true }).eq("company_id", companyId),
+        admin.from("jobs").select("id").eq("company_id", companyId),
+      ]);
+      if ((offers ?? 0) > 0 || (invoices ?? 0) > 0) return json({ error: "This company has a package or invoice, so it can't be deleted. Unverify or hide it instead." }, 400);
+      const jobIds = (jobRows ?? []).map((j: any) => j.id);
+      if (jobIds.length) {
+        const { count: apps } = await admin.from("applications").select("id", { count: "exact", head: true }).in("job_id", jobIds);
+        if ((apps ?? 0) > 0) return json({ error: "This company's jobs have applications, so it can't be deleted. Unverify or hide it instead." }, 400);
+        const { count: paid } = await admin.from("job_listings").select("id", { count: "exact", head: true }).in("job_id", jobIds);
+        if ((paid ?? 0) > 0) return json({ error: "This company has paid or credited jobs, so it can't be deleted. Unverify or hide it instead." }, 400);
+        for (const t of ["saved_jobs", "job_recommendations", "analytics", "ad_analytics"]) await admin.from(t).delete().in("job_id", jobIds);
+        await admin.from("jobs").delete().in("id", jobIds);
+      }
+      for (const t of ["company_members", "company_member_invites", "company_followers", "analytics", "ad_analytics", "company_billing_profiles"]) await admin.from(t).delete().eq("company_id", companyId);
+      const { error } = await admin.from("companies").delete().eq("id", companyId);
+      if (error) return json({ error: "Could not delete company: " + error.message }, 400);
+      if (body.make_candidate && company.owner_id) {
+        const { count: others } = await admin.from("companies").select("id", { count: "exact", head: true }).eq("owner_id", company.owner_id);
+        if (!others) {
+          await admin.from("user_roles").delete().eq("user_id", company.owner_id).eq("role", "employer");
+          await admin.from("user_roles").upsert({ user_id: company.owner_id, role: "job_seeker" }, { onConflict: "user_id,role" });
+        }
+      }
+      return json({ success: true });
+    }
+
     return json({ error: "Unknown action" }, 400);
   } catch (e) {
     return json({ error: (e as Error).message }, 500);
