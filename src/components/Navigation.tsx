@@ -90,6 +90,13 @@ export default function Navigation() {
                   }}>
                     {userRole === 'employer' || userRole === 'admin' ? t('nav.dashboard') : t('nav.myApplications')}
                   </DropdownMenuItem>
+                  {(userRole === 'employer' || userRole === 'admin') && (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate('/setup-company')}>Company Profile</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/employer/billing')}>My Plan & Billing</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/employer/talent')}>Talent Pool</DropdownMenuItem>
+                    </>
+                  )}
                   {userRole === 'admin' && (
                     <DropdownMenuItem onClick={() => navigate('/admin/dashboard')}>
                       {t('nav.adminPanel')}
