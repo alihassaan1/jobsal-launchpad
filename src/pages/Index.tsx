@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, MapPin, Building2, Users, TrendingUp, Star, ArrowRight, Briefcase, Clock, DollarSign, Sparkles, LogOut, User, Calendar, Check, ChevronsUpDown, Image as ImageIcon } from "lucide-react";
+import { Search, MapPin, Building2, Users, TrendingUp, Star, ArrowRight, Briefcase, Clock, Banknote, Sparkles, LogOut, User, Calendar, Check, ChevronsUpDown, Image as ImageIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -456,7 +456,7 @@ const Index = () => {
                       </Badge>
                       {job.is_salary_visible && job.salary_min && (
                         <Badge variant="secondary" className="text-xs">
-                          <DollarSign className="h-3 w-3 mr-1" />
+                          <Banknote className="h-3 w-3 mr-1" />
                           {job.salary_min}-{job.salary_max} {job.salary_currency}
                         </Badge>
                       )}
@@ -545,7 +545,7 @@ const Index = () => {
                         </span>
                         {job.is_salary_visible && job.salary_min && (
                           <span className="flex items-center">
-                            <DollarSign className="h-3 w-3 mr-1" />
+                            <Banknote className="h-3 w-3 mr-1" />
                             {job.salary_min}-{job.salary_max} {job.salary_currency}
                           </span>
                         )}
@@ -596,12 +596,9 @@ const Index = () => {
                       {category.icon}
                     </span>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors duration-300">
+                  <h3 className="text-lg font-semibold group-hover:text-primary transition-colors duration-300">
                     {category.name}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    <span className="font-semibold text-primary">{category.count}</span> jobs
-                  </p>
                 </CardContent>
               </Card>
             ))}

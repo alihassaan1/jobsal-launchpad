@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles, Briefcase, MapPin, DollarSign, TrendingUp, RefreshCw } from "lucide-react";
+import { Sparkles, Briefcase, MapPin, Banknote, TrendingUp, RefreshCw } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -232,7 +232,7 @@ export default function RecommendedJobs() {
                       </div>
                       {job.salary_min && (
                         <div className="flex items-center gap-1">
-                          <DollarSign className="h-3 w-3" />
+                          <Banknote className="h-3 w-3" />
                           ALL {job.salary_min.toLocaleString()}
                           {job.salary_max && ` - ${job.salary_max.toLocaleString()}`}
                         </div>

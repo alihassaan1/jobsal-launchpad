@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Briefcase, MapPin, DollarSign, Building2, Calendar, Users, Share2, ArrowLeft, Bookmark } from "lucide-react";
+import { Briefcase, MapPin, Banknote, Building2, Calendar, Users, Share2, ArrowLeft, Bookmark } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import ApplyToJobDialog from "@/components/ApplyToJobDialog";
@@ -274,7 +274,7 @@ const JobDetail = () => {
                       </span>
                       {job.is_salary_visible && (
                         <span className="flex items-center gap-1">
-                          <DollarSign className="h-4 w-4" />
+                          <Banknote className="h-4 w-4" />
                           {formatSalary(job.salary_min, job.salary_max, job.salary_currency)}
                         </span>
                       )}
