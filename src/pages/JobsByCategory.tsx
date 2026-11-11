@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Briefcase, MapPin, Building2, Clock, DollarSign, Search, ArrowRight, TrendingUp, Users } from "lucide-react";
+import { Briefcase, MapPin, Building2, Clock, Banknote, Search, ArrowRight, TrendingUp, Users } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -405,7 +405,7 @@ export default function JobsByCategory() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-primary/10 rounded-lg">
-                  <DollarSign className="h-5 w-5 text-primary" />
+                  <Banknote className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="font-semibold">{categoryInfo.salaryRange}</div>
@@ -506,7 +506,7 @@ export default function JobsByCategory() {
                           </span>
                           {job.is_salary_visible && (
                             <span className="flex items-center gap-1">
-                              <DollarSign className="h-4 w-4" />
+                              <Banknote className="h-4 w-4" />
                               {formatSalary(job.salary_min, job.salary_max, job.salary_currency)}
                             </span>
                           )}

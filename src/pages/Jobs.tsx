@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, MapPin, DollarSign, Building2, Search, Clock } from "lucide-react";
+import { Briefcase, MapPin, Banknote, Building2, Search, Clock } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -229,7 +229,7 @@ const Jobs = () => {
                           </span>
                           {job.is_salary_visible && (
                             <span className="flex items-center gap-1">
-                              <DollarSign className="h-4 w-4" />
+                              <Banknote className="h-4 w-4" />
                               {formatSalary(job.salary_min, job.salary_max, job.salary_currency)}
                             </span>
                           )}
