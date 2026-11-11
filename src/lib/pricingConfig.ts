@@ -28,7 +28,12 @@ export const MONTHLY_PACKAGES: (PaypalProduct & { recommended?: boolean })[] = [
   { ...PAYPAL_PRODUCTS.corporate_monthly, name: "Corporate" },
 ];
 
-export const ENTERPRISE_FROM_CENTS = PAYPAL_PRODUCTS.enterprise_monthly.amount_cents;
+// Corporate packages: shown on /pricing, sold by quote and contract only (no online checkout).
+export const CORPORATE_PACKAGES = [
+  { ...PAYPAL_PRODUCTS.corp_pilot, label: { en: "Pilot", sq: "Pilot" }, value_cents: 22500, savePct: 0, bestValue: false },
+  { ...PAYPAL_PRODUCTS.corp_standard, label: { en: "Standard", sq: "Standard" }, value_cents: 67500, savePct: 0, bestValue: false },
+  { ...PAYPAL_PRODUCTS.corp_annual, label: { en: "Annual", sq: "Vjetore" }, value_cents: 180000, savePct: 33, bestValue: true },
+];
 
 export const VAT_NOTE = {
   en: "Prices exclude VAT where applicable",

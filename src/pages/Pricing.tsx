@@ -3,18 +3,18 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Star, ShieldCheck } from "lucide-react";
+import { Check, Star, ShieldCheck, Award } from "lucide-react";
 import { Helmet } from "react-helmet";
 import Navigation from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { LISTING_OPTIONS, MONTHLY_PACKAGES, ENTERPRISE_FROM_CENTS, eur, approxLek, VAT_NOTE, PAYPAL_NOTE } from "@/lib/pricingConfig";
+import { LISTING_OPTIONS, MONTHLY_PACKAGES, CORPORATE_PACKAGES, eur, approxLek, VAT_NOTE, PAYPAL_NOTE } from "@/lib/pricingConfig";
 
 const copy = {
   title: { sq: "Zgjidh planin e duhur për ty", en: "Choose the right plan for you" },
   subtitle: {
-    sq: "Paguaj për çdo pune ose kurse me një paketë mujore. Pa kontrata afatgjata.",
-    en: "Pay per job or save with a monthly package. No long-term contracts.",
+    sq: "Paguaj për çdo punë, kurse me një paketë mujore, ose kërko një paketë korporative me faturë dhe kontratë.",
+    en: "Pay per job, save with a monthly package, or request a corporate package with invoice and contract.",
   },
   perJob: { sq: "Për punë", en: "Per job" },
   monthly: { sq: "Paketa mujore", en: "Monthly packages" },
@@ -32,7 +32,19 @@ const copy = {
     sq: "Për kompani me vëllime të mëdha rekrutimi: profile të shumta kompanish, koordinim i dedikuar dhe promovim i personalizuar.",
     en: "For high-volume hiring: multiple company profiles, dedicated coordination and custom promotion.",
   },
-  from: { sq: "nga", en: "from" },
+  customQuote: { sq: "Ofertë e personalizuar", en: "Custom quote" },
+  corpTitle: { sq: "Paketa korporative", en: "Corporate packages" },
+  corpSubtitle: {
+    sq: "Publikime të veçuara të parapaguara me faturë dhe kontratë. Për kompani që kanë nevojë për prokurim formal.",
+    en: "Prepaid Featured job postings with invoice and contract. For companies that need formal procurement.",
+  },
+  bestValue: { sq: "Vlera më e mirë", en: "Best value" },
+  value: (v: string, pct: number, sq: boolean) => pct ? (sq ? `vlerë ${v}, kurseni ${pct}%` : `${v} value, save ${pct}%`) : (sq ? `vlerë ${v}` : `${v} value`),
+  validMonths: (n: number, sq: boolean) => (sq ? `E vlefshme ${n} muaj` : `Valid ${n} months`),
+  corpItems: {
+    sq: (n: number) => [`${n} publikime të veçuara`, "30 ditë aktiv për çdo publikim", "Faturë dhe kontratë shërbimi", "Profil i verifikuar kompanie", "Mbështetje me email"],
+    en: (n: number) => [`${n} Featured postings`, "30 days live per posting", "Invoice and service contract", "Verified company profile", "Email support"],
+  },
   requestQuote: { sq: "Kërko ofertë", en: "Request a quote" },
   firstFree: { sq: "Njoftimi juaj i parë standard çdo muaj është falas.", en: "Your first standard listing each month is free." },
 };
@@ -153,13 +165,52 @@ export default function Pricing() {
                 ))}
               </div>
 
+              <section className="pt-10 space-y-6" aria-labelledby="corporate-packages">
+                <div className="text-center">
+                  <h2 id="corporate-packages" className="text-3xl font-bold">{sq ? copy.corpTitle.sq : copy.corpTitle.en}</h2>
+                  <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">{sq ? copy.corpSubtitle.sq : copy.corpSubtitle.en}</p>
+                </div>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
+                  {CORPORATE_PACKAGES.map((p) => (
+                    <Card key={p.key} className={`relative flex flex-col ${p.bestValue ? "border-primary shadow-lg" : ""}`}>
+                      {p.bestValue && (
+                        <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                          <Badge className="bg-primary text-primary-foreground shadow-md"><Award className="h-3 w-3 mr-1" />{sq ? copy.bestValue.sq : copy.bestValue.en}</Badge>
+                        </div>
+                      )}
+                      <CardHeader>
+                        <CardTitle className="text-2xl">{sq ? p.label.sq : p.label.en}</CardTitle>
+                        <div className="mt-2">
+                          <span className="text-4xl font-bold">{eur(p.amount_cents)}</span>
+                          <p className="text-sm text-muted-foreground mt-1">{approxLek(p.amount_cents)}</p>
+                          <p className="text-sm font-medium text-primary mt-1">{copy.value(eur(p.value_cents).replace(".00", ""), p.savePct, sq)}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{copy.validMonths(p.duration_months ?? 0, sq)}</p>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="flex flex-col flex-1">
+                        <ul className="space-y-3 text-sm flex-1">
+                          {(sq ? copy.corpItems.sq : copy.corpItems.en)(p.listing_credits).map((item) => (
+                            <li key={item} className="flex items-start gap-2"><Check className="h-4 w-4 text-green-600 mt-0.5" /><span>{item}</span></li>
+                          ))}
+                        </ul>
+                        <Button className="w-full mt-6" variant={p.bestValue ? "default" : "outline"} asChild>
+                          <a href={`mailto:info@jobs.al?subject=${encodeURIComponent(`Corporate package quote: ${p.label.en} (${eur(p.amount_cents)}) / Kërkesë për paketën korporative ${p.label.sq}`)}`}>
+                            {sq ? copy.requestQuote.sq : copy.requestQuote.en}
+                          </a>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+
               <Card>
                 <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6">
                   <div>
                     <CardTitle className="text-xl">{sq ? copy.enterpriseTitle.sq : copy.enterpriseTitle.en}</CardTitle>
                     <CardDescription className="mt-1 max-w-xl">{sq ? copy.enterpriseDesc.sq : copy.enterpriseDesc.en}</CardDescription>
                     <p className="text-sm text-muted-foreground mt-2">
-                      {sq ? copy.from.sq : copy.from.en} {eur(ENTERPRISE_FROM_CENTS)}{sq ? copy.perMonth.sq : copy.perMonth.en} · {approxLek(ENTERPRISE_FROM_CENTS)}
+                      {sq ? copy.customQuote.sq : copy.customQuote.en}
                     </p>
                   </div>
                   <Button variant="outline" asChild className="shrink-0">

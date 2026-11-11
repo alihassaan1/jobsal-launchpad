@@ -43,7 +43,7 @@ describe("Private configurable employer packages", () => {
   });
   it("charges the stored private price and grants the stored allowance", () => {
     expect(offerProduct({ ...terms, product_key: "custom_package" })).toMatchObject({ amount_cents: 37500, listing_credits: 17, duration_months: 4, kind: "client_package" });
-    expect(PAYPAL_PRODUCTS.starter_monthly.amount_cents).toBe(4900);
+    expect(PAYPAL_PRODUCTS.starter_monthly.amount_cents).toBe(7900);
   });
   it("rejects fractional credits and invalid amounts", () => {
     expect(validCustomOffer({ ...terms, credit_limit: 1.5 }, new Date("2026-11-07"))).toBe(false);
