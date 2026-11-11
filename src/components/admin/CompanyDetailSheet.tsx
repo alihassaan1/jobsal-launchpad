@@ -99,6 +99,14 @@ export function CompanyDetailSheet({ company, open, onOpenChange, onChanged }: {
     catch (e: any) { toast.error(e.message); } finally { setBusy(null); }
   };
 
+  const deleteCompany = async () => {
+    if (!confirm(`Permanently delete ${company.name}? Its page and unpaid jobs will be removed. This can't be undone.`)) return;
+    const makeCandidate = confirm("Should the owner's account become a job seeker account again? (OK = yes, Cancel = keep as employer)");
+    setBusy("delete");
+    try { await callFn("admin-manage-company-user", { action: "delete_company", company_id: company.id, make_candidate: makeCandidate }); toast.success("Company deleted"); onOpenChange(false); onChanged(); }
+    catch (e: any) { toast.error(e.message); } finally { setBusy(null); }
+  };
+
   const resetPw = async () => {
     if (!resetFor?.email) return;
     setBusy("reset");
@@ -127,6 +135,11 @@ export function CompanyDetailSheet({ company, open, onOpenChange, onChanged }: {
                 {company.location || "No location"} · {members.length} users · {activeJobs.length} active jobs
                 {company.slug && (<> · <a className="underline" href={`/companies/${company.slug}`} target="_blank" rel="noreferrer">Public page</a></>)}
               </SheetDescription>
+              <div>
+                <Button size="sm" variant="outline" className="text-destructive" disabled={busy === "delete"} onClick={deleteCompany}>
+                  <Trash2 className="h-4 w-4 mr-1" />Delete company
+                </Button>
+              </div>
             </SheetHeader>
 
             {loading ? (

@@ -47,6 +47,7 @@ export default function SetupCompany() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
+  const [confirmEmployer, setConfirmEmployer] = useState(false);
   
   const [formData, setFormData] = useState({
     name: "",
@@ -66,6 +67,28 @@ export default function SetupCompany() {
 
   if (!user) {
     return <Navigate to="/auth?type=employer" replace />;
+  }
+
+  if (userRole === 'job_seeker' && !confirmEmployer) {
+    return (
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-background flex items-center justify-center px-4">
+          <Card className="max-w-lg w-full">
+            <CardHeader>
+              <CardTitle>You're signed in as a job seeker</CardTitle>
+              <CardDescription>
+                Creating a company profile turns this account into an employer account. If you're looking for a job, go back to job search instead.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col sm:flex-row gap-3">
+              <Button variant="outline" className="flex-1" onClick={() => navigate('/jobs')}>Back to jobs</Button>
+              <Button className="flex-1" onClick={() => setConfirmEmployer(true)}>I represent a company</Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
   }
 
   const generateSlug = (name: string) => {
