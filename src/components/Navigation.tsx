@@ -90,6 +90,13 @@ export default function Navigation() {
                   }}>
                     {userRole === 'employer' || userRole === 'admin' ? t('nav.dashboard') : t('nav.myApplications')}
                   </DropdownMenuItem>
+                  {(userRole === 'employer' || userRole === 'admin') && (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate('/setup-company')}>Company Profile</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/employer/billing')}>My Plan & Billing</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/employer/talent')}>Talent Pool</DropdownMenuItem>
+                    </>
+                  )}
                   {userRole === 'admin' && (
                     <DropdownMenuItem onClick={() => navigate('/admin/dashboard')}>
                       {t('nav.adminPanel')}
@@ -169,6 +176,13 @@ export default function Navigation() {
                           {userRole === 'employer' || userRole === 'admin' ? t('nav.dashboard') : t('nav.myApplications')}
                         </Button>
                       </SheetClose>
+                      {(userRole === 'employer' || userRole === 'admin') && (
+                        <>
+                          <SheetClose asChild><Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/setup-company')}>Company Profile</Button></SheetClose>
+                          <SheetClose asChild><Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/employer/billing')}>My Plan & Billing</Button></SheetClose>
+                          <SheetClose asChild><Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/employer/talent')}>Talent Pool</Button></SheetClose>
+                        </>
+                      )}
                       {userRole === 'admin' && (
                         <SheetClose asChild>
                           <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/admin/dashboard')}>

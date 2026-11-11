@@ -22,6 +22,8 @@ import { Switch } from "@/components/ui/switch";
 import { Briefcase, Plus, Eye, Users, Edit, Trash2, MapPin, DollarSign, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
+import { Progress } from "@/components/ui/progress";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const EmployerDashboard = () => {
   const { user, userRole, loading: authLoading } = useAuth();
@@ -76,6 +78,21 @@ const EmployerDashboard = () => {
 
 
 
+
+  // Private packages (job quota) for this company
+  const { data: packages } = useQuery({
+    queryKey: ["employerPackages", company?.id],
+    enabled: !!company?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("client_package_offers")
+        .select("id, package_name, credit_limit, credits_used, status, expires_at, starts_at")
+        .eq("company_id", company!.id)
+        .in("status", ["paid", "offered"])
+        .order("created_at", { ascending: false });
+      return (data || []).filter((p: any) => p.status === "offered" || new Date(p.expires_at) > new Date());
+    },
+  });
 
   // Delete job mutation
   const deleteJobMutation = useMutation({
@@ -176,68 +193,61 @@ const EmployerDashboard = () => {
           </CardHeader>
         </Card>
 
-        {/* Quick links */}
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer border-primary/30 bg-gradient-to-br from-primary/5 to-transparent" onClick={() => navigate("/employer/talent")}>
-            <CardHeader>
-              <CardTitle className="text-lg">🔍 Talent Pool</CardTitle>
-              <CardDescription>Search opted-in candidates and reach out directly. Don't wait for applications.</CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate("/employer/analytics")}>
-            <CardHeader>
-              <CardTitle className="text-lg">📊 Analytics</CardTitle>
-              <CardDescription>Job performance, views and applications.</CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate("/employer/billing")}>
-            <CardHeader>
-              <CardTitle className="text-lg">💼 My Plan</CardTitle>
-              <CardDescription>View your job credits, private offers and monthly packages.</CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
+        {/* Package & quota */}
+        {packages && packages.length > 0 && (
+          <div className="mb-6 space-y-3">
+            {packages.map((p: any) => {
+              const used = p.credits_used || 0;
+              const total = p.credit_limit || 0;
+              const pct = total ? Math.min(100, Math.round((used / total) * 100)) : 0;
+              const paid = p.status === "paid";
+              return (
+                <Card key={p.id} className={paid ? "" : "border-primary/40 bg-primary/5"}>
+                  <CardContent className="pt-6">
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                      <div>
+                        <p className="font-semibold">{p.package_name || "Package"}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {paid
+                            ? `Valid until ${new Date(p.expires_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`
+                            : "Awaiting payment. Job posts unlock once payment is completed."}
+                        </p>
+                      </div>
+                      {paid ? (
+                        <Badge>Active</Badge>
+                      ) : (
+                        <Button size="sm" onClick={() => navigate("/employer/billing")}>Complete payment</Button>
+                      )}
+                    </div>
+                    <Progress value={pct} className="h-2" />
+                    <p className="mt-2 text-sm">
+                      <span className="font-semibold">{used} / {total}</span> job posts used ·{" "}
+                      <span className="font-semibold">{Math.max(0, total - used)}</span> remaining
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
 
         {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Jobs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{jobs?.length || 0}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Active Jobs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-600">
-                {jobs?.filter((j) => j.is_active).length || 0}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Views</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {jobs?.reduce((sum, j) => sum + (j.views_count || 0), 0) || 0}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Applications</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {jobs?.reduce((sum, j) => sum + (j.applications_count || 0), 0) || 0}
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {[
+            ["Total Jobs", jobs?.length || 0],
+            ["Active Jobs", jobs?.filter((j) => j.is_active).length || 0],
+            ["Total Views", jobs?.reduce((s, j) => s + (j.views_count || 0), 0) || 0],
+            ["Applications", jobs?.reduce((s, j) => s + (j.applications_count || 0), 0) || 0],
+          ].map(([label, value]) => (
+            <Card key={label as string}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{value}</div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Jobs List */}
@@ -294,90 +304,59 @@ const EmployerDashboard = () => {
                 ))}
               </div>
             ) : jobs && jobs.length > 0 ? (
-              <div className="space-y-4">
-                {jobs.map((job: any) => (
-                  <Card key={job.id}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <CardTitle className="text-xl">{job.title}</CardTitle>
-                            <Badge variant={job.is_active ? "default" : "secondary"}>
-                              {job.is_active ? "Active" : "Inactive"}
-                            </Badge>
-                            {job.payment_status === "awaiting_payment" && (
-                              <Badge variant="destructive">Awaiting payment</Badge>
-                            )}
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Job</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="hidden md:table-cell">Posted</TableHead>
+                      <TableHead className="text-right">Views</TableHead>
+                      <TableHead>Applicants</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {jobs.map((job: any) => (
+                      <TableRow key={job.id} className="cursor-pointer" onClick={() => navigate(`/ats/jobs/${job.id}`)}>
+                        <TableCell>
+                          <p className="font-medium">{job.title}</p>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />{job.location}
+                          </p>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            <Badge variant={job.is_active ? "default" : "secondary"}>{job.is_active ? "Active" : "Inactive"}</Badge>
+                            {job.payment_status === "awaiting_payment" && <Badge variant="destructive">Awaiting payment</Badge>}
                             {job.is_featured && <Badge variant="secondary">Featured</Badge>}
                           </div>
-                          <CardDescription className="flex flex-wrap gap-4">
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-4 w-4" />
-                              {job.location}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Eye className="h-4 w-4" />
-                              {job.views_count} views
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Users className="h-4 w-4" />
-                              {job.applications_count} applications
-                            </span>
-                          </CardDescription>
-                        </div>
-                        <div className="flex gap-2">
-                          {job.payment_status === "awaiting_payment" && (
-                            <Button size="sm" onClick={() => navigate(`/post-job/${job.id}/checkout`)}>
-                              Pay now
-                            </Button>
-                          )}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => navigate(`/ats/jobs/${job.id}`)}
-                          >
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
+                          {new Date(job.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                        </TableCell>
+                        <TableCell className="text-right">{job.views_count || 0}</TableCell>
+                        <TableCell>
+                          <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); navigate(`/ats/jobs/${job.id}`); }}>
                             <Users className="h-4 w-4 mr-1" />
-                            {job.applications_count}
+                            {job.applications_count || 0} {job.applications_count === 1 ? "applicant" : "applicants"}
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => navigate(`/jobs/${job.slug}`)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setEditingJob(job);
-                              setIsCreateDialogOpen(true);
-                            }}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              if (confirm("Are you sure you want to delete this job?")) {
-                                deleteJobMutation.mutate(job.id);
-                              }
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                          <Switch
-                            checked={job.is_active}
-                            onCheckedChange={() =>
-                              toggleJobStatusMutation.mutate({ jobId: job.id, isActive: job.is_active })
-                            }
-                          />
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))}
+                        </TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-end gap-1">
+                            {job.payment_status === "awaiting_payment" && (
+                              <Button size="sm" onClick={() => navigate(`/post-job/${job.id}/checkout`)}>Pay now</Button>
+                            )}
+                            <Button variant="ghost" size="icon" title="Preview" onClick={() => navigate(`/jobs/${job.slug}`)}><Eye className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon" title="Edit" onClick={() => { setEditingJob(job); setIsCreateDialogOpen(true); }}><Edit className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon" title="Delete" onClick={() => { if (confirm("Are you sure you want to delete this job?")) deleteJobMutation.mutate(job.id); }}><Trash2 className="h-4 w-4" /></Button>
+                            <Switch checked={job.is_active} onCheckedChange={() => toggleJobStatusMutation.mutate({ jobId: job.id, isActive: job.is_active })} />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             ) : (
               <div className="text-center py-12">
