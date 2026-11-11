@@ -14,6 +14,12 @@ const ENV = Deno.env.get("PAYPAL_ENV") === "live" ? "live" : "sandbox";
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
+async function verifyOfferCompany(admin: any, offerId: string | null) {
+  if (!offerId) return;
+  const { data } = await admin.from("client_package_offers").select("company_id").eq("id", offerId).maybeSingle();
+  if (data?.company_id) await admin.from("companies").update({ is_verified: true }).eq("id", data.company_id);
+}
+
 async function paypalToken() {
   const id = Deno.env.get("PAYPAL_CLIENT_ID")!;
   const secret = Deno.env.get("PAYPAL_CLIENT_SECRET")!;
@@ -201,7 +207,7 @@ async function handlePayLink(admin: any, body: { action: string; offer_id: strin
   const c = cap.purchase_units?.[0]?.payments?.captures?.[0];
   const ok = cap.status === "COMPLETED" && c?.status === "COMPLETED" && c?.amount?.value === formatEur(row.amount_cents) && c?.amount?.currency_code === "EUR";
   if (!ok) { await admin.from("paypal_orders").update({ status: "failed" }).eq("id", row.id); return json({ error: "Payment was not completed" }, 402); }
-  const { error } = await admin.rpc("settle_client_package", { _order_id: row.id });
+  const { error } = await admin.rpc("settle_client_package", { _order_id: row.id }); await verifyOfferCompany(admin, row.client_offer_id);
   if (error) return json({ error: "Payment received; package confirmation pending. Contact info@jobs.al with your order ID." }, 500);
   const mail = { packageName: offer.package_name ?? "Package", companyName: info.company_name, amount: eur(row.amount_cents), credits: String(offer.credit_limit),
     expiryDate: day(offer.expires_at), orderId: body.order_id!, paymentDate: day(new Date().toISOString()), name: info.company_name };
@@ -245,7 +251,7 @@ Deno.serve(async (req) => {
       const { data: employer } = await admin.from("user_roles").select("role").eq("user_id", owner.id).eq("role", "employer").maybeSingle();
       if (!canCreateOfferCompany(roles ?? [], employer ? [employer] : [])) return json({ error: "The selected owner must have an employer account." }, 400);
       const base = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "company";
-      const { data: company, error } = await admin.from("companies").insert({ name: body.name, slug: `${base}-${crypto.randomUUID().slice(0, 8)}`, owner_id: owner.id, email: body.owner_email.toLowerCase(), industry: body.industry || null, location: body.location || null, description: body.description || null, is_verified: false }).select("id, name, owner_id").single();
+      const { data: company, error } = await admin.from("companies").insert({ name: body.name, slug: `${base}-${crypto.randomUUID().slice(0, 8)}`, owner_id: owner.id, email: body.owner_email.toLowerCase(), industry: body.industry || null, location: body.location || null, description: body.description || null, is_verified: true }).select("id, name, owner_id").single();
       if (error) return json({ error: "Could not create company. Please try again." }, 400);
       return json({ company });
     }
@@ -272,6 +278,7 @@ Deno.serve(async (req) => {
         offer_expires_at: custom ? terms.offer_expires_at : CLIENT_OFFER_VALID_UNTIL, package_name: custom ? terms.package_name : product.name,
       }).select("id").single();
       if (error) return json({ error: error.code === "23505" ? "This company already has an unpaid offer" : "Could not assign offer" }, 400);
+      await admin.from("companies").update({ is_verified: true, is_hidden: false }).eq("id", company.id);
       await sendPackageEmail(admin, company.owner_id, "package-offer-ready", {
         packageName: custom ? terms.package_name : product.name, companyName: company.name, amount: eur(product.amount_cents),
         credits: String(product.listing_credits), duration: `${product.duration_months} muaj / months`, startDate: day(starts.toISOString()),
@@ -388,7 +395,7 @@ Deno.serve(async (req) => {
       const ok = cap.status === "COMPLETED" && captured?.status === "COMPLETED" && captured?.amount?.value === formatEur(row.amount_cents)
         && captured?.amount?.currency_code === "EUR";
       if (row.client_offer_id && ok) {
-        const { error } = await admin.rpc("settle_client_package", { _order_id: row.id });
+        const { error } = await admin.rpc("settle_client_package", { _order_id: row.id }); await verifyOfferCompany(admin, row.client_offer_id);
         if (error) return json({ error: "Payment received; package confirmation pending. Please contact support with your order ID." }, 500);
         const { data: o } = await admin.from("client_package_offers").select("package_name, credit_limit, expires_at, companies(name)").eq("id", row.client_offer_id).maybeSingle();
         await sendPackageEmail(admin, user.id, "package-payment-completed", {
