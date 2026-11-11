@@ -1,3 +1,4 @@
+import { htmlToPlainText } from "@/lib/utils";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -192,11 +193,11 @@ const JobDetail = () => {
     <>
       <Helmet>
         <title>{job.seo_title || `${job.title} at ${job.companies?.name} | Jobs.al`}</title>
-        <meta name="description" content={job.seo_description || `Apply for ${job.title} position at ${job.companies?.name} in ${job.location}. ${job.description.substring(0, 150)}...`} />
+        <meta name="description" content={job.seo_description || `Apply for ${job.title} position at ${job.companies?.name} in ${job.location}. ${htmlToPlainText(job.description).substring(0, 150)}...`} />
         <meta name="keywords" content={`${job.title}, ${job.category}, ${job.location}, ${job.companies?.name}, ${job.skills?.slice(0, 5).join(', ')}`} />
         <link rel="canonical" href={`https://jobs.al/jobs/${job.slug}`} />
         <meta property="og:title" content={`${job.title} at ${job.companies?.name}`} />
-        <meta property="og:description" content={job.description.substring(0, 200)} />
+        <meta property="og:description" content={htmlToPlainText(job.description).substring(0, 200)} />
         <meta property="og:type" content="article" />
         <script type="application/ld+json">
           {JSON.stringify({

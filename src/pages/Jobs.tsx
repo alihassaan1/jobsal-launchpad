@@ -1,3 +1,4 @@
+import { htmlToPlainText } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -247,7 +248,7 @@ const Jobs = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground line-clamp-2 mb-4">
-                    {job.description}
+                    {htmlToPlainText(job.description)}
                   </p>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {job.skills?.slice(0, 5).map((skill: string, idx: number) => (
