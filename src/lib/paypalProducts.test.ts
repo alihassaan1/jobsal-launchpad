@@ -11,7 +11,7 @@ describe("PayPal employer prices", () => {
   it("urgent hiring is €79", () => expect(PAYPAL_PRODUCTS.urgent_hiring.amount_cents).toBe(7900));
   it("extra promotion is €15", () => expect(PAYPAL_PRODUCTS.extra_promotion.amount_cents).toBe(1500));
   it("Starter is €79 for 5 listings", () => {
-    expect(PAYPAL_PRODUCTS.starter_monthly.amount_cents).toBe(4900);
+    expect(PAYPAL_PRODUCTS.starter_monthly.amount_cents).toBe(7900);
     expect(PAYPAL_PRODUCTS.starter_monthly.listing_credits).toBe(5);
   });
   it("Business is €139 for 10 listings", () => expect(PAYPAL_PRODUCTS.business_monthly.listing_credits).toBe(10));
