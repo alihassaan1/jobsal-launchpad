@@ -94,6 +94,23 @@ export default function EmployerBilling() {
     enabled: !!user?.id,
   });
 
+  // Companies on a private (quoted) package don't see the public monthly packages
+  const { data: hasPrivatePackage = false } = useQuery({
+    queryKey: ["has-private-package", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const [{ data: owned }, { data: memberships }] = await Promise.all([
+        supabase.from("companies").select("id").eq("owner_id", user!.id),
+        supabase.from("company_members").select("company_id").eq("user_id", user!.id),
+      ]);
+      const ids = [...(owned ?? []).map((c) => c.id), ...(memberships ?? []).map((m) => m.company_id)];
+      if (!ids.length) return false;
+      const { count } = await supabase.from("client_package_offers").select("id", { count: "exact", head: true })
+        .in("company_id", ids).in("status", ["offered", "paid"]).gt("expires_at", new Date().toISOString());
+      return (count ?? 0) > 0;
+    },
+  });
+
   // Get billing profile
   const { data: billingProfile } = useQuery({
     queryKey: ["billing-profile", company?.id],
@@ -338,6 +355,7 @@ export default function EmployerBilling() {
 
             <TabsContent value="package">
               <div className="mb-6"><ClientPackageOffers /></div>
+              {!hasPrivatePackage && (<>
               <Card>
                 <CardHeader>
                   <CardTitle>Your package</CardTitle>
@@ -386,6 +404,7 @@ export default function EmployerBilling() {
                   <CardContent className="space-y-4"><p>{p.listing_credits} {sq ? "publikime pune çdo muaj" : "job postings each month"}</p><Button asChild className="w-full"><Link to={`/subscribe/${p.key}`}>{sq ? "Abonohu me PayPal" : "Subscribe with PayPal"}</Link></Button></CardContent>
                 </Card>)}</div>
               </section>
+              </>)}
             </TabsContent>
 
             <TabsContent value="receipts">
