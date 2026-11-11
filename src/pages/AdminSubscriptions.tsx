@@ -6,7 +6,7 @@ import ClientPackageOffers from "@/components/ClientPackageOffers";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MONTHLY_PACKAGES, LISTING_OPTIONS, URGENT_ADDON, eur, ENTERPRISE_FROM_CENTS } from "@/lib/pricingConfig";
+import { MONTHLY_PACKAGES, LISTING_OPTIONS, URGENT_ADDON, eur, CORPORATE_PACKAGES } from "@/lib/pricingConfig";
 
 function describe(p: { kind: string; featured_days: number; listing_credits: number }): string {
   if (p.kind === "subscription") {
@@ -57,11 +57,19 @@ export default function AdminSubscriptions() {
           <TableCell>{p.kind === "subscription" ? "Monthly" : "One-time"}</TableCell>
           <TableCell className="text-sm text-muted-foreground">{describe(p)}</TableCell>
         </TableRow>)}
+          {CORPORATE_PACKAGES.map(p => <TableRow key={p.key}>
+            <TableCell className="font-medium">{p.name}{p.bestValue && <Badge variant="secondary" className="ml-2">Best value</Badge>}</TableCell>
+            <TableCell><Badge variant="outline">Corporate</Badge></TableCell>
+            <TableCell>{eur(p.amount_cents)}</TableCell>
+            <TableCell>{p.listing_credits} Featured</TableCell>
+            <TableCell>Prepaid · {p.duration_months} months</TableCell>
+            <TableCell className="text-sm text-muted-foreground">Sold by quote and contract, no online checkout. After signing, use "Create package" above with this template. Each posting live 30 days, Featured {p.featured_days} days.</TableCell>
+          </TableRow>)}
           <TableRow>
             <TableCell className="font-medium">Enterprise</TableCell>
             <TableCell><Badge variant="outline">Custom</Badge></TableCell>
-            <TableCell>From {eur(ENTERPRISE_FROM_CENTS)}</TableCell>
-            <TableCell>40+</TableCell>
+            <TableCell>Custom quote</TableCell>
+            <TableCell>Custom</TableCell>
             <TableCell>By quotation</TableCell>
             <TableCell className="text-sm text-muted-foreground">Custom volume and terms. Employer clicks "Request a quote" (email to info@jobs.al); once agreed, create it above as a private package.</TableCell>
           </TableRow>

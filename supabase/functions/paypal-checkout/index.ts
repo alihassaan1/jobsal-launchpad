@@ -28,8 +28,11 @@ async function paypalToken() {
 
 // Create (or reuse) the PayPal billing plan for a monthly package.
 async function ensurePaypalPlan(admin: ReturnType<typeof createClient>, token: string, product: PaypalProduct) {
+  // Plans are keyed by product + price: a price change creates a new PayPal plan for new
+  // subscribers, while existing subscriptions keep their original plan and price.
+  const planKey = `${product.key}@${product.amount_cents}`;
   const { data: existing } = await admin.from("paypal_plans").select("*")
-    .eq("product_key", product.key).eq("environment", ENV).maybeSingle();
+    .eq("product_key", planKey).eq("environment", ENV).maybeSingle();
   if (existing) return existing.paypal_plan_id as string;
 
   const prodRes = await fetch(`${PAYPAL_BASE}/v1/catalogs/products`, {
@@ -60,7 +63,7 @@ async function ensurePaypalPlan(admin: ReturnType<typeof createClient>, token: s
   if (!planRes.ok) throw new Error("PayPal could not create the billing plan");
 
   await admin.from("paypal_plans").upsert({
-    product_key: product.key, paypal_product_id: prod.id, paypal_plan_id: plan.id, environment: ENV,
+    product_key: planKey, paypal_product_id: prod.id, paypal_plan_id: plan.id, environment: ENV,
   });
   return plan.id as string;
 }
