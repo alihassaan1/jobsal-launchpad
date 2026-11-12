@@ -83,8 +83,7 @@ Deno.serve(async (req) => {
       const { data: offerRows } = await admin.from("client_package_offers").select("id").eq("company_id", companyId);
       const offerIds = (offerRows ?? []).map((o: any) => o.id);
       if (offerIds.length) {
-        await admin.from("invoices").update({ client_package_offer_id: null } as any).in("client_package_offer_id", offerIds);
-        await admin.from("paypal_orders").delete().in("client_package_offer_id", offerIds);
+        await admin.from("paypal_orders").delete().in("client_offer_id", offerIds);
         const { error: oErr } = await admin.from("client_package_offers").delete().in("id", offerIds);
         if (oErr) return json({ error: "Could not remove package offer: " + oErr.message }, 400);
       }

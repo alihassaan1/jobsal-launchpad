@@ -28,7 +28,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Search, UserCog, Users as UsersIcon, FileText, ExternalLink, KeyRound, LogIn } from "lucide-react";
+import { Search, UserCog, Users as UsersIcon, FileText, ExternalLink, KeyRound, LogIn, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ErrorBoundary } from "@/components/admin/ErrorBoundary";
 import { LoadingState } from "@/components/admin/LoadingState";
@@ -214,6 +214,21 @@ export default function AdminUsers() {
     toast.success("User role updated successfully");
     setSelectedUser(null);
     fetchUsers();
+  };
+
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const deleteUser = async (user: any) => {
+    if (!confirm(`Permanently delete ${user.email}? This cannot be undone. Invoices and payments are kept.`)) return;
+    setDeletingId(user.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-delete-user', { body: { user_id: user.id } });
+      let message = (data as any)?.error || error?.message;
+      const ctx = (error as any)?.context;
+      if (ctx?.json) { try { message = (await ctx.clone().json())?.error || message; } catch { /* keep */ } }
+      if (error || (data as any)?.error) { toast.error(message || 'Failed to delete user'); return; }
+      toast.success(`${user.email} deleted`);
+      setUsers((prev) => prev.filter((u) => u.id !== user.id));
+    } finally { setDeletingId(null); }
   };
 
   const resetUserPassword = async (user: any) => {
@@ -519,6 +534,16 @@ export default function AdminUsers() {
                           onClick={() => impersonateUser(user)}
                         >
                           <LogIn className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          title="Delete user permanently"
+                          className="text-destructive hover:text-destructive"
+                          disabled={deletingId === user.id || role === 'admin'}
+                          onClick={() => deleteUser(user)}
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                         </div>
                       </TableCell>
