@@ -66,34 +66,28 @@ Deno.serve(async (req) => {
       return json({ success: true, user_id: userId, created, password: created ? password : null });
     }
 
-    const userId = String(body.user_id || "");
-    if (!isUuid(userId)) return json({ error: "user_id required" }, 400);
-
-    if (action === "set_role") {
-      const role = String(body.role || "");
-      if (!ROLES.includes(role)) return json({ error: "Invalid role" }, 400);
-      const { error } = await admin.from("company_members").upsert(
-        { company_id: companyId, user_id: userId, role, invited_by: u.user.id, accepted_at: new Date().toISOString() },
-        { onConflict: "company_id,user_id" },
-      );
-      if (error) return json({ error: error.message }, 400);
-      return json({ success: true });
-    }
-
-    if (action === "remove") {
-      if (userId === company.owner_id) return json({ error: "The company owner can't be removed." }, 400);
-      const { error } = await admin.from("company_members").delete().eq("company_id", companyId).eq("user_id", userId);
-      if (error) return json({ error: error.message }, 400);
-      return json({ success: true });
-    }
-
     if (action === "delete_company") {
       const [{ count: offers }, { count: invoices }, { data: jobRows }] = await Promise.all([
         admin.from("client_package_offers").select("id", { count: "exact", head: true }).eq("company_id", companyId),
         admin.from("invoices").select("id", { count: "exact", head: true }).eq("company_id", companyId),
         admin.from("jobs").select("id").eq("company_id", companyId),
       ]);
-      if ((offers ?? 0) > 0 || (invoices ?? 0) > 0) return json({ error: "This company has a package or invoice, so it can't be deleted. Unverify or hide it instead." }, 400);
+      void offers; void invoices;
+      const { count: paidOffers } = await admin.from("client_package_offers").select("id", { count: "exact", head: true }).eq("company_id", companyId).eq("status", "paid");
+      if ((paidOffers ?? 0) > 0) return json({ error: "This company has a paid package, so it can't be deleted. Unverify or hide it instead." }, 400);
+      // Invoices are never deleted: void and detach them (number is kept).
+      const { data: invs } = await admin.from("invoices").select("id, status, notes").eq("company_id", companyId);
+      for (const inv of invs ?? []) {
+        await admin.from("invoices").update({ status: inv.status === "paid" ? inv.status : "void", company_id: null, notes: `${inv.notes ?? ""}\nVOID: company deleted by admin.`.trim() }).eq("id", inv.id);
+      }
+      const { data: offerRows } = await admin.from("client_package_offers").select("id").eq("company_id", companyId);
+      const offerIds = (offerRows ?? []).map((o: any) => o.id);
+      if (offerIds.length) {
+        await admin.from("invoices").update({ client_package_offer_id: null } as any).in("client_package_offer_id", offerIds);
+        await admin.from("paypal_orders").delete().in("client_package_offer_id", offerIds);
+        const { error: oErr } = await admin.from("client_package_offers").delete().in("id", offerIds);
+        if (oErr) return json({ error: "Could not remove package offer: " + oErr.message }, 400);
+      }
       const jobIds = (jobRows ?? []).map((j: any) => j.id);
       if (jobIds.length) {
         const { count: apps } = await admin.from("applications").select("id", { count: "exact", head: true }).in("job_id", jobIds);
@@ -115,6 +109,28 @@ Deno.serve(async (req) => {
       }
       return json({ success: true });
     }
+
+    const userId = String(body.user_id || "");
+    if (!isUuid(userId)) return json({ error: "user_id required" }, 400);
+
+    if (action === "set_role") {
+      const role = String(body.role || "");
+      if (!ROLES.includes(role)) return json({ error: "Invalid role" }, 400);
+      const { error } = await admin.from("company_members").upsert(
+        { company_id: companyId, user_id: userId, role, invited_by: u.user.id, accepted_at: new Date().toISOString() },
+        { onConflict: "company_id,user_id" },
+      );
+      if (error) return json({ error: error.message }, 400);
+      return json({ success: true });
+    }
+
+    if (action === "remove") {
+      if (userId === company.owner_id) return json({ error: "The company owner can't be removed." }, 400);
+      const { error } = await admin.from("company_members").delete().eq("company_id", companyId).eq("user_id", userId);
+      if (error) return json({ error: error.message }, 400);
+      return json({ success: true });
+    }
+
 
     return json({ error: "Unknown action" }, 400);
   } catch (e) {
