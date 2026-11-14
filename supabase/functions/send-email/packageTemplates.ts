@@ -9,10 +9,8 @@ const BILLING = "https://jobs.al/employer/billing";
 
 function rows(items: [string, string | undefined][]) {
   const shown = items.filter(([, v]) => v);
-  return `<div class="feature-box">${shown.map(([l, v], i) => `
-    <div class="info-row"${i === shown.length - 1 ? ' style="border-bottom: none;"' : ""}>
-      <span class="info-label">${l}</span><span class="info-value">${esc(v)}</span>
-    </div>`).join("")}</div>`;
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;margin:24px 0;">${shown.map(([l, v], i) => `
+    <tr><td style="padding:12px 20px;color:#737373;font-size:14px;width:50%;${i < shown.length - 1 ? "border-bottom:1px solid #FECACA;" : ""}">${l}</td><td style="padding:12px 20px;color:#1a1a1a;font-size:14px;font-weight:600;text-align:right;${i < shown.length - 1 ? "border-bottom:1px solid #FECACA;" : ""}">${esc(v)}</td></tr>`).join("")}</table>`;
 }
 
 function block(o: { title: string; heading: string; sq: string; en: string; details: string; cta: string; ctaUrl: string; note?: string }) {
@@ -41,7 +39,7 @@ export function packageTemplates(d: D, wrap: Wrap): Record<string, { subject: st
         title: "📦 Oferta juaj është gati", heading: hi(d),
         sq: `Kemi përgatitur paketën private <strong>${pkg}</strong> për ${esc(d.companyName, "kompaninë tuaj")}. Mund ta paguani me PayPal ose kartë nga faqja e faturimit.`,
         en: `We've prepared the private package ${pkg} for ${esc(d.companyName, "your company")}. You can pay by PayPal or card from your billing page.`,
-        details: rows([["Paketa / Package", d.packageName], ["Çmimi / Price", d.amount], ["Postime pune / Job posts", d.credits], ["Kohëzgjatja / Duration", d.duration], ["Aktivizimi / Starts", d.startDate], ["Oferta vlen deri / Offer valid until", d.offerDeadline]]),
+        details: rows([["Paketa / Package", d.packageName], ["Çmimi / Price", d.amount], ["Postime pune / Job posts", d.credits], ["Lloji i postimit / Post type", d.postType || "Featured (të veçuara / featured)"], ["Kohëzgjatja / Duration", d.duration], ["Aktivizimi / Starts", d.startDate], ["Oferta vlen deri / Offer valid until", d.offerDeadline]]),
         cta: "Paguaj tani / Pay now", ctaUrl: BILLING,
       })),
     },
@@ -63,7 +61,7 @@ export function packageTemplates(d: D, wrap: Wrap): Record<string, { subject: st
         sq: `Pagesa u konfirmua dhe njoftimi <strong>${esc(d.jobTitle, "i punës")}</strong> është tani live në Jobs.al.`,
         en: `Payment confirmed — your job post ${esc(d.jobTitle, "")} is now live on Jobs.al.`,
         details: rows([["Opsioni / Option", d.packageName], ["Shuma / Amount", d.amount], ["Nr. porosisë / Order ID", d.orderId], ["Data / Date", d.paymentDate]]),
-        cta: "Shiko punën / View job", ctaUrl: d.jobUrl || "https://jobs.al/employer-dashboard",
+        cta: "Shiko punën / View job", ctaUrl: d.jobUrl?.startsWith("https://jobs.al/") ? d.jobUrl : "https://jobs.al/employer-dashboard",
       })),
     },
     "package-subscribed": {
@@ -104,7 +102,7 @@ export function packageTemplates(d: D, wrap: Wrap): Record<string, { subject: st
         sq: `Paketa <strong>${pkg}</strong> skadon më <strong>${esc(d.expiryDate)}</strong> (${esc(d.daysLeft)} ditë). Postimet e papërdorura nuk transferohen.`,
         en: `Your ${pkg} package expires on ${esc(d.expiryDate)} (${esc(d.daysLeft)} days). Unused job posts do not carry over.`,
         details: rows([["Postime të mbetura / Job posts left", d.creditsLeft], ["Skadon / Expires", d.expiryDate]]),
-        cta: "Rinovo paketën / Renew package", ctaUrl: "mailto:info@jobs.al?subject=Package%20renewal",
+        cta: "Rinovo paketën / Renew package", ctaUrl: BILLING,
       })),
     },
     "package-expired": {

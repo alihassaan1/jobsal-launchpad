@@ -197,7 +197,7 @@ function wrapEmail(content: string, unsubscribeUrl: string = "https://jobs.al/se
     ${content}
     <div class="footer">
       <p style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 4px;">jobs.al</p>
-      <p style="margin-bottom: 20px;">Platforma #1 e punësimit në Shqipëri</p>
+      <p style="margin-bottom: 20px;">Jobs.al është portali i punësimit për Shqipërinë.</p>
       <div class="social-links">
         <a href="https://facebook.com/jobs.al">Facebook</a> ·
         <a href="https://instagram.com/jobs.al">Instagram</a> ·
@@ -230,12 +230,8 @@ function generateWelcomeEmail(data: Record<string, string>): string {
     </div>
     <div class="content">
       <h2>Përshëndetje${data.name ? `, ${data.name}` : ''}!</h2>
-      <p>Ju falënderojmë që u bashkuat me komunitetin tonë të punëkërkuesve! Jobs.al është platforma më e madhe e punësimit në Shqipëri, dhe jemi të lumtur t'ju kemi si anëtar.</p>
+      <p>Ju falënderojmë që u bashkuat me komunitetin tonë të punëkërkuesve! Jobs.al është portali i punësimit për Shqipërinë.</p>
       
-      <div class="stats-box">
-        <h3>1,000+</h3>
-        <p>Punëkërkues të suksesshëm na kanë besuar</p>
-      </div>
 
       <div class="feature-box">
         <div class="feature-item">
