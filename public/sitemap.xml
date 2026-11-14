@@ -56,32 +56,12 @@
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/category/technology</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/customer%20service</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://jobs.al/jobs/category/sales</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/category/marketing%20%26%20pr</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/finance</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/manufacturing</loc>
+    <loc>https://jobs.al/jobs/category/technology</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -91,127 +71,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/category/healthcare</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/construction</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/logistics%20%26%20transport</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/retail%20%26%20sales</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/it%20%26%20technology</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/engineering</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/finance%20%26%20banking</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/operations%20%26%20logistics</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/media%20%26%20communications</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/logistics</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/legal</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/human%20resources</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/marketing%20%26%20sales</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/finance%20%26%20accounting</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/category/sales%20%26%20marketing</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/tiran%C3%AB</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/elbasan</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/himare%20albania</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/spitalle</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/durr%C3%ABs</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/shkod%C3%ABr</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/teg</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/shqiperi</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/vlor%C3%AB</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/shkoder%20albania</loc>
+    <loc>https://jobs.al/jobs/category/finance</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -221,27 +81,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/location/fier</loc>
+    <loc>https://jobs.al/jobs/location/spitalle</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/location/albania</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/remote</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/poland</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/location/kor%C3%A7%C3%AB</loc>
+    <loc>https://jobs.al/jobs/location/shqiperi</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -251,320 +96,56 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/data-analyst-vodafone-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
+    <loc>https://jobs.al/jobs/location/albania</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/jobs/location/teg</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/jobs/location/remote</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/jobs/location/himare%20albania</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/jobs/location/poland</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/jobs/location/shkoder%20albania</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/jobs/b2b-sales-account-manager--1789152347472</loc>
+    <lastmod>2026-11-11T11:28:45.399Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/customer-experience-manager-one-telecom-1777907679</loc>
-    <lastmod>2026-05-04T15:14:39.258Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/store-manager-elbasan-conad-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/boat-tours-sales-promoter-female--1782425142839</loc>
-    <lastmod>2026-06-25T22:05:43.034Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/ecommerce-manager-neptun-1777907679</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/accountant-conad-1771891411</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/qa-inspector-conad-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/senior-software-engineer-vodafone-albania-1777907679</loc>
-    <lastmod>2026-05-04T15:14:39.258Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/junior-content-writer-ikub-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/sales-representative-1790103954434</loc>
-    <lastmod>2026-09-22T19:05:54.056Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/junior-full-stack-developer-durrës-mj2wwns8</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/cybersecurity-specialist-bkt-bank-1777907679</loc>
-    <lastmod>2026-05-04T15:14:39.258Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/healthcare-assistant-contract--shkodër-mj2wyllr</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/marketing-manager-kastrati-group-1777907679</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/real-estate-project-manager-balfin-1771891411</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/asistent-e-shitjesh-teg-qtu-inditex-1778835503382</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/airport-operations-coordinator-tia-1777907679</loc>
-    <lastmod>2026-05-04T15:14:39.258Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/software-developer-core-banking-bkt-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
+    <loc>https://jobs.al/jobs/chinese-albanian-translator-interpreter-1790104184836</loc>
+    <lastmod>2026-11-11T11:28:45.399Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://jobs.al/jobs/k-shilltar-komercial-1774427887988</loc>
-    <lastmod>2026-03-25T08:38:08.207Z</lastmod>
+    <lastmod>2026-11-11T11:28:45.399Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/financial-controller-balfin-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/branch-manager-vlore-bkt-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/sales-manager-1790162447901</loc>
-    <lastmod>2026-09-23T11:20:48.153Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/store-manager-neptun</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/senior-network-engineer-vodafone-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/mobile-app-developer-one</loc>
-    <lastmod>2026-03-06T11:27:30.347Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/hse-manager-albpetrol</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/financial-analyst-fier-mj2wxsuw</loc>
-    <lastmod>2025-12-12T13:38:51.687Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/operations-supervisor-tia</loc>
-    <lastmod>2026-03-06T11:27:30.347Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/financial-analyst-raiffeisen-bank-1777907679</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/egocentric-video-data-collection-specialist-freshers-welcome-1781771761993</loc>
-    <lastmod>2026-06-18T08:36:02.770Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/full-stack-developer-ikub-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/senior-healthcare-coordinator-part-time--elbasan-mj2wy7v2</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/customer-experience-specialist-vodafone-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/credit-risk-analyst-bkt-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/marcom-coordinator-balfin-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/video-content-producer-digitalb-1777907679</loc>
-    <lastmod>2026-05-04T15:14:39.258Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/network-engineer-albtelecom</loc>
-    <lastmod>2026-03-06T11:27:30.347Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/supply-chain-coordinator-conad-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/compliance-officer-bkt-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/ui-ux-designer-ikub-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/head-of-engineering-tirana-mj2wx2p0</loc>
-    <lastmod>2025-12-12T13:38:17.778Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/logistics-coordinator-logistics-specialist-1790104070446</loc>
-    <lastmod>2026-09-22T19:07:49.937Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/hr-business-partner-balfin-group-1777907679</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/seo-content-strategist-ikub-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/junior-financial-operations-analyst-elbasan-mj2wxgbp</loc>
-    <lastmod>2025-12-12T13:38:35.447Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/digital-marketing-manager-1780416334743</loc>
-    <lastmod>2026-06-02T16:05:34.849Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/legal-counsel-balfin-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/hr-business-partner-vodafone-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/accountant-finance-specialist-1790104303060</loc>
-    <lastmod>2026-09-22T19:11:42.534Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/petroleum-engineer-bankers</loc>
-    <lastmod>2026-03-06T11:27:30.347Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/digital-marketing-sales-associate-fier-mj2wzgok</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/qc-engineer-antea-cement</loc>
-    <lastmod>2026-03-06T11:27:30.347Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/truck-driver-1784210053091</loc>
-    <lastmod>2026-07-16T13:54:13.470Z</lastmod>
+    <loc>https://jobs.al/jobs/administrative-and-technical-assistant-1767544213528</loc>
+    <lastmod>2026-11-11T11:28:45.399Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -575,44 +156,50 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/digital-marketing-manager-vodafone-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
+    <loc>https://jobs.al/jobs/asistent-e-shitjesh-teg-qtu-inditex-1778835503382</loc>
+    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/devops-engineer-ikub-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
+    <loc>https://jobs.al/jobs/digital-marketing-manager-1780416334743</loc>
+    <lastmod>2026-06-02T16:05:34.849Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/investment-analyst-balfin-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
+    <loc>https://jobs.al/jobs/egocentric-video-data-collection-specialist-freshers-welcome-1781771761993</loc>
+    <lastmod>2026-06-18T08:36:02.770Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/credit-risk-analyst-credins</loc>
-    <lastmod>2026-03-06T11:27:30.347Z</lastmod>
+    <loc>https://jobs.al/jobs/boat-tours-sales-promoter-female--1782425142839</loc>
+    <lastmod>2026-06-25T22:05:43.034Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/head-of-digital-growth-sales-korçë-mj2wz1i8</loc>
-    <lastmod>2025-12-12T13:39:49.574Z</lastmod>
+    <loc>https://jobs.al/jobs/truck-driver-1784210053091</loc>
+    <lastmod>2026-07-16T13:54:13.470Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/teller-customer-service-bkt-1771891411</loc>
-    <lastmod>2026-02-24T00:03:31.470Z</lastmod>
+    <loc>https://jobs.al/jobs/sales-representative-1790103954434</loc>
+    <lastmod>2026-09-22T19:05:54.056Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/business-development-kastrati</loc>
-    <lastmod>2026-03-06T11:27:30.347Z</lastmod>
+    <loc>https://jobs.al/jobs/logistics-coordinator-logistics-specialist-1790104070446</loc>
+    <lastmod>2026-09-22T19:07:49.937Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/jobs/accountant-finance-specialist-1790104303060</loc>
+    <lastmod>2026-09-22T19:11:42.534Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -623,394 +210,322 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://jobs.al/jobs/b2b-sales-account-manager--1789152347472</loc>
-    <lastmod>2026-09-11T18:45:56.094Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/full-stack-developer-credins-bank-1777907679</loc>
-    <lastmod>2026-05-04T15:14:39.258Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/content-producer-digitalb</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/cashier-part-time-conad-1771891411</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/administrative-and-technical-assistant-1767544213528</loc>
-    <lastmod>2026-05-21T15:29:17.596Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/jobs/chinese-albanian-translator-interpreter-1790104184836</loc>
-    <lastmod>2026-09-22T19:09:44.353Z</lastmod>
+    <loc>https://jobs.al/jobs/sales-manager-1790162447901</loc>
+    <lastmod>2026-09-23T11:20:48.153Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/ai-machine-learning-jobs-albania-2026</loc>
-    <lastmod>2026-11-08T07:35:43.608Z</lastmod>
+    <lastmod>2026-11-10T11:41:00.402Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/10-essential-resume-tips-2025</loc>
-    <lastmod>2026-11-08T07:35:56.431Z</lastmod>
+    <lastmod>2026-11-13T01:16:50.561Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/remote-work-opportunities-in-albania-1766642461666</loc>
-    <lastmod>2026-11-08T07:56:24.779Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/hybrid-work-albania-guide-2026</loc>
-    <lastmod>2026-11-08T07:32:10.942Z</lastmod>
+    <lastmod>2026-11-13T01:18:56.095Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/career-guide-marketing-1766124184457</loc>
-    <lastmod>2026-11-08T07:34:45.406Z</lastmod>
+    <lastmod>2026-11-14T00:45:23.164Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/albanian-job-market-2025-trends</loc>
-    <lastmod>2026-11-08T07:35:17.427Z</lastmod>
+    <loc>https://jobs.al/blog/hybrid-work-albania-guide-2026</loc>
+    <lastmod>2026-11-13T01:17:45.967Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/employment-guide-elbasan-1765778571733</loc>
-    <lastmod>2026-11-08T07:33:41.144Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/linkedin-profile-optimization-for-albanian-job-market-1766124059477</loc>
-    <lastmod>2026-11-08T07:31:32.631Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/best-companies-to-work-for-in-albania-1765605664451</loc>
-    <lastmod>2026-11-08T07:35:04.826Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/interview-tips-for-albanian-job-seekers-1765692061244</loc>
-    <lastmod>2026-11-08T07:31:58.228Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/freelancing-vs-full-time-employment-in-albania-1765864898512</loc>
-    <lastmod>2026-11-08T07:32:43.135Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/albania-tech-boom-2026-tirana-startup-hub</loc>
-    <lastmod>2026-11-08T07:51:09.564Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/employment-guide-vlor-1767852200391</loc>
-    <lastmod>2026-11-08T07:33:21.586Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/top-10-in-demand-skills-in-albania-s-job-market-2025-1767765672735</loc>
-    <lastmod>2026-11-08T07:30:47.968Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/building-your-professional-network-in-albania-1765778462909</loc>
-    <lastmod>2026-11-08T07:34:57.523Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/albanian-professionals-returning-home-2026</loc>
-    <lastmod>2026-11-08T07:35:11.004Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/freelancer-guide-working-globally-from-tirana-2026</loc>
-    <lastmod>2026-11-08T07:32:56.056Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/tech-startup-scene-albania-whos-hiring-2026</loc>
-    <lastmod>2026-11-08T07:31:01.349Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/construction-infrastructure-boom-albania-careers-2026</loc>
-    <lastmod>2026-11-08T07:34:06.439Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/renewable-energy-careers-albania-solar-wind-2026</loc>
-    <lastmod>2026-11-08T07:31:13.998Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/top-industries-hiring-in-albania-1766296863567</loc>
-    <lastmod>2026-11-08T07:30:41.449Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/cv-writing-guide-for-albanian-job-seekers-1766210472112</loc>
-    <lastmod>2026-11-08T07:33:59.900Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/interview-mistakes-albanian-job-seekers-2026</loc>
-    <lastmod>2026-11-08T07:32:05.173Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/women-breaking-into-albanian-tech-industry-2026</loc>
-    <lastmod>2026-11-08T07:30:28.843Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/complete-remote-work-guide-albania-employers-employees-2026</loc>
-    <lastmod>2026-11-08T07:34:13.025Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/green-energy-jobs-albania-2026</loc>
-    <lastmod>2026-11-08T07:32:30.381Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/freelancing-albania-ultimate-guide-2026</loc>
-    <lastmod>2026-11-08T07:32:50.535Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/how-to-negotiate-your-salary-in-albania-1766556086220</loc>
-    <lastmod>2026-11-08T07:32:24.236Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/employment-guide-fier-1766642588270</loc>
-    <lastmod>2026-11-08T07:33:34.862Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/top-10-in-demand-skills-in-albania-s-job-market-2025-1766469675112</loc>
-    <lastmod>2026-11-08T07:30:54.448Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/blog/career-transition-tips-for-albanian-professionals-1766728858554</loc>
-    <lastmod>2026-11-08T07:34:32.742Z</lastmod>
+    <lastmod>2026-11-13T01:18:10.435Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/cybersecurity-careers-albania-talent-gap-2026</loc>
-    <lastmod>2026-11-08T07:33:53.726Z</lastmod>
+    <lastmod>2026-11-13T07:27:43.868Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/entrepreneurship-opportunities-in-albania-1766383267419</loc>
-    <lastmod>2026-11-08T07:33:15.120Z</lastmod>
+    <loc>https://jobs.al/blog/albanian-job-market-2025-trends</loc>
+    <lastmod>2026-11-13T01:16:59.438Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/interview-tips-for-albanian-job-seekers-1766988086396</loc>
-    <lastmod>2026-11-08T07:31:51.917Z</lastmod>
+    <loc>https://jobs.al/blog/linkedin-profile-optimization-for-albanian-job-market-1766124059477</loc>
+    <lastmod>2026-11-13T01:18:04.713Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/tourism-boom-albania-career-opportunities-2026</loc>
-    <lastmod>2026-11-08T07:30:35.079Z</lastmod>
+    <loc>https://jobs.al/blog/interview-tips-for-albanian-job-seekers-1765692061244</loc>
+    <lastmod>2026-11-13T01:17:31.594Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/building-your-professional-network-in-albania-1767074457996</loc>
-    <lastmod>2026-11-08T07:34:51.664Z</lastmod>
+    <loc>https://jobs.al/blog/building-your-professional-network-in-albania-1765778462909</loc>
+    <lastmod>2026-11-13T01:17:32.548Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/eu-accession-reshaping-albanian-careers-2026</loc>
-    <lastmod>2026-11-08T07:33:08.606Z</lastmod>
+    <loc>https://jobs.al/blog/employment-guide-vlor-1767852200391</loc>
+    <lastmod>2026-11-13T01:19:10.809Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/how-to-negotiate-your-salary-in-albania-1767852077851</loc>
-    <lastmod>2026-11-08T07:32:17.402Z</lastmod>
+    <loc>https://jobs.al/blog/best-companies-to-work-for-in-albania-1765605664451</loc>
+    <lastmod>2026-11-13T01:17:14.434Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/si-te-shkruani-cv-ne-shqip</loc>
-    <lastmod>2026-11-08T07:31:07.671Z</lastmod>
+    <loc>https://jobs.al/blog/freelancing-vs-full-time-employment-in-albania-1765864898512</loc>
+    <lastmod>2026-11-13T01:18:12.688Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/free-premium-resume-templates-jobs-al</loc>
-    <lastmod>2026-11-08T07:51:48.493Z</lastmod>
+    <loc>https://jobs.al/blog/albania-tech-boom-2026-tirana-startup-hub</loc>
+    <lastmod>2026-11-13T01:16:49.041Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/albanian-banking-digital-revolution-careers-2026</loc>
-    <lastmod>2026-11-08T07:35:29.476Z</lastmod>
+    <loc>https://jobs.al/blog/top-10-in-demand-skills-in-albania-s-job-market-2025-1767765672735</loc>
+    <lastmod>2026-11-13T01:17:57.397Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/freelancing-vs-full-time-employment-in-albania-1767160867380</loc>
-    <lastmod>2026-11-08T07:32:37.012Z</lastmod>
+    <loc>https://jobs.al/blog/albanian-professionals-returning-home-2026</loc>
+    <lastmod>2026-11-13T01:17:27.330Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://jobs.al/blog/it-sector-jobs-in-albania-top-tech-employers-career-guide</loc>
-    <lastmod>2026-11-08T08:11:26.462Z</lastmod>
+    <loc>https://jobs.al/blog/construction-infrastructure-boom-albania-careers-2026</loc>
+    <lastmod>2026-11-13T01:19:29.947Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/freelancer-guide-working-globally-from-tirana-2026</loc>
+    <lastmod>2026-11-13T01:17:49.801Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/tech-startup-scene-albania-whos-hiring-2026</loc>
+    <lastmod>2026-11-13T01:20:23.227Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/renewable-energy-careers-albania-solar-wind-2026</loc>
+    <lastmod>2026-11-13T01:19:00.099Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/personal-branding-linkedin-albania-2026</loc>
-    <lastmod>2026-11-08T07:31:26.490Z</lastmod>
+    <lastmod>2026-11-13T01:17:24.047Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/women-breaking-into-albanian-tech-industry-2026</loc>
+    <lastmod>2026-11-13T01:19:45.112Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/top-industries-hiring-in-albania-1766296863567</loc>
+    <lastmod>2026-11-13T01:16:58.213Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/albanian-banking-digital-revolution-careers-2026</loc>
+    <lastmod>2026-11-13T01:17:51.634Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/complete-remote-work-guide-albania-employers-employees-2026</loc>
+    <lastmod>2026-11-13T14:54:48.829Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/cv-writing-guide-for-albanian-job-seekers-1766210472112</loc>
+    <lastmod>2026-11-13T01:16:54.684Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/freelancing-albania-ultimate-guide-2026</loc>
+    <lastmod>2026-11-13T01:17:54.701Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/interview-mistakes-albanian-job-seekers-2026</loc>
+    <lastmod>2026-11-13T01:17:56.217Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/green-energy-jobs-albania-2026</loc>
+    <lastmod>2026-11-13T01:17:42.896Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/career-transition-tips-for-albanian-professionals-1766728858554</loc>
+    <lastmod>2026-11-13T01:17:20.424Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/top-10-in-demand-skills-in-albania-s-job-market-2025-1766469675112</loc>
+    <lastmod>2026-11-13T01:19:05.290Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/how-to-negotiate-your-salary-in-albania-1766556086220</loc>
+    <lastmod>2026-11-13T01:19:13.213Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/employment-guide-fier-1766642588270</loc>
+    <lastmod>2026-11-13T01:19:35.068Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/building-your-professional-network-in-albania-1767074457996</loc>
+    <lastmod>2026-11-13T01:17:44.816Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/entrepreneurship-opportunities-in-albania-1766383267419</loc>
+    <lastmod>2026-11-13T01:18:24.573Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/interview-tips-for-albanian-job-seekers-1766988086396</loc>
+    <lastmod>2026-11-13T01:19:41.647Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/tourism-boom-albania-career-opportunities-2026</loc>
+    <lastmod>2026-11-14T00:45:03.205Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/eu-accession-reshaping-albanian-careers-2026</loc>
+    <lastmod>2026-11-13T01:18:25.712Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/si-te-shkruani-cv-ne-shqip</loc>
+    <lastmod>2026-11-13T13:51:20.268Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/how-to-negotiate-your-salary-in-albania-1767852077851</loc>
+    <lastmod>2026-11-10T19:06:52.074Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/freelancing-vs-full-time-employment-in-albania-1767160867380</loc>
+    <lastmod>2026-11-13T01:18:09.875Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/free-premium-resume-templates-jobs-al</loc>
+    <lastmod>2026-11-13T01:19:37.949Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.65</priority>
+  </url>
+  <url>
+    <loc>https://jobs.al/blog/it-sector-jobs-in-albania-top-tech-employers-career-guide</loc>
+    <lastmod>2026-11-13T01:20:13.490Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/albania-salary-guide-every-industry-2026</loc>
-    <lastmod>2026-11-08T07:35:37.256Z</lastmod>
+    <lastmod>2026-11-13T17:48:51.625Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/career-guide-technology-1767074580943</loc>
-    <lastmod>2026-11-08T07:34:39.460Z</lastmod>
+    <lastmod>2026-11-13T01:18:47.376Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/it-job-market-trends-in-tirana-1768111266916</loc>
-    <lastmod>2026-11-08T07:31:45.368Z</lastmod>
+    <lastmod>2026-11-13T01:17:53.697Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/career-transition-tips-for-albanian-professionals-1768024859753</loc>
-    <lastmod>2026-11-08T07:34:25.585Z</lastmod>
+    <lastmod>2026-11-13T01:18:06.738Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/employment-guide-kor-1766383393012</loc>
-    <lastmod>2026-11-08T07:33:29.112Z</lastmod>
+    <lastmod>2026-11-13T01:17:48.976Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/digital-marketing-careers-albania-2026</loc>
-    <lastmod>2026-11-08T07:33:47.356Z</lastmod>
+    <lastmod>2026-11-13T01:19:10.916Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/companies-hiring-graduates-albania-2026</loc>
-    <lastmod>2026-11-08T07:34:19.029Z</lastmod>
+    <lastmod>2026-11-13T01:19:45.679Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
     <loc>https://jobs.al/blog/ace-job-interview-tips-albania</loc>
-    <lastmod>2026-11-08T07:35:49.509Z</lastmod>
+    <lastmod>2026-11-13T01:16:35.916Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/one-telecommunications</loc>
-    <lastmod>2026-05-21T08:47:11.795Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/vodafone-albania</loc>
-    <lastmod>2026-05-21T08:46:47.083Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/imake-technologies-mj308od5</loc>
-    <lastmod>2026-05-21T08:46:54.354Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/techcorp-albania</loc>
-    <lastmod>2026-05-20T15:02:53.175Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/albtelecom</loc>
-    <lastmod>2026-05-20T23:21:59.795Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/ikub-al</loc>
-    <lastmod>2026-05-19T19:23:53.030Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/balfin-group</loc>
-    <lastmod>2026-05-18T16:00:20.170Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
   </url>
   <url>
     <loc>https://jobs.al/companies/the-geodes-oil-and-gas-plc-mjzxrvny</loc>
@@ -1019,92 +534,8 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://jobs.al/companies/conad-albania</loc>
-    <lastmod>2026-05-20T00:04:57.449Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/edutech-albania</loc>
-    <lastmod>2026-05-17T05:50:39.877Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/albania-tourism-group</loc>
-    <lastmod>2026-05-17T05:49:36.983Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/bkt-bank</loc>
-    <lastmod>2026-05-21T05:40:43.280Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/raiffeisen-bank-albania</loc>
-    <lastmod>2026-05-17T05:53:53.723Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/medicare-albania</loc>
-    <lastmod>2026-05-17T05:54:02.803Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/tirana-airport</loc>
-    <lastmod>2026-05-21T08:42:43.268Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/blitz-automatic-car-wash-db70f1</loc>
-    <lastmod>2026-05-17T05:53:52.405Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/martinah-irinah-983ff5</loc>
-    <lastmod>2026-05-21T15:08:31.591Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/arina-43f464</loc>
-    <lastmod>2026-05-19T14:08:21.099Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/bankers-petroleum</loc>
-    <lastmod>2026-05-20T15:50:36.717Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/antea-cement</loc>
-    <lastmod>2026-05-19T21:16:06.269Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/credins-bank</loc>
-    <lastmod>2026-05-20T16:28:09.644Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/albpetrol</loc>
-    <lastmod>2026-05-17T06:00:28.787Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/digitalb</loc>
-    <lastmod>2026-05-20T01:50:56.345Z</lastmod>
+    <loc>https://jobs.al/companies/goumidi-moha-ff2b37</loc>
+    <lastmod>2026-11-11T15:25:27.829Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
@@ -1121,80 +552,8 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://jobs.al/companies/andrew-kelly-362dbb</loc>
-    <lastmod>2026-05-29T13:00:41.676Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://jobs.al/companies/valore-shpk-mn5shkha</loc>
     <lastmod>2026-05-17T05:54:18.962Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/digitalcode-srl-9e35ac</loc>
-    <lastmod>2026-06-01T08:51:59.589Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/kastrati-group</loc>
-    <lastmod>2026-05-17T05:53:24.571Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/fia-innovation-e1eb11</loc>
-    <lastmod>2026-05-17T05:54:35.470Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/neptun-albania</loc>
-    <lastmod>2026-05-17T05:54:43.237Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/redwan-7609b6</loc>
-    <lastmod>2026-06-09T22:28:03.427Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/km-shazib-hassan-shobuj-632a04</loc>
-    <lastmod>2026-06-13T14:29:45.558Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/runnel-9306ac</loc>
-    <lastmod>2026-06-14T13:37:27.467Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/mohsin-bhatti-5bdc35</loc>
-    <lastmod>2026-06-14T16:40:04.892Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/salman-d764fe</loc>
-    <lastmod>2026-06-17T21:01:17.539Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/ahmad-8a756e</loc>
-    <lastmod>2026-07-20T19:33:20.498Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/mehran-khan-4df51e</loc>
-    <lastmod>2026-07-23T13:22:26.224Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
@@ -1205,50 +564,8 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://jobs.al/companies/mokhtar-kortas-788d89</loc>
-    <lastmod>2026-06-19T12:36:22.180Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/mehtab-ashraf-c69416</loc>
-    <lastmod>2026-06-20T00:43:44.803Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/neama-mohamed-e0cc0e</loc>
-    <lastmod>2026-06-20T16:33:56.035Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/salifu-sumaila-2a6131</loc>
-    <lastmod>2026-06-20T17:23:45.600Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/aneta-kamarali-7d90bb</loc>
-    <lastmod>2026-06-21T20:44:44.313Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/deepu-singh-96d2e0</loc>
-    <lastmod>2026-06-22T08:24:30.610Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/mahabub-likhon-91da73</loc>
-    <lastmod>2026-06-22T14:04:19.871Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/soebmahmed-6aea7d</loc>
-    <lastmod>2026-06-23T09:26:00.868Z</lastmod>
+    <loc>https://jobs.al/companies/abdo-khaled-e524a6</loc>
+    <lastmod>2026-11-13T00:35:46.424Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
@@ -1259,152 +576,8 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://jobs.al/companies/ifediora-chibuike-kingsley-41d1b2</loc>
-    <lastmod>2026-06-27T11:57:53.531Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/tanko-adam-d9a3dd</loc>
-    <lastmod>2026-06-29T21:58:05.386Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/latifur-rahman-a02c70</loc>
-    <lastmod>2026-07-01T03:00:04.347Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/mirza-husnain-naseer-e47203</loc>
-    <lastmod>2026-07-02T07:01:58.952Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/jeandedieu-nduwimana-2ef7e8</loc>
-    <lastmod>2026-07-02T13:10:45.868Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/jalel-jouini-ef5c90</loc>
-    <lastmod>2026-07-03T12:07:40.208Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/abdou-azzaba-a9bfdc</loc>
-    <lastmod>2026-07-04T10:37:51.813Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/burhan-hussa-ac21e0</loc>
-    <lastmod>2026-07-05T19:49:22.495Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/hind-brigdi-4a892c</loc>
-    <lastmod>2026-07-06T14:51:19.202Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/ripon-ripon-929c22</loc>
-    <lastmod>2026-07-07T06:06:08.965Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/mohamed-abobarka-77c86c</loc>
-    <lastmod>2026-07-08T06:39:18.233Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/ersila-72f7be</loc>
-    <lastmod>2026-07-09T12:28:11.907Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/walid-el-addab-86c105</loc>
-    <lastmod>2026-07-11T16:16:38.253Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/umar-farooq-8ddf0e</loc>
-    <lastmod>2026-07-12T03:19:25.930Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/pranit-khati-1bb745</loc>
-    <lastmod>2026-07-13T01:15:24.282Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/akinmusayo-odunayo-430fe2</loc>
-    <lastmod>2026-07-13T14:47:36.579Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/md-shakib-hosen-bb4f48</loc>
-    <lastmod>2026-07-15T17:59:04.640Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://jobs.al/companies/elena-ded3f1</loc>
     <lastmod>2026-07-16T13:27:55.856Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/tofik-jihad-157ca5</loc>
-    <lastmod>2026-07-18T09:00:54.161Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/ert-tani-b9bdc9</loc>
-    <lastmod>2026-07-18T13:22:49.018Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/mohamed-eldeeb-69fbb0</loc>
-    <lastmod>2026-07-18T20:54:45.286Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/yassine-afce5d</loc>
-    <lastmod>2026-07-19T20:19:00.227Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/muhammad-ahsan-69c1ce</loc>
-    <lastmod>2026-07-20T11:45:54.832Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/muhammad-kaleem-8f198a</loc>
-    <lastmod>2026-07-23T16:46:27.433Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/lu-s-samuel-bieta-fd1c87</loc>
-    <lastmod>2026-07-24T03:05:03.303Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
@@ -1427,104 +600,8 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://jobs.al/companies/muhammad-jamshaid-b03e74</loc>
-    <lastmod>2026-07-25T09:51:24.500Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/yogesh-bharti-810708</loc>
-    <lastmod>2026-07-26T16:19:55.203Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/muctar-bah-cf4052</loc>
-    <lastmod>2026-07-26T19:09:25.292Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/tariqahmad-a14987</loc>
-    <lastmod>2026-08-01T08:23:28.196Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/mehdi-c3dfaf</loc>
-    <lastmod>2026-08-01T08:29:14.984Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/abdou-sami-dd057a</loc>
-    <lastmod>2026-08-04T14:15:13.505Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/agents-only-recruitment-0a516e</loc>
-    <lastmod>2026-08-05T13:23:51.548Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/abdelbaki-salhi-f42bc2</loc>
-    <lastmod>2026-08-12T12:30:24.290Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/emeka-eae529</loc>
-    <lastmod>2026-08-14T09:20:41.914Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/shorove-hossain-7cd653</loc>
-    <lastmod>2026-08-16T01:05:00.419Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/mohamed-akaya-7051d4</loc>
-    <lastmod>2026-08-17T22:34:51.836Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/zene-muha-280001</loc>
-    <lastmod>2026-08-18T15:07:51.818Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/deepak-kumar-b19e36</loc>
-    <lastmod>2026-08-18T18:34:51.205Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/irfan-inayat-df2ed2</loc>
-    <lastmod>2026-08-20T06:28:37.627Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/adil-keroum-472a30</loc>
-    <lastmod>2026-09-22T21:32:58.018Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://jobs.al/companies/prime-partners-a389ff</loc>
     <lastmod>2026-09-11T18:48:20.753Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/ye-shenshen-71c2f6</loc>
-    <lastmod>2026-09-20T21:33:31.923Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
@@ -1535,104 +612,8 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://jobs.al/companies/calixte-nduwimana-db9354</loc>
-    <lastmod>2026-10-30T15:39:38.875Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://jobs.al/companies/yeshenyang-263047</loc>
     <lastmod>2026-09-26T09:36:44.365Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/kimani-kariuki-866611</loc>
-    <lastmod>2026-09-27T02:17:51.050Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/petra-sewing-mestre-63a79b</loc>
-    <lastmod>2026-09-28T16:42:27.318Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/mohamed-marghiche-101354</loc>
-    <lastmod>2026-10-01T23:19:31.273Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/amr-emad-9a98ae</loc>
-    <lastmod>2026-10-03T13:30:01.967Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/abdelmourid-saraj-707988</loc>
-    <lastmod>2026-10-04T12:24:45.287Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/md-shohag-hossain-0c6d28</loc>
-    <lastmod>2026-10-04T13:11:01.562Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/muhammad-abdullah-ijaz-a4d854</loc>
-    <lastmod>2026-10-05T06:52:21.190Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/md-mahbub-hasan-c8ddb3</loc>
-    <lastmod>2026-10-07T05:41:25.238Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/xkdsx-ea429b</loc>
-    <lastmod>2026-10-08T15:44:46.919Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/md-salman-9a6cb9</loc>
-    <lastmod>2026-10-08T19:14:08.155Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/hana-misganu-8eea9c</loc>
-    <lastmod>2026-10-11T10:52:01.377Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/abdelazizadelwafy-69709d</loc>
-    <lastmod>2026-10-12T18:49:06.285Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/md-salah-uddin-367a66</loc>
-    <lastmod>2026-10-12T18:56:17.526Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/bilal-zahraouo-711b48</loc>
-    <lastmod>2026-10-12T19:49:55.250Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/mohamed-daldoul-063810</loc>
-    <lastmod>2026-10-15T00:40:30.005Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
@@ -1643,62 +624,8 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://jobs.al/companies/ahmed-nasr-59bd54</loc>
-    <lastmod>2026-10-17T13:04:42.812Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/ahmed-abd-elhamed-9eb75b</loc>
-    <lastmod>2026-10-20T08:08:48.495Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/ahmed-abd-elhamed-cc87ae</loc>
-    <lastmod>2026-10-20T08:27:05.533Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/magdy-ismael-ahmed-93e346</loc>
-    <lastmod>2026-10-20T16:02:17.158Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://jobs.al/companies/faith-chinenye-owunna-07b0b0</loc>
     <lastmod>2026-10-26T15:56:31.380Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/josha-jarga-magar-d07d33</loc>
-    <lastmod>2026-10-28T11:10:30.334Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/abdallah-shaban-abdallah-1fddd3</loc>
-    <lastmod>2026-10-28T15:15:12.814Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/akbarkhan-85180c</loc>
-    <lastmod>2026-10-29T04:09:55.527Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/tanvir-haque-49ad99</loc>
-    <lastmod>2026-10-29T18:37:18.485Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://jobs.al/companies/md-rayhan-mia-c7762c</loc>
-    <lastmod>2026-10-30T13:06:03.562Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>

@@ -67,14 +67,28 @@ Deno.serve(async (req) => {
     }
 
     if (action === "delete_company") {
-      const [{ count: offers }, { count: invoices }, { data: jobRows }] = await Promise.all([
-        admin.from("client_package_offers").select("id", { count: "exact", head: true }).eq("company_id", companyId),
-        admin.from("invoices").select("id", { count: "exact", head: true }).eq("company_id", companyId),
+      // Complete every blocking check before modifying any billing or company data.
+      // A failed read must not be treated as an empty result (safe to delete).
+      const [offerCheck, jobCheck] = await Promise.all([
+        admin.from("client_package_offers").select("id", { count: "exact", head: true }).eq("company_id", companyId).eq("status", "paid"),
         admin.from("jobs").select("id").eq("company_id", companyId),
       ]);
-      void offers; void invoices;
-      const { count: paidOffers } = await admin.from("client_package_offers").select("id", { count: "exact", head: true }).eq("company_id", companyId).eq("status", "paid");
-      if ((paidOffers ?? 0) > 0) return json({ error: "This company has a paid package, so it can't be deleted. Unverify or hide it instead." }, 400);
+      if (offerCheck.error || jobCheck.error || offerCheck.count === null || jobCheck.data === null) {
+        return json({ error: "Could not verify company deletion safeguards. No data was changed." }, 500);
+      }
+      if (offerCheck.count > 0) return json({ error: "This company has a paid package, so it can't be deleted. Unverify or hide it instead." }, 400);
+      const jobIds = jobCheck.data.map((job) => job.id);
+      if (jobIds.length) {
+        const [applicationCheck, listingCheck] = await Promise.all([
+          admin.from("applications").select("id", { count: "exact", head: true }).in("job_id", jobIds),
+          admin.from("job_listings").select("id", { count: "exact", head: true }).in("job_id", jobIds),
+        ]);
+        if (applicationCheck.error || listingCheck.error || applicationCheck.count === null || listingCheck.count === null) {
+          return json({ error: "Could not verify company deletion safeguards. No data was changed." }, 500);
+        }
+        if (applicationCheck.count > 0) return json({ error: "This company's jobs have applications, so it can't be deleted. Unverify or hide it instead." }, 400);
+        if (listingCheck.count > 0) return json({ error: "This company has paid or credited jobs, so it can't be deleted. Unverify or hide it instead." }, 400);
+      }
       // Invoices are never deleted: void and detach them (number is kept).
       const { data: invs } = await admin.from("invoices").select("id, status, notes").eq("company_id", companyId);
       for (const inv of invs ?? []) {
@@ -87,12 +101,7 @@ Deno.serve(async (req) => {
         const { error: oErr } = await admin.from("client_package_offers").delete().in("id", offerIds);
         if (oErr) return json({ error: "Could not remove package offer: " + oErr.message }, 400);
       }
-      const jobIds = (jobRows ?? []).map((j: any) => j.id);
       if (jobIds.length) {
-        const { count: apps } = await admin.from("applications").select("id", { count: "exact", head: true }).in("job_id", jobIds);
-        if ((apps ?? 0) > 0) return json({ error: "This company's jobs have applications, so it can't be deleted. Unverify or hide it instead." }, 400);
-        const { count: paid } = await admin.from("job_listings").select("id", { count: "exact", head: true }).in("job_id", jobIds);
-        if ((paid ?? 0) > 0) return json({ error: "This company has paid or credited jobs, so it can't be deleted. Unverify or hide it instead." }, 400);
         for (const t of ["saved_jobs", "job_recommendations", "analytics", "ad_analytics"]) await admin.from(t).delete().in("job_id", jobIds);
         await admin.from("jobs").delete().in("id", jobIds);
       }

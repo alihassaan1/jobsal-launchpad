@@ -1,5 +1,9 @@
 # Premium resume templates
 
+# Company deletion safeguard regression
+- [x] Check all deletion blockers before any invoice, package, or PayPal changes; fail closed on lookup errors
+- [x] Run request-level regression tests for blocked and permitted deletion (8 passed with mocked records; no real customer deletion performed)
+
 # Unified employer pricing and private packages
 - [x] Keep admin English and add Create package with select/add company and editable quotation terms; isolated desktop/mobile form verified, 30 tests passed
 - [x] Replace legacy employer upgrade prices with the PayPal catalog and checkout
