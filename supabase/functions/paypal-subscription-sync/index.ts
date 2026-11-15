@@ -1,6 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendPackageEmail, day } from "../_shared/packageEmails.ts";
+import { requireInternal } from "../_shared/auth.ts";
 
 // Daily safety net: re-sync PayPal subscriptions whose period ends within 3 days
 // (or that are stuck in pending/past_due), in case a webhook was missed.
