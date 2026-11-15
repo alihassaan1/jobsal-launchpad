@@ -1,3 +1,14 @@
+# Urgent backend and rendering security
+- [ ] Trace callers and add shared admin/internal authorization
+- [ ] Secure email functions, escape template data, and restrict links
+- [ ] Remove public seed/aggregation functions and their callers
+- [ ] Protect AI and scheduled functions; update cron authentication and responses
+- [ ] Sanitize all job and company HTML rendering
+- [ ] Restrict database function execution and promo-code reads
+- [ ] Require employer email confirmation and assess delivery
+- [ ] Enable leaked-password protection or document the manual blocker
+- [ ] Deploy, test authorization and cron paths, and run the security scan
+
 # Premium resume templates
 
 # Company deletion safeguard regression
