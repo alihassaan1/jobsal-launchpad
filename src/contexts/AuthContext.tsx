@@ -86,99 +86,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUp = async (email: string, password: string, fullName: string, accountType: 'job_seeker' | 'employer' = 'job_seeker') => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
-
-      if (accountType === 'employer') {
-        const { data, error } = await supabase.functions.invoke('employer-signup', {
-          body: { email, password, fullName },
-        });
-
-        if (error || (data as any)?.error) {
-          const message = (data as any)?.error || error?.message || 'Employer signup failed';
-          if (message.toLowerCase().includes('already registered')) {
-            const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-            if (!signInError) {
-              toast({ title: "Welcome back!", description: "Continue setting up your company profile." });
-              return { error: null, signedIn: true };
-            }
-          }
-          toast({ title: "Employer signup failed", description: message, variant: "destructive" });
-          return { error: error || new Error(message), signedIn: false };
-        }
-
-        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-        if (signInError) {
-          toast({ title: "Account created", description: "Sign in with your new password to continue." });
-          return { error: null, signedIn: false };
-        }
-
-        toast({ title: "Employer account created!", description: "You're signed in and ready to set up your company." });
-        return { error: null, signedIn: true };
-      }
-
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            full_name: fullName,
-            account_type: accountType,
-          }
-        }
+      const { data, error } = await supabase.functions.invoke('employer-signup', {
+        body: { email, password, fullName, accountType },
       });
 
-      if (error) {
-        const msg = (error.message || '').toLowerCase();
-        const alreadyRegistered =
-          msg.includes('already registered') ||
-          msg.includes('already exists') ||
-          msg.includes('user already');
-
-        if (alreadyRegistered) {
-          // Try to sign them in directly with the password they just typed.
+      if (error || (data as any)?.error) {
+        const message = (data as any)?.error || error?.message || 'Registration failed';
+        if (message.toLowerCase().includes('already registered')) {
           const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
           if (!signInError) {
-            toast({
-              title: "Welcome back!",
-              description: "You already have an account — we've signed you in.",
-            });
+            toast({ title: "Welcome back!", description: "You're signed in." });
             return { error: null, signedIn: true };
           }
-          toast({
-            title: "Account already exists",
-            description: "This email is already registered. Please sign in instead, or use 'Forgot password' to reset it.",
-            variant: "destructive",
-          });
-          return { error, signedIn: false };
         }
-
-        toast({
-          title: "Registration failed",
-          description: error.message,
-          variant: "destructive",
-        });
-        return { error, signedIn: false };
-      }
-
-      // Email confirmation is disabled — sign the user in immediately.
-      if (data?.session) {
-        toast({ title: "Account created!", description: "You're signed in and ready to go." });
-        return { error: null, signedIn: true };
-      }
-
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-      if (!signInError) {
-        toast({ title: "Account created!", description: "You're signed in and ready to go." });
-        return { error: null, signedIn: true };
+        toast({ title: "Registration failed", description: message, variant: "destructive" });
+        return { error: error || new Error(message), signedIn: false };
       }
 
       toast({
-        title: "Account created",
-        description: "Please sign in with your new password.",
+        title: "Check your inbox",
+        description: "We sent you a confirmation link. Confirm your email before signing in.",
       });
       return { error: null, signedIn: false };
     } catch (error: any) {
+      toast({ title: "Registration failed", description: error.message, variant: "destructive" });
       return { error };
     }
   };

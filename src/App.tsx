@@ -92,6 +92,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/confirm" element={<AuthConfirm />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/category/:category" element={<JobsByCategory />} />

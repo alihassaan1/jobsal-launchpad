@@ -46,11 +46,8 @@ const JobDetail = () => {
     },
   });
 
-  // Increment view count
   useEffect(() => {
-    if (job?.id) {
-      supabase.rpc("increment_job_views", { job_id: job.id });
-    }
+    if (job?.id) void trackPageView("job", job.id);
   }, [job?.id]);
 
   const { data: relatedJobs } = useQuery({

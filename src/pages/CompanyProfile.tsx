@@ -44,16 +44,14 @@ const CompanyProfile = () => {
         .maybeSingle();
 
       if (error) throw error;
-
-      // Increment view count (fire and forget)
-      if (data) {
-        supabase.rpc("increment_company_views", { company_slug: slug });
-      }
-
       return data;
     },
     enabled: !!slug,
   });
+
+  useEffect(() => {
+    if (company?.id) void trackPageView("company", company.id);
+  }, [company?.id]);
 
   // Fetch this company's active jobs from the public view (RLS-safe for anon)
   const { data: companyJobs } = useQuery({
