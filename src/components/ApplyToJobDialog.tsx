@@ -81,6 +81,7 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
     onSuccess: (applicationId) => {
       toast({ title: "Application submitted successfully!" });
       queryClient.invalidateQueries({ queryKey: ["myApplications"] });
+      queryClient.invalidateQueries({ queryKey: ["hasApplied", job.id, user?.id] });
       
       // Trigger new-applicant notification to employer
       sendNewApplicantNotification(applicationId);
