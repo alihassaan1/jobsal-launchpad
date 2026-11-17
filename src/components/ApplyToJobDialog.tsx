@@ -32,56 +32,20 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
   const [uploading, setUploading] = useState(false);
   const [selectedDocumentIds, setSelectedDocumentIds] = useState<string[]>([]);
 
-  const sendNewApplicantNotification = async () => {
-    try {
-      const { data: contact, error: contactError } = await (supabase.rpc as any)(
-        "get_job_employer_contact",
-        { _job_id: job.id }
-      );
-      if (contactError) throw contactError;
-      const row: any = Array.isArray(contact) ? contact[0] : contact;
-      if (!row?.employer_email) return;
-
-      const { data: userProfile } = await supabase
-        .from("profiles")
-        .select("full_name, email")
-        .eq("id", user!.id)
-        .maybeSingle();
-
-      const { count: totalApplications } = await supabase
-        .from("applications")
-        .select("*", { count: "exact", head: true })
-        .eq("job_id", job.id);
-
-      await supabase.functions.invoke("send-email", {
-        body: {
-          to: row.employer_email,
-          templateSlug: "new-applicant",
-          data: {
-            employerName: row.employer_name || "",
-            jobTitle: row.job_title || job.title,
-            location: job.location,
-            applicantName: userProfile?.full_name || "Kandidat",
-            applicantEmail: userProfile?.email || "",
-            appliedDate: new Date().toLocaleDateString("sq-AL"),
-            totalApplications: String(totalApplications || 1),
-          },
-          userId: row.owner_id,
-        },
-      });
-    } catch (err) {
-      console.error("Failed to send new-applicant notification:", err);
-    }
+  const sendNewApplicantNotification = async (applicationId: string) => {
+    const { error } = await supabase.functions.invoke("notify-new-applicant", { body: { applicationId } });
+    if (error) console.error("Failed to send new-applicant notification:", error);
   };
 
   const applyMutation = useMutation({
     mutationFn: async ({ coverLetter, resumeUrl }: { coverLetter: string; resumeUrl?: string }) => {
+      if (!user) throw new Error("Please sign in to apply");
       // Check if already applied
       const { data: existing } = await supabase
         .from("applications")
         .select("id")
         .eq("job_id", job.id)
-        .eq("applicant_id", user!.id)
+        .eq("applicant_id", user?.id)
         .maybeSingle();
 
       if (existing) {
@@ -92,7 +56,7 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
         .from("applications")
         .insert({
           job_id: job.id,
-          applicant_id: user!.id,
+          applicant_id: user?.id,
           cover_letter: coverLetter,
           resume_url: resumeUrl,
           status: "applied",
@@ -112,13 +76,14 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
         );
         if (linkError) throw linkError;
       }
+      return created.id;
     },
-    onSuccess: () => {
+    onSuccess: (applicationId) => {
       toast({ title: "Application submitted successfully!" });
       queryClient.invalidateQueries({ queryKey: ["myApplications"] });
       
       // Trigger new-applicant notification to employer
-      sendNewApplicantNotification();
+      sendNewApplicantNotification(applicationId);
       
       onClose();
       setCoverLetter("");
@@ -172,7 +137,7 @@ const ApplyToJobDialog = ({ job, isOpen, onClose }: ApplyToJobDialogProps) => {
       // Upload resume if provided
       if (resumeFile) {
         const fileExt = resumeFile.name.split(".").pop();
-        const fileName = `${user!.id}/${Date.now()}.${fileExt}`;
+        const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
           .from("resumes")

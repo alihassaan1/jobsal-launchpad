@@ -1259,6 +1259,9 @@ serve(async (req) => {
   }
 
   try {
+    const internalCheck = requireInternal(req);
+    const authorizationCheck = internalCheck.ok ? internalCheck : await requireAdmin(req);
+    if (!authorizationCheck.ok) return authorizationCheck.response;
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -1270,7 +1273,7 @@ serve(async (req) => {
     }
 
     // Get email template
-    const template = getEmailTemplate(templateSlug, data);
+    const template = getEmailTemplate(templateSlug, sanitizeEmailData(data));
 
     // Send email via Resend
     const emailResponse = await resend.emails.send({

@@ -13,6 +13,8 @@ serve(async (req) => {
   }
 
   try {
+    const authorizationCheck = requireInternal(req);
+    if (!authorizationCheck.ok) return authorizationCheck.response;
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -273,7 +275,7 @@ serve(async (req) => {
     console.log("Scheduled job alerts completed:", results);
 
     return new Response(
-      JSON.stringify({ success: true, results }),
+      JSON.stringify({ success: true, results: { ...results, errors: results.errors.length } }),
       {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -282,7 +284,7 @@ serve(async (req) => {
   } catch (error: any) {
     console.error("Error in scheduled-job-alerts:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Scheduled task failed" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

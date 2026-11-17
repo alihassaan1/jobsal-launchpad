@@ -27,13 +27,8 @@ async function paypalToken() {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    // Callable by the daily cron (anon key) or service role. It only triggers a
-    // re-sync with PayPal and returns counts — no employer data is exposed.
-    const auth = req.headers.get("Authorization") ?? "";
-    const allowed = [Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"), Deno.env.get("SUPABASE_ANON_KEY")];
-    if (!allowed.some((k) => k && auth === `Bearer ${k}`)) {
-      return json({ error: "Forbidden" }, 403);
-    }
+    const authorizationCheck = requireInternal(req);
+    if (!authorizationCheck.ok) return authorizationCheck.response;
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const soon = new Date(Date.now() + 3 * 86400000).toISOString();
 

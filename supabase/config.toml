@@ -27,9 +27,6 @@ verify_jwt = false
 [functions.generate-seo-content]
 verify_jwt = false
 
-[functions.seed-blog-posts]
-verify_jwt = false
-
 [functions.scheduled-content-generator]
 verify_jwt = false
 
@@ -46,12 +43,6 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.scheduled-ai-content]
-verify_jwt = false
-
-[functions.aggregate-jobs]
-verify_jwt = false
-
-[functions.seed-jobs]
 verify_jwt = false
 
 [functions.generate-job-images]

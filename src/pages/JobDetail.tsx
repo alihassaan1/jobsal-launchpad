@@ -1,3 +1,4 @@
+import { sanitizeBasicHtml } from "@/lib/sanitizeHtml";
 import { htmlToPlainText } from "@/lib/utils";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -334,7 +335,7 @@ const JobDetail = () => {
                 <CardTitle>Job Description</CardTitle>
               </CardHeader>
               <CardContent className="prose prose-sm max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: job.description.replace(/\n/g, "<br />") }} />
+                <div dangerouslySetInnerHTML={{ __html: sanitizeBasicHtml(job.description) }} />
               </CardContent>
             </Card>
 
@@ -345,7 +346,7 @@ const JobDetail = () => {
                   <CardTitle>Requirements</CardTitle>
                 </CardHeader>
                 <CardContent className="prose prose-sm max-w-none">
-                  <div dangerouslySetInnerHTML={{ __html: job.requirements.replace(/\n/g, "<br />") }} />
+                  <div dangerouslySetInnerHTML={{ __html: sanitizeBasicHtml(job.requirements) }} />
                 </CardContent>
               </Card>
             )}
@@ -357,7 +358,7 @@ const JobDetail = () => {
                   <CardTitle>Responsibilities</CardTitle>
                 </CardHeader>
                 <CardContent className="prose prose-sm max-w-none">
-                  <div dangerouslySetInnerHTML={{ __html: job.responsibilities.replace(/\n/g, "<br />") }} />
+                  <div dangerouslySetInnerHTML={{ __html: sanitizeBasicHtml(job.responsibilities) }} />
                 </CardContent>
               </Card>
             )}

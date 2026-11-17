@@ -10,3 +10,5 @@
 - File storage lives in Cloudflare R2 (S3-compatible via aws4fetch): resumes under `resumes/` and user documents under `documents/{certificates,cover-letters,experience-letters,thumbnails}/{userId}/` (private; owner/admin presigned GET, employers via document-access), legacy Supabase-bucket paths still resolved by prefix, website images under `images/{blog,logos,banners,ads,jobs,templates,misc}/` (public via R2_PUBLIC_URL, folder allowlisted server-side); the `r2-storage` edge function issues presigned URLs and content generators fall back to the Supabase `blog-images` bucket when R2 is unconfigured.
 - Invoices are never deleted (database trigger blocks it); voiding keeps the number. Seller block and the reverse-charge rule live in src/lib/invoiceRules.ts and are mirrored in generate-invoice-pdf.
 - Company deletion must complete all blocking reads successfully before any mutation, so rejected attempts preserve billing and package records.
+
+- Admin endpoints use shared server-side role validation and scheduled/email endpoints use internal credentials; shared blog generation is imported by both entrypoints so cron never bypasses admin checks.

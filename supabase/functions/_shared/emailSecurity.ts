@@ -5,7 +5,7 @@ export function escapeHtml(value: unknown): string {
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#39;",
-  })[character]!);
+  })[character] ?? character);
 }
 
 export function isJobsAlUrl(value: string): boolean {

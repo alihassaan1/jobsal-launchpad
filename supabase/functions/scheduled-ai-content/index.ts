@@ -388,6 +388,8 @@ serve(async (req) => {
   }
 
   try {
+    const authorizationCheck = requireInternal(req);
+    if (!authorizationCheck.ok) return authorizationCheck.response;
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);

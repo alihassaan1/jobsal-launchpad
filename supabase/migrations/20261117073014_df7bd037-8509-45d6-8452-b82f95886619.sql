@@ -1,0 +1,13 @@
+REVOKE EXECUTE ON FUNCTION public.get_job_employer_contact(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.get_job_employer_contact(uuid) TO service_role;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.handle_user_role_assignment() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.handle_employer_role_company() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.trigger_welcome_email() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.become_employer() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.become_employer() TO authenticated, service_role;
+REVOKE EXECUTE ON FUNCTION public.unlock_candidate(uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.unlock_candidate(uuid, uuid) TO authenticated, service_role;
+REVOKE EXECUTE ON FUNCTION public.can_post_job(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.can_post_job(uuid) TO authenticated, service_role;
+DROP POLICY IF EXISTS "Anyone can view active promo codes" ON public.promo_codes;
