@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
     });
 
     const { data: page, error: pageError } = await admin.from(kind === "job" ? "jobs" : "companies")
-      .select("id").eq("id", id).maybeSingle();
+      .select(kind === "job" ? "id" : "id, slug").eq("id", id).maybeSingle();
     if (pageError || !page) return json({ counted: false });
 
     // One count per visitor/page in a 30-minute window. Only a keyed hash is stored,
@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     if (receiptError) throw receiptError;
 
     const rpc = kind === "job" ? "increment_job_views" : "increment_company_views";
-    const args = kind === "job" ? { job_id: id } : { company_id: id };
+    const args = kind === "job" ? { job_id: id } : { company_slug: page.slug };
     const { error: incrementError } = await admin.rpc(rpc, args);
     if (incrementError) throw incrementError;
     return json({ counted: true });
