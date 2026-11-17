@@ -7,21 +7,21 @@ Deno.test("admin endpoint rejects missing authorization with 401", async () => {
   if (!result.ok) assertEquals(result.response.status, 401);
 });
 
-Deno.test("internal endpoint rejects public bearer and incorrect secret", () => {
-  const result = requireInternal(new Request("https://jobs.al", { headers: {
+Deno.test("internal endpoint rejects public bearer and incorrect secret", async () => {
+  const result = await requireInternal(new Request("https://jobs.al", { headers: {
     Authorization: "Bearer public-invalid", "x-internal-secret": "incorrect",
   } }));
   assertEquals(result.ok, false);
   if (!result.ok) assertEquals(result.response.status, 401);
 });
 
-Deno.test("internal endpoint accepts configured internal secret", () => {
+Deno.test("internal endpoint accepts configured internal secret", async () => {
   const previous = Deno.env.get("INTERNAL_CRON_SECRET");
   Deno.env.set("INTERNAL_CRON_SECRET", "test-only-internal-credential");
   try {
-    assertEquals(requireInternal(new Request("https://jobs.al", { headers: {
+    assertEquals((await requireInternal(new Request("https://jobs.al", { headers: {
       "x-internal-secret": "test-only-internal-credential",
-    } })).ok, true);
+    } }))).ok, true);
   } finally {
     if (previous === undefined) Deno.env.delete("INTERNAL_CRON_SECRET");
     else Deno.env.set("INTERNAL_CRON_SECRET", previous);

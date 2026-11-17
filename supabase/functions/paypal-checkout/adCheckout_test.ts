@@ -2,7 +2,7 @@ import { assertEquals } from "https://deno.land/std@0.190.0/testing/asserts.ts";
 import { allocateDiscount } from "./adCheckout.ts";
 
 Deno.test("ad discount never exceeds the order subtotal", () => {
-  assertEquals(allocateDiscount([2500, 4500], 10000), [0, 7000].map(() => 0).map((_, i) => i === 0 ? 2500 : 4500));
+  assertEquals(allocateDiscount([2500, 4500], 10000), [2500, 4500]);
 });
 
 Deno.test("ad discount allocations add up to the exact discount", () => {
