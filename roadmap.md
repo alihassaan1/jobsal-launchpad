@@ -1,13 +1,17 @@
 # Urgent backend and rendering security
-- [ ] Trace callers and add shared admin/internal authorization
-- [ ] Secure email functions, escape template data, and restrict links
-- [ ] Remove public seed/aggregation functions and their callers
-- [ ] Protect AI and scheduled functions; update cron authentication and responses
-- [ ] Sanitize all job and company HTML rendering
-- [ ] Restrict database function execution and promo-code reads
-- [ ] Require employer email confirmation and assess delivery
-- [ ] Enable leaked-password protection or document the manual blocker
-- [ ] Deploy, test authorization and cron paths, and run the security scan
+- [x] Trace callers and enforce shared admin/internal authorization on 14 endpoints
+- [x] Escape email template data and restrict dynamic link URLs
+- [x] Delete production seed/aggregation functions and remove their admin caller
+- [x] Move applicant notification and employer contact lookup into authenticated server function
+- [x] Revoke requested database execution grants and remove public promo-code reads
+- [x] Activate tested sanitization on job description, requirements and responsibilities
+- [ ] Restore five paused schedules with private credentials; external Supabase cannot access Edge secrets from SQL without separate secure configuration
+- [ ] Deliver queued welcome emails after trusted scheduling is restored
+- [ ] Verify employer confirmation email delivery before changing signup
+- [ ] Enable leaked-password protection in external Supabase Auth settings (no settings-write tool available)
+- [ ] Complete remaining broader HTML rendering and legacy promo checkout audit
+- [x] Deploy protected functions; verify live 401 rejections and deleted function 404; 8 security tests passed
+- [x] Run database scan; deep scan started against pre-edit saved source and awaits notification
 
 # Premium resume templates
 
