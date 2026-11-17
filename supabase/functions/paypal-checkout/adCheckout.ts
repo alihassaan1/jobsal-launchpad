@@ -86,6 +86,7 @@ export async function handleAdCheckout(options: {
     const total = subtotal - discount;
     if (total <= 0) return json({ error: "This promotion needs manual checkout because it covers the full total" }, 400);
     const discounts = allocateDiscount(orderedProducts.map((product) => product.price), discount);
+    const ret = safeReturnUrl(body.return_url!);
     const start = new Date();
     const purchaseRows = items.map((item, index) => {
       const product = orderedProducts[index];
@@ -107,7 +108,6 @@ export async function handleAdCheckout(options: {
     const { data: purchases, error: purchaseError } = await admin.from("ad_purchases").insert(purchaseRows).select("id");
     if (purchaseError || !purchases?.length) return json({ error: "Could not prepare the advertising order" }, 500);
 
-    const ret = safeReturnUrl(body.return_url!);
     const response = await fetch(`${paypalBase}/v2/checkout/orders`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "PayPal-Request-Id": crypto.randomUUID() },
