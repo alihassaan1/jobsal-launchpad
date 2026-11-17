@@ -1259,7 +1259,7 @@ serve(async (req) => {
   }
 
   try {
-    const internalCheck = requireInternal(req);
+    const internalCheck = await requireInternal(req);
     const authorizationCheck = internalCheck.ok ? internalCheck : await requireAdmin(req);
     if (!authorizationCheck.ok) return authorizationCheck.response;
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;

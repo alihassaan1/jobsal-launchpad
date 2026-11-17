@@ -1,11 +1,53 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireInternal } from "../_shared/auth.ts";
+import { isWelcomeEligible } from "../_shared/welcomeEligibility.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+async function processWelcomeQueue(supabase: any, supabaseUrl: string, supabaseKey: string) {
+  const counts = { sent: 0, cancelled: 0, failed: 0, waiting: 0 };
+  const now = new Date();
+  const { data: queued, error } = await supabase.from("email_queue")
+    .select("id, user_id").eq("template_slug", "welcome").eq("status", "pending")
+    .lte("scheduled_for", now.toISOString()).order("created_at", { ascending: true }).limit(100);
+  if (error) throw error;
+
+  for (const item of queued ?? []) {
+    const { data: profile } = await supabase.from("profiles").select("email, full_name, created_at").eq("id", item.user_id).maybeSingle();
+    if (!profile) {
+      await supabase.from("email_queue").update({ status: "cancelled", processed_at: now.toISOString(), error_message: "Profile unavailable" }).eq("id", item.id);
+      counts.cancelled++;
+      continue;
+    }
+    if (!isWelcomeEligible(profile.created_at, now)) {
+      await supabase.from("email_queue").update({ status: "cancelled", processed_at: now.toISOString(), error_message: "Outside 7-day welcome window" }).eq("id", item.id);
+      counts.cancelled++;
+      continue;
+    }
+    const { data: authData } = await supabase.auth.admin.getUserById(item.user_id);
+    if (!authData.user?.email_confirmed_at) {
+      counts.waiting++;
+      continue;
+    }
+    const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${supabaseKey}` },
+      body: JSON.stringify({ to: profile.email, templateSlug: "welcome", data: { name: profile.full_name || "" }, userId: item.user_id }),
+    });
+    if (response.ok) {
+      await supabase.from("email_queue").update({ status: "sent", processed_at: now.toISOString(), error_message: null }).eq("id", item.id);
+      counts.sent++;
+    } else {
+      await supabase.from("email_queue").update({ status: "failed", processed_at: now.toISOString(), error_message: `Delivery status ${response.status}` }).eq("id", item.id);
+      counts.failed++;
+    }
+  }
+  return counts;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -13,13 +55,14 @@ serve(async (req) => {
   }
 
   try {
-    const authorizationCheck = requireInternal(req);
+    const authorizationCheck = await requireInternal(req, "scheduled-email-reminders");
     if (!authorizationCheck.ok) return authorizationCheck.response;
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     console.log("Starting scheduled email reminders...");
+    const welcome = await processWelcomeQueue(supabase, supabaseUrl, supabaseKey);
 
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -234,7 +277,7 @@ serve(async (req) => {
     console.log("Scheduled email reminders completed:", results);
 
     return new Response(
-      JSON.stringify({ success: true, results: { ...results, errors: results.errors.length } }),
+      JSON.stringify({ success: true, welcome, results: { ...results, errors: results.errors.length } }),
       {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },

@@ -5,6 +5,7 @@ import { PAYPAL_PRODUCTS, formatEur, type PaypalProduct } from "./products.ts";
 import { canPurchaseOffer, canUseOffer, offerExpiry, CLIENT_OFFER_VALID_UNTIL, validCustomOffer, offerProduct } from "./clientOffers.ts";
 import { canCreateOfferCompany } from "./companyAccess.ts";
 import { sendPackageEmail, eur, day } from "../_shared/packageEmails.ts";
+import { handleAdCheckout } from "./adCheckout.ts";
 
 const PAYPAL_BASE = Deno.env.get("PAYPAL_ENV") === "live"
   ? "https://api-m.paypal.com"
@@ -151,6 +152,8 @@ const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("create"), product_key: z.string().max(50), return_url: z.string().url().max(500), job_id: z.string().uuid().optional(), offer_id: z.string().uuid().optional(), urgent: z.boolean().optional() }),
   z.object({ action: z.literal("assign_offer"), company_id: z.string().uuid(), product_key: z.string().max(50), starts_at: z.string().datetime(), package_name: z.string().trim().min(1).max(120).optional(), amount_cents: z.number().int().positive().max(100000000).optional(), credit_limit: z.number().int().positive().max(1000000).optional(), duration_months: z.number().int().min(1).max(120).optional(), offer_expires_at: z.string().datetime().optional() }),
   z.object({ action: z.literal("capture"), order_id: z.string().min(5).max(64) }),
+  z.object({ action: z.literal("create_ad"), items: z.array(z.object({ product_id: z.string().uuid(), job_id: z.string().uuid().nullable().optional() })).min(1).max(20), return_url: z.string().url().max(500), promo_code: z.string().trim().max(50).optional() }),
+  z.object({ action: z.literal("capture_ad"), order_id: z.string().min(5).max(64) }),
   z.object({ action: z.literal("subscribe"), product_key: z.string().max(50), return_url: z.string().url().max(500) }),
   z.object({ action: z.literal("activate"), subscription_id: z.string().min(5).max(64) }),
   z.object({ action: z.literal("cancel"), subscription_id: z.string().min(5).max(64) }),
@@ -324,6 +327,10 @@ Deno.serve(async (req) => {
     }
 
     const token = await paypalToken();
+
+    if (body.action === "create_ad" || body.action === "capture_ad") {
+      return await handleAdCheckout({ admin, userId: user.id, body, token, paypalBase: PAYPAL_BASE, environment: ENV, safeReturnUrl });
+    }
 
     if (body.action === "create") {
       let product = PAYPAL_PRODUCTS[body.product_key];

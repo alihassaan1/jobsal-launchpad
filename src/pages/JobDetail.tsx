@@ -1,4 +1,5 @@
 import { sanitizeBasicHtml } from "@/lib/sanitizeHtml";
+import { trackPageView } from "@/lib/pageView";
 import { htmlToPlainText } from "@/lib/utils";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -45,11 +46,8 @@ const JobDetail = () => {
     },
   });
 
-  // Increment view count
   useEffect(() => {
-    if (job?.id) {
-      supabase.rpc("increment_job_views", { job_id: job.id });
-    }
+    if (job?.id) void trackPageView("job", job.id);
   }, [job?.id]);
 
   const { data: relatedJobs } = useQuery({

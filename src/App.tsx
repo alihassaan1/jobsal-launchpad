@@ -11,6 +11,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import AdminLayout from "@/components/AdminLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AuthConfirm from "./pages/AuthConfirm";
 import ResetPassword from "./pages/ResetPassword";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
@@ -91,6 +92,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/confirm" element={<AuthConfirm />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/category/:category" element={<JobsByCategory />} />
