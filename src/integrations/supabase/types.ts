@@ -159,6 +159,7 @@ export type Database = {
           job_id: string | null
           payment_method: Database["public"]["Enums"]["payment_method"] | null
           payment_reference: string | null
+          paypal_order_id: string | null
           promo_code_id: string | null
           start_date: string
           status: Database["public"]["Enums"]["ad_purchase_status"] | null
@@ -177,6 +178,7 @@ export type Database = {
           job_id?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
           payment_reference?: string | null
+          paypal_order_id?: string | null
           promo_code_id?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["ad_purchase_status"] | null
@@ -195,6 +197,7 @@ export type Database = {
           job_id?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"] | null
           payment_reference?: string | null
+          paypal_order_id?: string | null
           promo_code_id?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["ad_purchase_status"] | null
@@ -235,6 +238,13 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "jobs_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_purchases_paypal_order_id_fkey"
+            columns: ["paypal_order_id"]
+            isOneToOne: false
+            referencedRelation: "paypal_orders"
             referencedColumns: ["id"]
           },
           {
@@ -1363,6 +1373,30 @@ export type Database = {
         }
         Relationships: []
       }
+      internal_cron_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          task: string
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          task: string
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          task?: string
+          token_hash?: string
+        }
+        Relationships: []
+      }
       invoice_items: {
         Row: {
           created_at: string | null
@@ -1959,6 +1993,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      page_view_receipts: {
+        Row: {
+          bucket: number
+          content_id: string
+          content_type: string
+          created_at: string
+          id: string
+          visitor_hash: string
+        }
+        Insert: {
+          bucket: number
+          content_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          visitor_hash: string
+        }
+        Update: {
+          bucket?: number
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          visitor_hash?: string
+        }
+        Relationships: []
       }
       payment_transactions: {
         Row: {
@@ -3296,6 +3357,11 @@ export type Database = {
         Args: { _company_id: string }
         Returns: boolean
       }
+      consume_internal_cron_token: {
+        Args: { _task: string; _token: string }
+        Returns: boolean
+      }
+      create_internal_cron_token: { Args: { _task: string }; Returns: string }
       current_user_has_talent_pool: { Args: never; Returns: boolean }
       generate_credit_note_number: { Args: never; Returns: string }
       generate_invoice_number: { Args: never; Returns: string }
@@ -3353,6 +3419,7 @@ export type Database = {
         Args: { _job_id: string; _user_id: string }
         Returns: string
       }
+      settle_ad_order: { Args: { _order_id: string }; Returns: number }
       settle_client_package: { Args: { _order_id: string }; Returns: string }
       settle_paid_job_order: { Args: { _order_id: string }; Returns: string }
       unlock_candidate: {
