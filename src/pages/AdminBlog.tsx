@@ -49,7 +49,6 @@ const AdminBlog = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [isSeeding, setIsSeeding] = useState(false);
   const [togglingPublish, setTogglingPublish] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>('created_at');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -179,25 +178,10 @@ const AdminBlog = () => {
     });
   };
 
-  const seedSamplePosts = async () => {
-    setIsSeeding(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('seed-blog-posts');
-      if (error) throw error;
-      toast.success('Sample blog posts created successfully!');
-      await fetchPosts();
-    } catch (error: any) {
-      console.error('Seeding error:', error);
-      toast.error(error.message || 'Failed to seed sample posts');
-    } finally {
-      setIsSeeding(false);
-    }
-  };
-
   const runScheduledGenerator = async () => {
     toast.info("Starting content generation...");
     try {
-      const { data, error } = await supabase.functions.invoke('scheduled-content-generator');
+      const { data, error } = await supabase.functions.invoke('generate-seo-content', { body: { action: 'generate_blog', topic: 'Career opportunities in Albania' } });
       if (error) throw error;
       
       if (data?.success) {
@@ -220,15 +204,6 @@ const AdminBlog = () => {
           <p className="text-muted-foreground mt-1">Create, edit, and manage blog posts</p>
         </div>
         <div className="flex gap-2">
-          {posts.length === 0 && (
-            <Button 
-              variant="outline" 
-              onClick={seedSamplePosts}
-              disabled={isSeeding}
-            >
-              {isSeeding ? 'Creating...' : 'Create Sample Posts'}
-            </Button>
-          )}
           <Button variant="outline" onClick={runScheduledGenerator}>
             <RefreshCw className="mr-2 h-4 w-4" />
             Generate Content

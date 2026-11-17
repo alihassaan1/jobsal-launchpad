@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireInternal } from "../_shared/auth.ts";
+import { generateBlogPost } from "../_shared/generateBlogPost.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -79,21 +80,12 @@ serve(async (req) => {
     console.log("Selected topic:", randomTopic);
     console.log("Generated keywords:", keywords);
 
-    // Call the generate-blog-post function
-    const { data, error } = await supabase.functions.invoke("generate-blog-post", {
-      body: {
-        topic: randomTopic,
-        keywords: keywords,
-        userId: userId,
-        generateFacebookPost: true,
-        generateInfographic: true
-      }
-    });
-
-    if (error) {
-      console.error("Error generating blog post:", error);
-      throw error;
-    }
+    const response = await generateBlogPost(new Request(req.url, {
+      method: "POST",
+      body: JSON.stringify({ topic: randomTopic, keywords, userId, generateFacebookPost: true, generateInfographic: true }),
+    }));
+    if (!response.ok) throw new Error("Blog generation failed");
+    const data = await response.json();
 
     console.log("Blog post generated successfully:", data);
 
@@ -117,9 +109,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        topic: randomTopic,
-        post: data?.post,
-        message: "Automated blog post generated and published successfully"
+        generated: data?.post?.id ? 1 : 0
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
