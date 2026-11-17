@@ -1,8 +1,8 @@
 # Current verification and reliability round
-- [ ] Re-enable daily job alerts, email reminders and PayPal subscription sync with internal authentication; send queued welcome emails only to sign-ups from the last 7 days; keep both AI content schedules paused
-- [ ] Reproduce and fix job-seeker registration on desktop and mobile; verify sign-up, CV creation and job application end to end
-- [ ] Prevent public company-view inflation and verify job/company views increment once per visit
-- [ ] Test advertising checkout and verify confirmed PayPal capture activates the purchased ad
+- [x] Re-enabled and ran daily job alerts, email reminders and PayPal subscription sync with task-scoped single-use headers; welcome queue is limited to confirmed sign-ups from the last 7 days; both AI content schedules remain paused
+- [x] Fixed job-seeker registration through Resend confirmation; verified desktop/mobile sign-up, sign-in, CV creation and a stored job application; removed all test records
+- [x] Prevented public company-view inflation and verified job/company views each increment once, with forced duplicates rejected
+- [x] Replaced demo ad activation with verified PayPal capture and transactional settlement; tested activation atomically with rollback. A real buyer-approved live payment was not completed.
 
 # Urgent backend and rendering security
 - [x] Trace callers and enforce shared admin/internal authorization on 14 endpoints
@@ -11,9 +11,9 @@
 - [x] Move applicant notification and employer contact lookup into authenticated server function
 - [x] Revoke requested database execution grants and remove public promo-code reads
 - [x] Activate tested sanitization on job description, requirements and responsibilities
-- [ ] Restore five paused schedules with private credentials; external Supabase cannot access Edge secrets from SQL without separate secure configuration
-- [ ] Deliver queued welcome emails after trusted scheduling is restored
-- [ ] Verify employer confirmation email delivery before changing signup
+- [x] Restore the three requested schedules with single-use internal tokens; the two AI content schedules remain paused
+- [x] Process queued welcome emails only for confirmed users whose sign-up is within seven days
+- [x] Verify Resend confirmation delivery using Resend's accepted test recipients for both account types
 - [ ] Enable leaked-password protection in external Supabase Auth settings (no settings-write tool available)
 - [ ] Complete remaining broader HTML rendering and legacy promo checkout audit
 - [x] Deploy protected functions; verify live 401 rejections and deleted function 404; 8 security tests passed

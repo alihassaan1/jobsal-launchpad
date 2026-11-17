@@ -11,4 +11,5 @@
 - Invoices are never deleted (database trigger blocks it); voiding keeps the number. Seller block and the reverse-charge rule live in src/lib/invoiceRules.ts and are mirrored in generate-invoice-pdf.
 - Company deletion must complete all blocking reads successfully before any mutation, so rejected attempts preserve billing and package records.
 
-- Admin endpoints use shared server-side role validation and scheduled/email endpoints use internal credentials; shared blog generation is imported by both entrypoints so cron never bypasses admin checks.
+- Admin endpoints use shared server-side role validation; scheduled and email endpoints accept a configured internal credential, service-role bearer, or task-scoped single-use database token so external cron never stores a reusable secret.
+- Page-view counters use browser-session suppression plus service-role, keyed visitor/page/time-window receipts; advertising purchases stay pending until an exact-amount PayPal capture is verified and settled transactionally.
