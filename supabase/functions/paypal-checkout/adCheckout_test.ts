@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.190.0/testing/asserts.ts";
-import { allocateDiscount } from "./adCheckout.ts";
+import { allocateDiscount, isConfirmedAdCapture } from "./adCheckout.ts";
 
 Deno.test("ad discount never exceeds the order subtotal", () => {
   assertEquals(allocateDiscount([2500, 4500], 10000), [2500, 4500]);
@@ -15,4 +15,15 @@ Deno.test("each ad keeps a non-negative payable amount", () => {
   const prices = [100, 100, 100];
   const shares = allocateDiscount(prices, 150);
   assertEquals(prices.map((price, index) => price - shares[index]), [50, 50, 50]);
+});
+
+Deno.test("only a completed PayPal capture for the exact EUR amount confirms an ad", () => {
+  const capture = (status: string, currency = "EUR", value = "15.00") => ({
+    status,
+    purchase_units: [{ payments: { captures: [{ status, amount: { currency_code: currency, value } }] } }],
+  });
+  assertEquals(isConfirmedAdCapture(capture("COMPLETED"), 1500), true);
+  assertEquals(isConfirmedAdCapture(capture("PENDING"), 1500), false);
+  assertEquals(isConfirmedAdCapture(capture("COMPLETED", "EUR", "14.99"), 1500), false);
+  assertEquals(isConfirmedAdCapture(capture("COMPLETED", "USD"), 1500), false);
 });
