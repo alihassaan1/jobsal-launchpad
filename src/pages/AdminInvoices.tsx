@@ -251,7 +251,7 @@ export default function AdminInvoices() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status, paid_date }: { id: string; status: string; paid_date?: string }) => {
-      const updates: Record<string, unknown> = { status };
+      const updates: { status: string; paid_date?: string; amount_paid?: number } = { status };
       if (paid_date) updates.paid_date = paid_date;
       if (status === "paid") updates.amount_paid = selectedInvoice?.total;
 

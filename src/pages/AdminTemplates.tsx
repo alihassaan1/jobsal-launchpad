@@ -45,12 +45,12 @@ export default function AdminTemplates() {
     }
   };
 
-  const updateTemplate = async (id: string, field: string, value: boolean) => {
+  const updateTemplate = async (id: string, field: "is_premium" | "is_active", value: boolean) => {
     setUpdating(id);
     try {
       const { error } = await supabase
         .from("resume_templates")
-        .update({ [field]: value })
+        .update(field === "is_premium" ? { is_premium: value } : { is_active: value })
         .eq("id", id);
 
       if (error) throw error;
