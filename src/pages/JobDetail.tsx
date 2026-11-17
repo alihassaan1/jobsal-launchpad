@@ -1,4 +1,5 @@
 import { sanitizeBasicHtml } from "@/lib/sanitizeHtml";
+import { trackPageView } from "@/lib/pageView";
 import { htmlToPlainText } from "@/lib/utils";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

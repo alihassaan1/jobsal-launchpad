@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const authorizationCheck = requireInternal(req);
+    const authorizationCheck = await requireInternal(req, "scheduled-email-reminders");
     if (!authorizationCheck.ok) return authorizationCheck.response;
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;

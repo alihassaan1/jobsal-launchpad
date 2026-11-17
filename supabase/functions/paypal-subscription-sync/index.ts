@@ -27,7 +27,7 @@ async function paypalToken() {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    const authorizationCheck = requireInternal(req);
+    const authorizationCheck = await requireInternal(req, "paypal-subscription-sync");
     if (!authorizationCheck.ok) return authorizationCheck.response;
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const soon = new Date(Date.now() + 3 * 86400000).toISOString();

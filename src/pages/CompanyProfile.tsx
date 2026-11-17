@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { trackPageView } from "@/lib/pageView";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

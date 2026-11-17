@@ -11,6 +11,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import AdminLayout from "@/components/AdminLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AuthConfirm from "./pages/AuthConfirm";
 import ResetPassword from "./pages/ResetPassword";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";

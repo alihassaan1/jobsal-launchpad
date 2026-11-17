@@ -77,7 +77,7 @@ serve(async (req) => {
   }
 
   try {
-    const authorizationCheck = requireInternal(req);
+    const authorizationCheck = await requireInternal(req);
     if (!authorizationCheck.ok) return authorizationCheck.response;
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');

@@ -43,7 +43,7 @@ serve(async (req) => {
   }
 
   try {
-    const authorizationCheck = requireInternal(req);
+    const authorizationCheck = await requireInternal(req);
     if (!authorizationCheck.ok) return authorizationCheck.response;
     console.log("Starting automated blog post generation...");
 
