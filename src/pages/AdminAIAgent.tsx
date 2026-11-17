@@ -1,3 +1,4 @@
+import { sanitizeRichHtml } from "@/lib/sanitizeHtml";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -660,7 +661,7 @@ const AdminAIAgent = () => {
                   {generatedContent.content && (
                     <div 
                       className="prose prose-sm max-w-none dark:prose-invert"
-                      dangerouslySetInnerHTML={{ __html: generatedContent.content }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(generatedContent.content) }}
                     />
                   )}
                 </ScrollArea>

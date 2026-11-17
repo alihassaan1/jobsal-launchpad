@@ -1,3 +1,4 @@
+import { sanitizeRichHtml } from "@/lib/sanitizeHtml";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -331,7 +332,7 @@ const BlogPost = () => {
                 [&_figcaption]:bg-muted/50 [&_figcaption]:px-4 [&_figcaption]:py-3 [&_figcaption]:text-center [&_figcaption]:text-sm [&_figcaption]:text-muted-foreground
                 [&_.blog-cta]:my-10 [&_.blog-cta]:rounded-lg [&_.blog-cta]:border [&_.blog-cta]:border-primary/20 [&_.blog-cta]:bg-muted/50 [&_.blog-cta]:p-6 [&_.blog-cta]:text-center
                 [&_.blog-cta_h2]:mt-0 [&_.blog-cta_a]:inline-flex [&_.blog-cta_a]:items-center [&_.blog-cta_a]:justify-center [&_.blog-cta_a]:rounded-md [&_.blog-cta_a]:bg-primary [&_.blog-cta_a]:px-6 [&_.blog-cta_a]:py-3 [&_.blog-cta_a]:font-semibold [&_.blog-cta_a]:text-primary-foreground [&_.blog-cta_a]:no-underline [&_.blog-cta_a]:hover:bg-primary/90">
-                <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                <div dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(post.content) }} />
               </div>
 
               {/* Tags */}

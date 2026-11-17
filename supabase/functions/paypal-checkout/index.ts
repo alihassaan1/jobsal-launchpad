@@ -162,6 +162,14 @@ const Body = z.discriminatedUnion("action", [
 
 // Public one-time payment link for a private package: no login, token-bound to one offer.
 // deno-lint-ignore no-explicit-any
+
+const ALLOWED_RETURN_HOSTS = new Set(["jobs.al", "www.jobs.al", "jobsal-launchpad.lovable.app", "id-preview--dce33a52-85a0-4683-b28b-bed8bd5b89dd.lovable.app", "dce33a52-85a0-4683-b28b-bed8bd5b89dd.lovableproject.com"]);
+function safeReturnUrl(value: string): URL {
+  const url = new URL(value);
+  if (url.protocol !== "https:" || !ALLOWED_RETURN_HOSTS.has(url.hostname)) throw new Error("Return URL not allowed");
+  return url;
+}
+
 async function handlePayLink(admin: any, body: { action: string; offer_id: string; token: string; return_url?: string; order_id?: string }) {
   const { data: offer } = await admin.from("client_package_offers")
     .select("id, company_id, employer_user_id, product_key, package_name, amount_cents, credit_limit, duration_months, starts_at, expires_at, offer_expires_at, status, paid_at, pay_token, receipt_emails, companies(name)")
@@ -182,7 +190,7 @@ async function handlePayLink(admin: any, body: { action: string; offer_id: strin
       if (prev.ok && ["CREATED", "APPROVED", "PAYER_ACTION_REQUIRED"].includes(o.status)) return json({ order_id: o.id });
     }
     const product = offerProduct(offer);
-    const ret = new URL(body.return_url!);
+    const ret = safeReturnUrl(body.return_url!);
     const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
       method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "PayPal-Request-Id": crypto.randomUUID() },
       body: JSON.stringify({ intent: "CAPTURE",
@@ -350,7 +358,7 @@ Deno.serve(async (req) => {
         ? PAYPAL_PRODUCTS.urgent_hiring
         : null;
       const totalCents = product.amount_cents + (urgentAddon?.amount_cents ?? 0);
-      const ret = new URL(body.return_url);
+      const ret = safeReturnUrl(body.return_url);
       const res = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -431,7 +439,7 @@ Deno.serve(async (req) => {
       }
 
       const planId = await ensurePaypalPlan(admin, token, product);
-      const ret = new URL(body.return_url);
+      const ret = safeReturnUrl(body.return_url);
       const res = await fetch(`${PAYPAL_BASE}/v1/billing/subscriptions`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },

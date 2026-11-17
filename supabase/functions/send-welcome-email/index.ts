@@ -30,7 +30,7 @@ serve(async (req) => {
       });
     }
 
-    console.log(`Sending welcome email to ${record.email}`);
+    console.log("Sending welcome email");
 
     // Create email preferences for the new user
     const { error: prefsError } = await supabase
@@ -73,7 +73,7 @@ serve(async (req) => {
       throw new Error(`Failed to send welcome email: ${errorText}`);
     }
 
-    console.log(`Welcome email sent successfully to ${record.email}`);
+    console.log("Welcome email sent");
 
     return new Response(
       JSON.stringify({ success: true, message: "Welcome email sent" }),
