@@ -14,6 +14,8 @@ serve(async (req) => {
   }
 
   try {
+    const authorizationCheck = await requireAdmin(req);
+    if (!authorizationCheck.ok) return authorizationCheck.response;
     const { topic, keywords, userId, generateFacebookPost, generateInfographic } = await req.json();
 
     if (!topic || !keywords) {

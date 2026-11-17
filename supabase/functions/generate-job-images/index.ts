@@ -69,6 +69,8 @@ serve(async (req) => {
   const startTime = Date.now();
 
   try {
+    const authorizationCheck = await requireAdmin(req);
+    if (!authorizationCheck.ok) return authorizationCheck.response;
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');

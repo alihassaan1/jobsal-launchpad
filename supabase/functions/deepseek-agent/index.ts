@@ -231,6 +231,8 @@ serve(async (req) => {
   const startTime = Date.now();
 
   try {
+    const authorizationCheck = await requireAdmin(req);
+    if (!authorizationCheck.ok) return authorizationCheck.response;
     const { type, context, includeImage }: ContentRequest = await req.json();
 
     // Handle image-only generation

@@ -42,6 +42,8 @@ serve(async (req) => {
   }
 
   try {
+    const authorizationCheck = requireInternal(req);
+    if (!authorizationCheck.ok) return authorizationCheck.response;
     console.log("Starting automated blog post generation...");
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");

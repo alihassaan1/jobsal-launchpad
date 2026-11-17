@@ -12,6 +12,8 @@ serve(async (req) => {
   }
 
   try {
+    const authorizationCheck = await requireAdmin(req);
+    if (!authorizationCheck.ok) return authorizationCheck.response;
     const { taskType } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
