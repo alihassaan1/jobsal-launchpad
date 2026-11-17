@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { requireAdmin } from "../_shared/auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,7 +13,15 @@ serve(async (req) => {
   }
 
   try {
+    const authorizationCheck = await requireAdmin(req);
+    if (!authorizationCheck.ok) return authorizationCheck.response;
     const { sourceUrl, companyId } = await req.json();
+    let parsedSource: URL;
+    try { parsedSource = new URL(String(sourceUrl)); } catch { return new Response(JSON.stringify({ error: 'Invalid URL' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }); }
+    const allowedHosts = ['duapune.com', 'www.duapune.com', 'karriere.al', 'www.karriere.al'];
+    if (parsedSource.protocol !== 'https:' || !allowedHosts.includes(parsedSource.hostname)) {
+      return new Response(JSON.stringify({ error: 'Source not allowed' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -28,7 +37,7 @@ serve(async (req) => {
 
     // ⚠️ WARNING: Web scraping may violate Terms of Service
     // This is for educational purposes only. Always get permission first.
-    const pageResponse = await fetch(sourceUrl, {
+    const pageResponse = await fetch(parsedSource.toString(), { redirect: 'error',
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; JobsAlBot/1.0; +https://jobs.al/bot)'
       }

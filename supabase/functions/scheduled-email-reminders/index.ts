@@ -219,15 +219,15 @@ serve(async (req) => {
 
         if (sendEmailResponse.ok) {
           results.emailsSent++;
-          console.log(`Sent ${templateToSend} to ${profile.email}`);
+          console.log(`Sent ${templateToSend}`);
         } else {
           const errorText = await sendEmailResponse.text();
-          results.errors.push(`Failed to send to ${profile.email}: ${errorText}`);
+          results.errors.push(`Failed to send ${templateToSend}`);
         }
 
         results.processed++;
       } catch (userError: any) {
-        results.errors.push(`Error processing ${profile.email}: ${userError.message}`);
+        results.errors.push(`Error processing a recipient`);
       }
     }
 

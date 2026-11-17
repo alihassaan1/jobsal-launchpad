@@ -62,3 +62,16 @@ export function requireInternal(req: Request): AuthResult {
 
   return denied(401, "Internal authentication required");
 }
+
+export async function requireUser(req: Request): Promise<AuthResult> {
+  const authorization = req.headers.get("Authorization") ?? "";
+  if (!authorization.startsWith("Bearer ")) return denied(401, "Authentication required");
+  const token = authorization.slice(7).trim();
+  const url = Deno.env.get("SUPABASE_URL");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !serviceRoleKey) throw new Error("Authentication service is not configured");
+  const admin = createClient(url, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
+  const { data: { user }, error } = await admin.auth.getUser(token);
+  if (error || !user) return denied(401, "Invalid or expired session");
+  return { ok: true, userId: user.id };
+}

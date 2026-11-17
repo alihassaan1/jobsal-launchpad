@@ -157,9 +157,9 @@ serve(async (req) => {
 
           if (sendResponse.ok) {
             results.jobMatchAlertsSent++;
-            console.log(`Sent job-match to ${profile.email} (${matchedJobs.length} matches)`);
+            console.log(`Sent job-match (${matchedJobs.length} matches)`);
           } else {
-            results.errors.push(`Failed job-match for ${profile.email}`);
+            results.errors.push(`Failed job-match`);
           }
         } catch (err: any) {
           results.errors.push(`Error processing user ${userId}: ${err.message}`);
