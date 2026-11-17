@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { corsHeaders } from "npm:@supabase/supabase-js@2.119.0/cors";
 import { requireAdmin } from "../_shared/auth.ts";
 import { generateBlogPost } from "../_shared/generateBlogPost.ts";
 
