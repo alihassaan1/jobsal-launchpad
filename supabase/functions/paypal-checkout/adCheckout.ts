@@ -8,6 +8,15 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
 type AdItem = { product_id: string; job_id?: string | null };
 type Product = { id: string; slug: string; product_type: string; price: number; duration_days: number; currency: string };
 
+export function isConfirmedAdCapture(capture: {
+  status?: string;
+  purchase_units?: Array<{ payments?: { captures?: Array<{ status?: string; amount?: { currency_code?: string; value?: string } }> } }>;
+}, amountCents: number): boolean {
+  const captured = capture.purchase_units?.[0]?.payments?.captures?.[0];
+  return capture.status === "COMPLETED" && captured?.status === "COMPLETED"
+    && captured.amount?.value === (amountCents / 100).toFixed(2) && captured.amount?.currency_code === "EUR";
+}
+
 export function allocateDiscount(prices: number[], requestedDiscount: number): number[] {
   const subtotal = prices.reduce((sum, price) => sum + price, 0);
   let remaining = Math.min(Math.max(0, Math.round(requestedDiscount)), subtotal);
@@ -139,10 +148,7 @@ export async function handleAdCheckout(options: {
     const read = await fetch(`${paypalBase}/v2/checkout/orders/${body.order_id}`, { headers: { Authorization: `Bearer ${token}` } });
     if (read.ok) capture = await read.json();
   }
-  const captured = capture.purchase_units?.[0]?.payments?.captures?.[0];
-  const paid = capture.status === "COMPLETED" && captured?.status === "COMPLETED"
-    && captured?.amount?.value === money(row.amount_cents) && captured?.amount?.currency_code === "EUR";
-  if (!paid) return json({ error: "Payment was not completed" }, 402);
+  if (!isConfirmedAdCapture(capture, row.amount_cents)) return json({ error: "Payment was not completed" }, 402);
   const { data: activated, error: settlementError } = await admin.rpc("settle_ad_order", { _order_id: row.id });
   if (settlementError) return json({ error: "Payment received; ad activation is pending. Contact info@jobs.al with your order ID." }, 500);
   return json({ status: "completed", activated });
