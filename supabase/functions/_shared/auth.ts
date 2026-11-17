@@ -47,7 +47,7 @@ export async function requireAdmin(req: Request): Promise<AuthResult> {
   return { ok: true, userId: user.id };
 }
 
-export function requireInternal(req: Request): AuthResult {
+export async function requireInternal(req: Request, task?: string): Promise<AuthResult> {
   const internalSecret = Deno.env.get("INTERNAL_CRON_SECRET");
   const suppliedSecret = req.headers.get("x-internal-secret") ?? "";
   if (internalSecret && suppliedSecret && suppliedSecret === internalSecret) {
@@ -58,6 +58,22 @@ export function requireInternal(req: Request): AuthResult {
   const authorization = req.headers.get("Authorization") ?? "";
   if (serviceRoleKey && authorization === `Bearer ${serviceRoleKey}`) {
     return { ok: true };
+  }
+
+  // pg_cron cannot read Edge Function secrets. It can instead mint a short-lived,
+  // single-use token inside Postgres and send it in the same private header.
+  if (task && suppliedSecret) {
+    const url = Deno.env.get("SUPABASE_URL");
+    if (url && serviceRoleKey) {
+      const admin = createClient(url, serviceRoleKey, {
+        auth: { autoRefreshToken: false, persistSession: false },
+      });
+      const { data, error } = await admin.rpc("consume_internal_cron_token", {
+        _token: suppliedSecret,
+        _task: task,
+      });
+      if (!error && data === true) return { ok: true };
+    }
   }
 
   return denied(401, "Internal authentication required");
