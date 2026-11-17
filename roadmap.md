@@ -1,3 +1,9 @@
+# Current verification and reliability round
+- [ ] Re-enable daily job alerts, email reminders and PayPal subscription sync with internal authentication; send queued welcome emails only to sign-ups from the last 7 days; keep both AI content schedules paused
+- [ ] Reproduce and fix job-seeker registration on desktop and mobile; verify sign-up, CV creation and job application end to end
+- [ ] Prevent public company-view inflation and verify job/company views increment once per visit
+- [ ] Test advertising checkout and verify confirmed PayPal capture activates the purchased ad
+
 # Urgent backend and rendering security
 - [x] Trace callers and enforce shared admin/internal authorization on 14 endpoints
 - [x] Escape email template data and restrict dynamic link URLs
