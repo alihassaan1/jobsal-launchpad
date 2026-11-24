@@ -3343,6 +3343,52 @@ export type Database = {
       }
     }
     Functions: {
+      admin_application_counts: {
+        Args: never
+        Returns: {
+          company_id: string
+          job_id: string
+          total: number
+        }[]
+      }
+      admin_application_documents: {
+        Args: { _application_id: string }
+        Returns: {
+          doc_type: Database["public"]["Enums"]["user_document_type"]
+          file_name: string
+          file_path: string
+          id: string
+          mime_type: string
+          title: string
+        }[]
+      }
+      admin_list_applications: {
+        Args: never
+        Returns: {
+          ai_match_score: number
+          applicant_email: string
+          applicant_id: string
+          applicant_linkedin: string
+          applicant_location: string
+          applicant_name: string
+          applicant_phone: string
+          applicant_signed_up: string
+          company_id: string
+          company_name: string
+          company_slug: string
+          cover_letter: string
+          created_at: string
+          extracted_data: Json
+          id: string
+          job_id: string
+          job_slug: string
+          job_title: string
+          notes: string
+          resume_url: string
+          status: Database["public"]["Enums"]["application_status"]
+          viewed_at: string
+        }[]
+      }
       become_employer: { Args: never; Returns: undefined }
       calculate_text_similarity: {
         Args: { text1: string; text2: string }

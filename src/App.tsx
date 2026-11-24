@@ -33,6 +33,7 @@ import AdminCompanies from "./pages/AdminCompanies";
 import AdminUsers from "./pages/AdminUsers";
 import AdminSettings from "./pages/AdminSettings";
 import AdminJobs from "./pages/AdminJobs";
+import AdminApplications from "./pages/AdminApplications";
 import AdminTemplates from "./pages/AdminTemplates";
 import AdminResumeBuilder from "./pages/AdminResumeBuilder";
 import AdminMarketingAgent from "./pages/AdminMarketingAgent";
@@ -115,6 +116,7 @@ const App = () => (
               <Route path="users" element={<AdminUsers />} />
               <Route path="companies" element={<AdminCompanies />} />
               <Route path="jobs" element={<AdminJobs />} />
+              <Route path="applications" element={<AdminApplications />} />
               <Route path="revenue" element={<AdminRevenue />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="marketing-agent" element={<AdminMarketingAgent />} />

@@ -23,7 +23,8 @@ import {
   Palette,
   Package,
   Ticket,
-  PanelLeft
+  PanelLeft,
+  ClipboardList
 } from "lucide-react";
 import {
   Sidebar,
@@ -85,6 +86,7 @@ const adminMenuItems: MenuGroup[] = [
       { title: "Users", url: "/admin/users", icon: Users },
       { title: "Companies", url: "/admin/companies", icon: Building2 },
       { title: "Jobs", url: "/admin/jobs", icon: Briefcase },
+      { title: "Applications", url: "/admin/applications", icon: ClipboardList },
     ]
   },
   {

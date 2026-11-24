@@ -26,3 +26,7 @@ export function downloadCsv(csv: string, filename: string) {
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
+
+export function rowsToCsv(rows: unknown[][]): string {
+  return "\uFEFF" + rows.map((r) => r.map(esc).join(",")).join("\r\n");
+}

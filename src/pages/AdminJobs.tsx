@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,15 @@ export default function AdminJobs() {
 
   useEffect(() => {
     fetchJobs();
+  }, []);
+
+  const [appCounts, setAppCounts] = useState<Record<string, number>>({});
+  useEffect(() => {
+    (supabase.rpc as any)("admin_application_counts").then(({ data }: any) => {
+      const m: Record<string, number> = {};
+      (data || []).forEach((r: any) => { m[r.job_id] = Number(r.total); });
+      setAppCounts(m);
+    });
   }, []);
 
   const fetchJobs = async () => {
@@ -218,7 +228,7 @@ export default function AdminJobs() {
                             <Badge variant="outline">{job.category}</Badge>
                           </TableCell>
                           <TableCell>{job.location}</TableCell>
-                          <TableCell>{job.applications_count || 0}</TableCell>
+                          <TableCell><Link to={`/admin/applications?job=${job.id}`} className="text-primary hover:underline">{appCounts[job.id] ?? 0}</Link></TableCell>
                           <TableCell>
                             <div className="flex gap-2">
                               {job.is_active ? (

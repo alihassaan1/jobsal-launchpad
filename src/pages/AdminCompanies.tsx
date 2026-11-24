@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,14 @@ export default function AdminCompanies() {
   const { user } = useAuth();
   const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [companyAppCounts, setCompanyAppCounts] = useState<Record<string, number>>({});
+  useEffect(() => {
+    (supabase.rpc as any)("admin_application_counts").then(({ data }: any) => {
+      const m: Record<string, number> = {};
+      (data || []).forEach((r: any) => { if (r.company_id) m[r.company_id] = (m[r.company_id] || 0) + Number(r.total); });
+      setCompanyAppCounts(m);
+    });
+  }, []);
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
@@ -511,6 +520,7 @@ export default function AdminCompanies() {
                   <TableHead>Status</TableHead>
                   <TableHead>Package</TableHead>
                   <TableHead>Active Jobs</TableHead>
+                  <TableHead>Applications</TableHead>
                   <TableHead>Stats</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -567,6 +577,9 @@ export default function AdminCompanies() {
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{company.jobs_count || 0}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      {company.is_orphan_employer ? <span className="text-xs text-muted-foreground">—</span> : <Link to={`/admin/applications?company=${company.id}`} className="text-primary hover:underline">{companyAppCounts[company.id] ?? 0}</Link>}
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
