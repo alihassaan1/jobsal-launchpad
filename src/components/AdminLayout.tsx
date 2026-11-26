@@ -18,7 +18,6 @@ import {
   Bot,
   Megaphone,
   Activity,
-  PenTool,
   FileCode,
   Palette,
   Package,
@@ -126,25 +125,22 @@ const adminMenuItems: MenuGroup[] = [
         icon: FileText,
         subItems: [
           { title: "All Posts", url: "/admin/blog", icon: FileText },
-          { title: "Content Generator", url: "/admin/content-generator", icon: PenTool },
         ]
       },
       { 
         title: "AI Agent", 
-        url: "/admin/ai-agent", 
+        url: "/admin/ai-agent/logs", 
         icon: Bot,
         subItems: [
-          { title: "Dashboard", url: "/admin/ai-agent", icon: LayoutDashboard },
           { title: "API Logs", url: "/admin/ai-agent/logs", icon: FileCode },
           { title: "Analytics", url: "/admin/ai-agent/analytics", icon: Activity },
         ]
       },
       { 
         title: "Marketing", 
-        url: "/admin/marketing-agent", 
+        url: "/admin/emails", 
         icon: Megaphone,
         subItems: [
-          { title: "Outreach Agent", url: "/admin/marketing-agent", icon: Bot },
           { title: "Email Campaigns", url: "/admin/emails", icon: Mail },
         ]
       },

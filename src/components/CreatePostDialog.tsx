@@ -21,10 +21,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Sparkles, FileText, Loader2, ExternalLink, Facebook, Instagram } from "lucide-react";
+import { FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import RichTextEditor from "@/components/RichTextEditor";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface CreatePostDialogProps {
   open: boolean;
@@ -44,18 +43,8 @@ const CATEGORIES = [
 ];
 
 export function CreatePostDialog({ open, onOpenChange, onSuccess, userId }: CreatePostDialogProps) {
-  const [activeTab, setActiveTab] = useState<"ai" | "manual">("ai");
+  const [activeTab, setActiveTab] = useState<"ai" | "manual">("manual");
   
-  // AI Generation State
-  const [blogTopic, setBlogTopic] = useState("");
-  const [blogKeywords, setBlogKeywords] = useState("");
-  const [generateFacebookPost, setGenerateFacebookPost] = useState(true);
-  const [generateInfographic, setGenerateInfographic] = useState(false);
-  const [isGeneratingBlog, setIsGeneratingBlog] = useState(false);
-  const [generatedBlogSlug, setGeneratedBlogSlug] = useState<string | null>(null);
-  const [generatedFacebookPost, setGeneratedFacebookPost] = useState<string | null>(null);
-  const [generatedInfographic, setGeneratedInfographic] = useState<string | null>(null);
-
   // Manual Creation State
   const [formData, setFormData] = useState({
     title: '',
@@ -72,66 +61,6 @@ export function CreatePostDialog({ open, onOpenChange, onSuccess, userId }: Crea
     meta_description: ''
   });
   const [isCreating, setIsCreating] = useState(false);
-
-  const handleAIGenerate = async () => {
-    if (!blogTopic.trim() || !blogKeywords.trim()) {
-      toast.error("Please provide both topic and keywords");
-      return;
-    }
-
-    setIsGeneratingBlog(true);
-    setGeneratedBlogSlug(null);
-    setGeneratedFacebookPost(null);
-    setGeneratedInfographic(null);
-
-    try {
-      // Use DeepSeek agent with human-style writing and API logging
-      const { data, error } = await supabase.functions.invoke('deepseek-agent', {
-        body: {
-          action: 'generate_blog',
-          topic: blogTopic,
-          keywords: blogKeywords.split(',').map(k => k.trim()),
-          userId: userId,
-          options: {
-            generateFacebookPost,
-            generateInfographic,
-            humanStyle: true // Enable human-style writing
-          }
-        }
-      });
-
-      if (error) throw error;
-
-      if (data?.slug) {
-        setGeneratedBlogSlug(data.slug);
-        toast.success("Blog post generated with human-style writing!");
-        
-        if (data.facebookPost) {
-          setGeneratedFacebookPost(data.facebookPost);
-        }
-        if (data.infographicUrl) {
-          setGeneratedInfographic(data.infographicUrl);
-        }
-
-        // Reset form
-        setBlogTopic("");
-        setBlogKeywords("");
-        
-        // Refresh and close after short delay
-        setTimeout(() => {
-          onSuccess();
-          onOpenChange(false);
-        }, 2000);
-      } else if (data?.error) {
-        throw new Error(data.error);
-      }
-    } catch (error: any) {
-      console.error('Error generating blog post:', error);
-      toast.error(error.message || "Failed to generate blog post");
-    } finally {
-      setIsGeneratingBlog(false);
-    }
-  };
 
   const handleManualCreate = async () => {
     if (!formData.title.trim() || !formData.content.trim()) {
@@ -204,126 +133,17 @@ export function CreatePostDialog({ open, onOpenChange, onSuccess, userId }: Crea
         <DialogHeader>
           <DialogTitle>Create New Blog Post</DialogTitle>
           <DialogDescription>
-            Choose between AI-generated content or manual creation
+            Write and publish a blog post
           </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "ai" | "manual")} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="ai" className="gap-2">
-              <Sparkles className="h-4 w-4" />
-              AI Generate
-            </TabsTrigger>
+          <TabsList className="grid w-full grid-cols-1">
             <TabsTrigger value="manual" className="gap-2">
               <FileText className="h-4 w-4" />
               Manual Create
             </TabsTrigger>
           </TabsList>
-
-          {/* AI Generation Tab */}
-          <TabsContent value="ai" className="space-y-4 mt-4">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="topic">Topic</Label>
-                <Input
-                  id="topic"
-                  placeholder="e.g., Top Skills for Tech Jobs in Albania 2025"
-                  value={blogTopic}
-                  onChange={(e) => setBlogTopic(e.target.value)}
-                  disabled={isGeneratingBlog}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="keywords">Keywords (comma-separated)</Label>
-                <Input
-                  id="keywords"
-                  placeholder="e.g., tech jobs Albania, programming skills"
-                  value={blogKeywords}
-                  onChange={(e) => setBlogKeywords(e.target.value)}
-                  disabled={isGeneratingBlog}
-                />
-              </div>
-
-              <div className="flex items-center gap-6">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="facebook"
-                    checked={generateFacebookPost}
-                    onCheckedChange={(checked) => setGenerateFacebookPost(checked as boolean)}
-                    disabled={isGeneratingBlog}
-                  />
-                  <Label htmlFor="facebook" className="flex items-center gap-2 cursor-pointer">
-                    <Facebook className="h-4 w-4 text-blue-600" />
-                    Facebook Post
-                  </Label>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="infographic"
-                    checked={generateInfographic}
-                    onCheckedChange={(checked) => setGenerateInfographic(checked as boolean)}
-                    disabled={isGeneratingBlog}
-                  />
-                  <Label htmlFor="infographic" className="flex items-center gap-2 cursor-pointer">
-                    <Instagram className="h-4 w-4 text-pink-600" />
-                    Generate Infographic
-                  </Label>
-                </div>
-              </div>
-
-              <Button
-                onClick={handleAIGenerate}
-                disabled={isGeneratingBlog || !blogTopic.trim() || !blogKeywords.trim()}
-                className="w-full"
-                size="lg"
-              >
-                {isGeneratingBlog ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Generate Blog Post
-                  </>
-                )}
-              </Button>
-
-              {/* Success Messages */}
-              {generatedBlogSlug && (
-                <Alert className="bg-green-50 border-green-200">
-                  <AlertDescription className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">✓ Blog post created!</span>
-                      <a
-                        href={`/blog/${generatedBlogSlug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline flex items-center gap-1"
-                      >
-                        View Post <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </div>
-                    {generatedFacebookPost && (
-                      <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
-                        <p className="text-xs font-semibold mb-1">Facebook Post:</p>
-                        <p className="text-sm">{generatedFacebookPost}</p>
-                      </div>
-                    )}
-                    {generatedInfographic && (
-                      <div className="mt-2">
-                        <p className="text-xs font-semibold mb-1">Infographic:</p>
-                        <img src={generatedInfographic} alt="Generated infographic" className="max-w-xs rounded border" />
-                      </div>
-                    )}
-                  </AlertDescription>
-                </Alert>
-              )}
-            </div>
-          </TabsContent>
 
           {/* Manual Creation Tab */}
           <TabsContent value="manual" className="space-y-4 mt-4">

@@ -17,7 +17,6 @@ export const translations = {
   'nav.myApplications': { sq: 'Aplikimet e Mia', en: 'My Applications' },
   'nav.myResumes': { sq: 'CV-të e Mia', en: 'My Resumes' },
   'nav.signOut': { sq: 'Dil', en: 'Sign Out' },
-  'nav.aiRecommendedJobs': { sq: 'Pune të Rekomanduara nga AI', en: 'AI Recommended Jobs' },
 
   // Hero Section
   'hero.title': { sq: 'Gjej Punën e Ëndrrave në', en: 'Find Your Dream Job in' },

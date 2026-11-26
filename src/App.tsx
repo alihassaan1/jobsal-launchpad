@@ -36,14 +36,10 @@ import AdminJobs from "./pages/AdminJobs";
 import AdminApplications from "./pages/AdminApplications";
 import AdminTemplates from "./pages/AdminTemplates";
 import AdminResumeBuilder from "./pages/AdminResumeBuilder";
-import AdminMarketingAgent from "./pages/AdminMarketingAgent";
-import AdminContentGenerator from "./pages/AdminContentGenerator";
-import AdminAIAgent from "./pages/AdminAIAgent";
 import AdminAIAgentLogs from "./pages/AdminAIAgentLogs";
 import AdminAIAgentAnalytics from "./pages/AdminAIAgentAnalytics";
 import EmployerAnalytics from "./pages/EmployerAnalytics";
 import EmployerSubscription from "./pages/EmployerSubscription";
-import RecommendedJobs from "./pages/RecommendedJobs";
 import Pricing from "./pages/Pricing";
 import ResumeBuilderLanding from "./pages/ResumeBuilderLanding";
 import ResumeBuilderLandingAL from "./pages/ResumeBuilderLandingAL";
@@ -119,9 +115,7 @@ const App = () => (
               <Route path="applications" element={<AdminApplications />} />
               <Route path="revenue" element={<AdminRevenue />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
-              <Route path="marketing-agent" element={<AdminMarketingAgent />} />
-              <Route path="content-generator" element={<AdminContentGenerator />} />
-              <Route path="ai-agent" element={<AdminAIAgent />} />
+              <Route path="ai-agent" element={<Navigate to="/admin/ai-agent/logs" replace />} />
               <Route path="ai-agent/logs" element={<AdminAIAgentLogs />} />
               <Route path="ai-agent/analytics" element={<AdminAIAgentAnalytics />} />
               <Route path="blog" element={<AdminBlog />} />
@@ -147,7 +141,7 @@ const App = () => (
             <Route path="/pay/:offerId" element={<PayPackage />} />
             <Route path="/employer/talent" element={<EmployerTalentPool />} />
             <Route path="/candidate/visibility" element={<CandidateVisibility />} />
-            <Route path="/recommended-jobs" element={<RecommendedJobs />} />
+            <Route path="/recommended-jobs" element={<Navigate to="/jobs" replace />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/ai-resume-builder" element={<ResumeBuilderLanding />} />
             <Route path="/resume-builder-al" element={<ResumeBuilderLandingAL />} />
