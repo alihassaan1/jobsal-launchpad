@@ -3,52 +3,10 @@ project_id = "vbnrmpudzcxjfdytlgks"
 [functions.enhance-resume]
 verify_jwt = true
 
-[functions.parse-resume]
-verify_jwt = true
-
-[functions.match-jobs]
-verify_jwt = true
-
-[functions.match-candidates]
-verify_jwt = true
-
-[functions.generate-blog-post]
-verify_jwt = false
-
-[functions.auto-generate-blog]
-verify_jwt = false
-
-[functions.scrape-jobs]
-verify_jwt = true
-
-[functions.marketing-outreach]
-verify_jwt = false
-
-[functions.generate-seo-content]
-verify_jwt = false
-
-[functions.scheduled-content-generator]
-verify_jwt = false
-
 [functions.send-email]
 verify_jwt = false
 
 [functions.scheduled-email-reminders]
-verify_jwt = false
-
-[functions.send-welcome-email]
-verify_jwt = false
-
-[functions.deepseek-agent]
-verify_jwt = false
-
-[functions.scheduled-ai-content]
-verify_jwt = false
-
-[functions.generate-job-images]
-verify_jwt = false
-
-[functions.generate-blog-images]
 verify_jwt = false
 
 [functions.scheduled-job-alerts]

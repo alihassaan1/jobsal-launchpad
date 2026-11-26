@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Eye, Calendar, Loader2, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown, AlertTriangle } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, Calendar, Loader2, ArrowUpDown, ArrowUp, ArrowDown, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { EditPostDialog } from "@/components/EditPostDialog";
@@ -178,24 +178,6 @@ const AdminBlog = () => {
     });
   };
 
-  const runScheduledGenerator = async () => {
-    toast.info("Starting content generation...");
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-seo-content', { body: { action: 'generate_blog', topic: 'Career opportunities in Albania' } });
-      if (error) throw error;
-      
-      if (data?.success) {
-        toast.success(`Generated: ${data.result?.title || 'New content'}`);
-        fetchPosts();
-      } else {
-        toast.info(data?.message || 'Content generation completed');
-      }
-    } catch (error: any) {
-      console.error('Generation error:', error);
-      toast.error(error.message || 'Failed to generate content');
-    }
-  };
-
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -204,10 +186,6 @@ const AdminBlog = () => {
           <p className="text-muted-foreground mt-1">Create, edit, and manage blog posts</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={runScheduledGenerator}>
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Generate Content
-          </Button>
           <Button onClick={() => setCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             New Post

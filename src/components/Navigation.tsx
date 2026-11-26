@@ -18,7 +18,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { LogOut, User, Sparkles, Bookmark, FileText, Menu } from "lucide-react";
+import { LogOut, User, Bookmark, FileText, Menu } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navigation() {
@@ -104,10 +104,6 @@ export default function Navigation() {
                   )}
                   {userRole === 'job_seeker' && (
                     <>
-                      <DropdownMenuItem onClick={() => navigate('/recommended-jobs')}>
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        {t('nav.aiRecommendedJobs')}
-                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/my-applications')}>
                         {t('nav.myApplications')}
                       </DropdownMenuItem>
@@ -192,7 +188,6 @@ export default function Navigation() {
                       )}
                       {userRole === 'job_seeker' && (
                         <>
-                          <SheetClose asChild><Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/recommended-jobs')}><Sparkles className="h-4 w-4" />{t('nav.aiRecommendedJobs')}</Button></SheetClose>
                           <SheetClose asChild><Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/saved-jobs')}><Bookmark className="h-4 w-4" />Saved Jobs</Button></SheetClose>
                           <SheetClose asChild><Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/my-resumes')}>{t('nav.myResumes')}</Button></SheetClose>
                           <SheetClose asChild><Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/my-documents')}><FileText className="h-4 w-4" />My Documents</Button></SheetClose>
