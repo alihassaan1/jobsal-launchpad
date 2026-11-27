@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
+import { button, h1, p, wrapEmail } from "../_shared/emailLayout.ts";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -81,7 +82,15 @@ Deno.serve(async (req) => {
         from: "Jobs.al <info@jobs.al>",
         to: [email],
         subject: "Confirm your Jobs.al account / Konfirmo llogarinë",
-        html: `<!doctype html><html><body style="margin:0;background:#f7f7f8;font-family:Arial,sans-serif;color:#18181b"><div style="max-width:600px;margin:0 auto;padding:32px 16px"><div style="background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:32px"><div style="color:#E8272C;font-size:24px;font-weight:700;margin-bottom:24px">Jobs.al</div><p>Përshëndetje ${safeName},</p><p>Your ${accountLabel} account has been created. Confirm your email to activate it.</p><p>Llogaria juaj u krijua. Konfirmoni emailin për ta aktivizuar.</p><p style="margin:32px 0"><a href="${confirmationUrl}" style="display:inline-block;background:#E8272C;color:#fff;text-decoration:none;padding:14px 24px;border-radius:8px;font-weight:700">Confirm account / Konfirmo llogarinë</a></p><p style="font-size:13px;color:#52525b">If the button does not work, open this direct link:</p><p style="font-size:13px;word-break:break-all"><a href="${confirmationUrl}" style="color:#E8272C">${confirmationUrl}</a></p></div></div></body></html>`,
+        html: wrapEmail(
+          h1("Konfirmoni llogarinë tuaj", "Confirm your Jobs.al account")
+          + p(`Përshëndetje ${safeName},`)
+          + p("Llogaria juaj u krijua. Konfirmoni emailin për ta aktivizuar.")
+          + p(`<em>Your ${accountLabel} account has been created. Confirm your email to activate it.</em>`, true)
+          + button("Konfirmo llogarinë / Confirm account", confirmationUrl)
+          + p(`Nëse butoni nuk funksionon, hapni këtë lidhje / If the button does not work, open this link:<br><a href="${confirmationUrl}" style="color:#E9282B;word-break:break-all;">${confirmationUrl}</a>`, true),
+          { preheader: "Konfirmoni emailin për të aktivizuar llogarinë tuaj në Jobs.al.", signOff: false },
+        ),
       }),
     });
     if (!emailResponse.ok) {

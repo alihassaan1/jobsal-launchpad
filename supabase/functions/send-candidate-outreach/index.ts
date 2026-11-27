@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { button, h1, link, note, p, wrapEmail } from "../_shared/emailLayout.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -94,7 +95,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           from: "Jobs.al <info@jobs.al>",
           to: candidate.email,
-          subject: `${subject} — via ${company?.name ?? "Jobs.al"}`,
+          subject: `${subject} (via ${company?.name ?? "Jobs.al"})`,
           html,
           reply_to: reply_to ?? undefined,
         }),
@@ -118,18 +119,17 @@ Deno.serve(async (req) => {
   }
 });
 
-function renderEmail(p: { candidateName: string; companyName: string; subject: string; message: string; jobLink: string | null }) {
-  const safe = (s: string) => s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  return `<!doctype html><html><body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;background:#f5f5f5;margin:0;padding:24px">
-<table align="center" width="600" style="background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e5e5e5">
-<tr><td style="background:#E8272C;padding:20px;color:#fff;font-weight:700;font-size:18px">jobs.al</td></tr>
-<tr><td style="padding:24px">
-<p style="color:#333">Hi ${safe(p.candidateName) || "there"},</p>
-<p style="color:#333"><strong>${safe(p.companyName)}</strong> reached out to you on Jobs.al:</p>
-<div style="background:#fafafa;border-left:3px solid #E8272C;padding:14px;margin:16px 0;color:#333;white-space:pre-wrap">${safe(p.message)}</div>
-${p.jobLink ? `<p><a href="${p.jobLink}" style="background:#E8272C;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;display:inline-block">View the job</a></p>` : ""}
-<p style="color:#666;font-size:12px;margin-top:24px">You're receiving this because you opted in to be discovered by employers on Jobs.al. <a href="https://jobs.al/candidate/visibility">Manage your visibility settings</a>.</p>
-</td></tr></table></body></html>`;
+function renderEmail(d: { candidateName: string; companyName: string; subject: string; message: string; jobLink: string | null }) {
+  const safe = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return wrapEmail(
+    h1(`Mesazh nga ${safe(d.companyName)}`, safe(d.subject))
+    + p(`Hi ${safe(d.candidateName) || "there"},`)
+    + p(`<b>${safe(d.companyName)}</b> reached out to you on Jobs.al:`)
+    + note(`<div style="white-space:pre-wrap;">${safe(d.message)}</div>`)
+    + (d.jobLink ? button("View the job", d.jobLink) : "")
+    + p(`You're receiving this because you opted in to be discovered by employers on Jobs.al. ${link("Manage your visibility settings", "https://jobs.al/candidate/visibility")}.`, true),
+    { preheader: `${safe(d.companyName)} sent you a message on Jobs.al.`, unsubscribeUrl: "https://jobs.al/candidate/visibility", signOff: false },
+  );
 }
 
 function json(body: unknown, status = 200) {
